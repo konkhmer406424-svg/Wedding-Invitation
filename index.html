@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>កម្មវិធីបង្កើតធៀបអញ្ជើញ (ខ្មែរ/English)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Moul&family=Battambang:wght@400;700&family=Suwannaphum&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --b-bg:#F4F2EF; --b-panel:#FFFFFF; --b-ink:#2B2620; --b-sub:#726A5F;
+  --b-line:#E4E0D8; --b-accent:#8A5A3A; --b-accent-ink:#FFFFFF;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --b-bg:#1B1815; --b-panel:#242019; --b-ink:#EFEAE2; --b-sub:#A79E8F;
+    --b-line:#3A342C; --b-accent:#C98A5A; --b-accent-ink:#1B1815;
+  }
+}
+:root[data-theme="dark"]{
+  --b-bg:#1B1815; --b-panel:#242019; --b-ink:#EFEAE2; --b-sub:#A79E8F;
+  --b-line:#3A342C; --b-accent:#C98A5A; --b-accent-ink:#1B1815;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--b-bg);color:var(--b-ink);font-family:'Kantumruy Pro',sans-serif;}
+.app{display:grid;grid-template-columns:360px 6px 1fr;height:100vh;}
+.resizer{background:var(--b-line);cursor:col-resize;position:relative;}
+.resizer:hover,.resizer.active{background:var(--b-accent);}
+.resizer::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:36px;border-radius:2px;background:var(--b-panel);}
+.panel{background:var(--b-panel);border-right:1px solid var(--b-line);overflow-y:auto;padding:22px 22px 80px;}
+.brand{font-size:15px;font-weight:600;margin:0 0 4px;}
+.brand-sub{font-size:12.5px;color:var(--b-sub);margin:0 0 22px;}
+fieldset{border:none;padding:0;margin:0 0 26px;}
+legend{font-size:12.5px;font-weight:600;color:var(--b-sub);text-transform:uppercase;letter-spacing:.04em;padding:0 0 10px;width:100%;border-bottom:1px solid var(--b-line);margin-bottom:14px;}
+legend.sub{font-size:11px;text-transform:none;letter-spacing:0;border-bottom:none;padding:0 0 8px;margin-bottom:10px;color:var(--b-accent);font-weight:600;}
+label{display:block;font-size:13px;color:var(--b-sub);margin:0 0 5px;}
+.field{margin-bottom:14px;}
+input[type=text],input[type=date],input[type=time],textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--b-line);border-radius:6px;
+  background:var(--b-bg);color:var(--b-ink);font-family:inherit;font-size:14px;
+}
+textarea{resize:vertical;min-height:64px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.theme-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.theme-card{border:2px solid var(--b-line);border-radius:8px;padding:8px;cursor:pointer;text-align:center;}
+.theme-card.active{border-color:var(--b-accent);}
+.theme-swatch{height:34px;border-radius:5px;margin-bottom:6px;}
+.theme-card span{font-size:11.5px;}
+.effect-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.effect-card{border:2px solid var(--b-line);border-radius:8px;padding:10px 8px;cursor:pointer;text-align:center;}
+.effect-card.active{border-color:var(--b-accent);}
+.effect-icon{font-size:20px;margin-bottom:4px;}
+.effect-card span{font-size:11.5px;display:block;}
+.template-row{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;}
+.template-chip{border:1px solid var(--b-line);background:var(--b-bg);color:var(--b-sub);font-size:11.5px;padding:5px 10px;border-radius:999px;cursor:pointer;}
+.template-chip:hover{border-color:var(--b-accent);color:var(--b-accent);}
+.template-preview-wrap{margin-bottom:8px;}
+.tpl-toggle-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--b-line);background:var(--b-bg);color:var(--b-accent);font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;cursor:pointer;margin-bottom:6px;}
+.tpl-toggle-btn:hover{border-color:var(--b-accent);}
+.tpl-toggle-btn.expanded{background:var(--b-accent);color:var(--b-accent-ink);}
+.template-preview-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.template-chip-lg{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;border:1px solid var(--b-line);background:var(--b-bg);border-radius:8px;padding:9px 11px;cursor:pointer;width:100%;}
+.template-chip-lg:hover{border-color:var(--b-accent);}
+.template-chip-lg.chosen{border-color:var(--b-accent);background:color-mix(in srgb, var(--b-accent) 10%, var(--b-bg));}
+.template-chip-lg .tpl-num{font-size:10.5px;font-weight:700;color:var(--b-accent);text-transform:uppercase;letter-spacing:.03em;}
+.template-chip-lg .tpl-text{font-size:12.5px;color:var(--b-ink);line-height:1.5;}
+.item-card{border:1px solid var(--b-line);border-radius:8px;padding:12px;margin-bottom:10px;}
+.tl-row{display:grid;grid-template-columns:74px 1fr 30px;gap:8px;margin-bottom:8px;align-items:center;}
+.tl-row.en-row{grid-template-columns:74px 1fr;margin-bottom:0;}
+.tl-row input{padding:7px 8px;font-size:13px;}
+.lang-tag{font-size:10.5px;color:var(--b-sub);text-transform:uppercase;letter-spacing:.04em;margin:2px 0 6px;}
+.icon-btn{background:none;border:1px solid var(--b-line);border-radius:6px;width:30px;height:34px;cursor:pointer;color:var(--b-sub);font-size:15px;}
+.add-btn{width:100%;padding:9px;border:1px dashed var(--b-line);border-radius:6px;background:none;color:var(--b-sub);font-size:13px;cursor:pointer;margin-top:2px;}
+.photo-hint{font-size:12px;color:var(--b-sub);margin:-8px 0 12px;}
+.photo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.photo-slot{aspect-ratio:4/3;border:1px solid var(--b-line);border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--b-bg);}
+.photo-slot img{width:100%;height:100%;object-fit:cover;}
+.photo-slot span{font-size:11px;color:var(--b-sub);text-align:center;padding:0 6px;}
+.photo-slot.add-tile{border:1px dashed var(--b-line);cursor:pointer;}
+.photo-slot.add-tile input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.guest-link-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--b-line);border-radius:8px;margin-bottom:6px;background:var(--b-bg);}
+.guest-link-info{flex:1;min-width:0;}
+.guest-link-name{font-size:13px;font-weight:600;color:var(--b-ink);margin-bottom:2px;}
+.guest-link-url{font-size:11px;color:var(--b-sub);word-break:break-all;}
+.copy-btn{flex-shrink:0;border:1px solid var(--b-accent);background:none;color:var(--b-accent);font-size:12px;padding:6px 11px;border-radius:6px;cursor:pointer;white-space:nowrap;}
+.copy-btn.copied{background:var(--b-accent);color:var(--b-accent-ink);border-color:var(--b-accent);}
+.copy-all-btn{width:100%;margin-top:6px;padding:10px;border-radius:7px;border:none;background:var(--b-accent);color:var(--b-accent-ink);font-size:13.5px;font-weight:600;cursor:pointer;}
+.guest-empty-hint{font-size:12.5px;color:var(--b-sub);text-align:center;padding:10px 0;margin:0;}
+.photo-clear{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:4px;width:20px;height:20px;font-size:12px;cursor:pointer;z-index:2;}
+.preview-col{display:flex;flex-direction:column;height:100vh;}
+.toolbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--b-line);gap:12px;flex-wrap:wrap;}
+.toolbar-title{font-size:13.5px;color:var(--b-sub);}
+.btn{padding:10px 20px;border-radius:999px;border:none;font-size:13.5px;cursor:pointer;font-weight:600;}
+.btn-primary{background:var(--b-accent);color:var(--b-accent-ink);}
+.frame-wrap{flex:1;overflow:auto;padding:26px;display:flex;justify-content:center;background:var(--b-bg);}
+iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);border-radius:10px;background:#fff;}
+.mobile-tabs{display:none;}
+@media(max-width:860px){
+  .app{grid-template-columns:1fr;grid-template-rows:1fr;}
+  .resizer{display:none;}
+  .panel{position:fixed;inset:0;top:52px;z-index:5;transition:transform .2s;}
+  .panel.hide{transform:translateX(-101%);}
+  .preview-col{padding-top:52px;}
+  .mobile-tabs{display:flex;position:fixed;top:0;left:0;right:0;height:52px;background:var(--b-panel);border-bottom:1px solid var(--b-line);z-index:6;}
+  .mobile-tabs button{flex:1;border:none;background:none;color:var(--b-sub);font-size:13.5px;font-weight:600;cursor:pointer;}
+  .mobile-tabs button.active{color:var(--b-accent);}
+  iframe{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-tabs">
+  <button id="tabEdit" class="active">កែប្រែ</button>
+  <button id="tabPreview">មើលសាកល្បង</button>
+</div>
+
+<div class="app">
+  <aside class="panel" id="panel">
+    <p class="brand">កម្មវិធីបង្កើតធៀបអញ្ជើញអាពាហ៍ពិពាហ៍</p>
+    <p class="brand-sub">បំពេញព័ត៌មាន ជ្រើសរើសទម្រង់ រួចទាញយកជាឯកសារ HTML (ខ្មែរ + English ជាមួយប៊ូតុងប្តូរភាសា)</p>
+
+    <fieldset>
+      <legend>ទម្រង់</legend>
+      <div class="theme-grid" id="themeGrid"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>បែបផែនចលនា (ពេលភ្ញៀវចុចមើល)</legend>
+      <div class="effect-grid" id="effectGrid"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>រូបភាពគម្រប (Cover)</legend>
+      <p class="photo-hint">រូបភាពរួម ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា</p>
+      <div class="photo-grid" id="coverGrid" style="grid-template-columns:1fr 1fr;"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>កូនកម្លោះ & កូនក្រមុំ — ខ្មែរ</legend>
+      <div class="field"><label>ឈ្មោះកូនកម្លោះ</label><input type="text" id="groomName" placeholder="ឧ. ចាន់ ដារា"></div>
+      <div class="field"><label>ឈ្មោះកូនក្រមុំ</label><input type="text" id="brideName" placeholder="ឧ. សុខ ស្រីនាង"></div>
+      <div class="field"><label>ពាក្យអញ្ជើញខ្លីៗ (Eyebrow)</label>
+        <p class="photo-hint" style="margin:-4px 0 8px;">ជ្រើសរើសគំរូខាងក្រោម ឬសរសេរខ្លួនឯងក្នុងប្រអប់</p>
+        <div class="template-row" id="tpl-eyebrow-km"></div>
+        <input type="text" id="eyebrow" placeholder="ឧ. សូមគោរពអញ្ជើញអ្នកមកចូលរួមព្រឹត្តិការណ៍ដ៏មានតម្លៃមួយនេះ"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend class="sub">Names & Headline — English</legend>
+      <div class="field"><label>Groom's Name</label><input type="text" id="groomNameEn" placeholder="e.g. Dara Chan"></div>
+      <div class="field"><label>Bride's Name</label><input type="text" id="brideNameEn" placeholder="e.g. Sreynang Sok"></div>
+      <div class="field"><label>Short Invitation Line (Eyebrow)</label>
+        <p class="photo-hint" style="margin:-4px 0 8px;">Pick a template below, or write your own in the box</p>
+        <div class="template-row" id="tpl-eyebrow-en"></div>
+        <input type="text" id="eyebrowEn" placeholder="e.g. You are cordially invited to celebrate this special day"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>ថ្ងៃ និង ម៉ោង (ប្រើរួមទាំងពីរភាសា)</legend>
+      <div class="row2">
+        <div class="field"><label>កាលបរិច្ឆេទ</label><input type="date" id="eventDate"></div>
+        <div class="field"><label>ម៉ោងចាប់ផ្តើម (សម្រាប់ការរាប់ថយក្រោយ)</label><input type="time" id="startTime"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>សារស្វាគមន៍ & ម្ចាស់ផ្ទះ — ខ្មែរ</legend>
+      <div class="field"><label>អត្ថបទស្វាគមន៍</label>
+        <p class="photo-hint" style="margin:-4px 0 8px;">ជ្រើសរើសគំរូខាងក្រោម ឬសរសេរខ្លួនឯង</p>
+        <div class="template-row" id="tpl-welcome-km"></div>
+        <textarea id="welcomeText" placeholder="សរសេរសារស្វាគមន៍ខ្លីមួយ ពណ៌នាអំពីអារម្មណ៍របស់អ្នកមុនថ្ងៃមង្គលការ"></textarea></div>
+      <div class="field"><label>ឪពុកម្តាយកូនកម្លោះ</label><input type="text" id="host1" placeholder="ឧ. លោក ... និង អ្នកនាង ..."></div>
+      <div class="field"><label>ឪពុកម្តាយកូនក្រមុំ</label><input type="text" id="host2" placeholder="ឧ. លោក ... និង អ្នកនាង ..."></div>
+    </fieldset>
+
+    <fieldset>
+      <legend class="sub">Welcome & Hosts — English</legend>
+      <div class="field"><label>Welcome Message</label>
+        <p class="photo-hint" style="margin:-4px 0 8px;">Pick a template below, or write your own</p>
+        <div class="template-row" id="tpl-welcome-en"></div>
+        <textarea id="welcomeTextEn" placeholder="Write a short welcome message describing how you feel about your big day"></textarea></div>
+      <div class="field"><label>Groom's Parents</label><input type="text" id="host1En" placeholder="e.g. Mr. ... & Mrs. ..."></div>
+      <div class="field"><label>Bride's Parents</label><input type="text" id="host2En" placeholder="e.g. Mr. ... & Mrs. ..."></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>កម្មវិធីពិធី (ខ្មែរ + English)</legend>
+      <div id="timelineList"></div>
+      <button class="add-btn" id="addTimeline" type="button">+ បន្ថែមកម្មវិធី</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>ទំនាក់ទំនង (ខ្មែរ + English, លេខទូរស័ព្ទរួម)</legend>
+      <div id="contactList"></div>
+      <button class="add-btn" id="addContact" type="button">+ បន្ថែមទំនាក់ទំនង</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>ទីតាំង — ខ្មែរ</legend>
+      <div class="field"><label>ឈ្មោះកន្លែង</label><input type="text" id="venueName" placeholder="ឧ. សាលភោជនីយដ្ឋាន ..."></div>
+      <div class="field"><label>អាសយដ្ឋាន</label><textarea id="venueAddr" placeholder="ផ្លូវ, សង្កាត់, ខណ្ឌ, រាជធានី/ខេត្ត"></textarea></div>
+    </fieldset>
+
+    <fieldset>
+      <legend class="sub">Venue — English</legend>
+      <div class="field"><label>Venue Name</label><input type="text" id="venueNameEn" placeholder="e.g. ... Restaurant"></div>
+      <div class="field"><label>Address</label><textarea id="venueAddrEn" placeholder="Street, commune, district, city/province"></textarea></div>
+      <div class="field"><label>តំណភ្ជាប់ Google Maps (ស្រេចចិត្ត — ប្រើរួមទាំងពីរភាសា)</label><input type="text" id="venueMapLink" placeholder="ទុកទទេ ប្រសិនបើចង់ឲ្យប្រព័ន្ធស្វែងរកដោយស្វ័យប្រវត្តិ"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>រូបភាព (Pre-wedding) — រួម</legend>
+      <p class="photo-hint">បញ្ចូលបានតិច-ច្រើនតាមចិត្ត (រហូតដល់ ១០ សន្លឹក) ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា</p>
+      <div class="photo-grid" id="photoGrid"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>លីងផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវ (Guest Links)</legend>
+      <p class="photo-hint" style="margin-top:-2px;">
+        បន្ទាប់ពីអ្នកបានផុសគេហទំព័រនេះលើ GitHub Pages រួច ដាក់ URL ខាងក្រោម និងឈ្មោះភ្ញៀវម្នាក់ម្តងក្នុងមួយបន្ទាត់ ដើម្បីបង្កើតលីងផ្ទាល់ខ្លួន (ភ្ញៀវម្នាក់លីងមួយ) ដែលបង្ហាញឈ្មោះគាត់ដោយស្វ័យប្រវត្តិនៅលើកាត។
+      </p>
+      <div class="field"><label>URL គេហទំព័រ (Base URL)</label>
+        <input type="text" id="baseUrl" placeholder="https://username.github.io/wedding/"></div>
+      <div class="field"><label>បញ្ជីឈ្មោះភ្ញៀវ (មួយបន្ទាត់ម្នាក់)</label>
+        <textarea id="guestNames" style="min-height:110px;" placeholder="ចាន់ សុវណ្ណា
+សុខ ស្រីពៅ
+លោក គង់ សុភាព"></textarea></div>
+      <button class="add-btn" id="genLinksBtn" type="button">បង្កើតលីងទាំងអស់</button>
+      <div id="guestLinksList" style="margin-top:12px;"></div>
+    </fieldset>
+  </aside>
+
+  <div class="resizer" id="resizer"></div>
+
+  <div class="preview-col" id="previewCol">
+    <div class="toolbar">
+      <span class="toolbar-title">មើលសាកល្បង</span>
+      <button class="btn btn-primary" id="downloadBtn">ទាញយកជា index.html</button>
+    </div>
+    <div class="frame-wrap"><iframe id="frame"></iframe></div>
+  </div>
+</div>
+
+<script>
+const THEMES = {
+  gold:{ label:"មាស", swatch:"linear-gradient(135deg,#6B2D5C,#B8912E)",
+    bg:"#FBF6F8", ink:"#3B2440", accent1:"#6B2D5C", accent2:"#B8912E",
+    card:"#FFFFFF", border:"rgba(107,45,92,0.18)", radius:"4px",
+    display:"'Moul',serif", body:"'Kantumruy Pro',sans-serif", ornate:true,
+    displayEn:"'Great Vibes',cursive", bodyEn:"'Cormorant Garamond',serif" },
+  rose:{ label:"ផ្កាកុលាប", swatch:"linear-gradient(135deg,#A8465A,#C9A227)",
+    bg:"#FFF3F0", ink:"#402530", accent1:"#A8465A", accent2:"#C9A227",
+    card:"#FFFFFF", border:"rgba(168,70,90,0.2)", radius:"4px",
+    display:"'Suwannaphum',serif", body:"'Battambang',sans-serif", ornate:true,
+    displayEn:"'Parisienne',cursive", bodyEn:"'Cormorant Garamond',serif" },
+  minimal:{ label:"សាមញ្ញ", swatch:"linear-gradient(135deg,#1F1B16,#6B6142)",
+    bg:"#F7F4EE", ink:"#1F1B16", accent1:"#1F1B16", accent2:"#6B6142",
+    card:"#FFFFFF", border:"rgba(31,27,22,0.15)", radius:"0px",
+    display:"'Battambang',serif", body:"'Kantumruy Pro',sans-serif", ornate:false,
+    displayEn:"'Playfair Display',serif", bodyEn:"'Cormorant Garamond',serif" }
+};
+
+const KM_WEEKDAYS = ["អាទិត្យ","ចន្ទ","អង្គារ","ពុធ","ព្រហស្បតិ៍","សុក្រ","សៅរ៍"];
+const KM_MONTHS = ["មករា","កុម្ភៈ","មីនា","មេសា","ឧសភា","មិថុនា","កក្កដា","សីហា","កញ្ញា","តុលា","វិច្ឆិកា","ធ្នូ"];
+const EN_WEEKDAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const EN_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+const LABELS = {
+  km:{ countdownTitle:"រាប់ថយក្រោយ", countdownSub:"រយៈពេលដែលនៅសល់រហូតដល់ថ្ងៃមង្គលការ",
+    days:"ថ្ងៃ", hours:"ម៉ោង", minutes:"នាទី", seconds:"វិនាទី", congrats:"សូមអបអរសាទរ!",
+    programTitle:"កម្មវិធីនៃពិធីមង្គលការ", galleryTitle:"រូបភាពនៃពួកយើង",
+    gallerySub:"ដាក់រូបភាព pre-wedding របស់អ្នកជំនួសកន្លែងទាំងនេះ", venueTitle:"ទីតាំងកម្មវិធី",
+    mapBtn:"មើលទីតាំងលើ Google Maps", contactsTitle:"ទំនាក់ទំនង",
+    contactsSub:"សម្រាប់ព័ត៌មានលម្អិត សូមទាក់ទងមកកាន់", thanks:"អរគុណ", and:"និង",
+    toggleKm:"ខ្មែរ", toggleEn:"English" },
+  en:{ countdownTitle:"Countdown", countdownSub:"Time remaining until our special day",
+    days:"Days", hours:"Hours", minutes:"Minutes", seconds:"Seconds", congrats:"Congratulations!",
+    programTitle:"Wedding Program", galleryTitle:"Our Moments Together",
+    gallerySub:"Your pre-wedding photos will appear here", venueTitle:"Event Location",
+    mapBtn:"View on Google Maps", contactsTitle:"Contact Us",
+    contactsSub:"For more details, please reach out to", thanks:"Thank You", and:"&",
+    toggleKm:"ខ្មែរ", toggleEn:"English" }
+};
+
+const EFFECTS = {
+  none:{ label:"គ្មាន", icon:"–" },
+  petals:{ label:"ផ្កាធ្លាក់", icon:"🌸" },
+  snow:{ label:"ព្រិលធ្លាក់", icon:"❄️" },
+  stars:{ label:"ផ្កាយធ្លាក់", icon:"✨" }
+};
+
+const TPL_LABELS = { km:["ប្រពៃណី","កក់ក្តៅ","សាមញ្ញ"], en:["Formal","Heartfelt","Simple"] };
+
+const TEMPLATES = {
+  eyebrow:{
+    km:[
+      "សូមគោរពអញ្ជើញអ្នកមកចូលរួមព្រឹត្តិការណ៍ដ៏មានតម្លៃមួយនេះ",
+      "ក្នុងជីវិតមានតែថ្ងៃមួយប៉ុណ្ណោះ ដែលយើងចង់ឲ្យអ្នកនៅជាមួយ",
+      "អញ្ជើញអ្នកមកចែករំលែកភាពរីករាយក្នុងថ្ងៃសំខាន់របស់យើង"
+    ],
+    en:[
+      "You are cordially invited to join us in celebrating our special day",
+      "Together with our families, we joyfully invite you to share in our wedding day",
+      "Join us as we begin our forever — your presence means the world to us"
+    ]
+  },
+  welcomeText:{
+    km:[
+      "ក្តីស្រឡាញ់ពីរដួងចិត្តបានលូតលាស់ ហើយថ្ងៃមួយដ៏មានអត្ថន័យបំផុតកំពុងតែមកដល់។ សូមគោរពអញ្ជើញលោកអ្នកជាទីគោរពស្រឡាញ់ ចូលរួមជាភ្ញៀវកិត្តិយសក្នុងពិធីមង្គលការនេះ។",
+      "ពួកយើងទាំងពីរនាក់មានក្តីរីករាយយ៉ាងខ្លាំង ដែលទទួលបានឱកាសចែករំលែកថ្ងៃពិសេសនេះជាមួយអ្នក។ វត្តមានរបស់អ្នកនឹងធ្វើឲ្យថ្ងៃនេះកាន់តែមានអត្ថន័យសម្រាប់ពួកយើង។",
+      "សុបិនចង់បានរបស់យើងកំពុងនឹងក្លាយជាការពិត។ សូមអញ្ជើញអ្នកមកចែករំលែកភាពសប្បាយរីករាយ និងក្តីស្រឡាញ់ជាមួយពួកយើង។"
+    ],
+    en:[
+      "Two hearts have grown into one, and the most meaningful day is finally here. We warmly invite you, our cherished guest, to join us as an honored guest at our wedding celebration.",
+      "We are so happy to share this special chapter of our lives with you. Your presence would mean so much to us as we begin our journey together as husband and wife.",
+      "Our story is just beginning, and we would love for you to be part of it. Please join us for a celebration of love, laughter, and new beginnings."
+    ]
+  }
+};
+
+const defaultState = {
+  theme:"gold",
+  effect:"petals",
+  groomName:"", brideName:"",
+  eyebrow:"",
+  groomNameEn:"", brideNameEn:"",
+  eyebrowEn:"",
+  eventDate:"", startTime:"",
+  welcomeText:"",
+  host1:"",
+  host2:"",
+  welcomeTextEn:"",
+  host1En:"",
+  host2En:"",
+  timeline:[
+    {time:"", name:"", timeEn:"", nameEn:""},
+    {time:"", name:"", timeEn:"", nameEn:""},
+    {time:"", name:"", timeEn:"", nameEn:""},
+    {time:"", name:"", timeEn:"", nameEn:""}
+  ],
+  venueName:"",
+  venueAddr:"",
+  venueNameEn:"",
+  venueAddrEn:"",
+  venueMapLink:"",
+  contacts:[
+    {name:"", phone:"", nameEn:""},
+    {name:"", phone:"", nameEn:""}
+  ],
+  photos:[],
+  coverPhoto:null,
+  guestLinksBase:"",
+  guestNamesRaw:""
+};
+const MAX_PHOTOS = 10;
+
+let state = JSON.parse(JSON.stringify(defaultState));
+try{
+  const saved = localStorage.getItem("wib-draft-v2");
+  if(saved) state = Object.assign(JSON.parse(JSON.stringify(defaultState)), JSON.parse(saved));
+}catch(e){}
+state.photos = (state.photos || []).filter(Boolean);
+
+function saveDraft(){ try{ localStorage.setItem("wib-draft-v2", JSON.stringify(state)); }catch(e){} }
+
+function kmDate(dateStr){
+  if(!dateStr) return "";
+  const d = new Date(dateStr+"T00:00:00");
+  return `ថ្ងៃ${KM_WEEKDAYS[d.getDay()]} ទី${d.getDate()} ខែ${KM_MONTHS[d.getMonth()]} ឆ្នាំ${d.getFullYear()}`;
+}
+function enDate(dateStr){
+  if(!dateStr) return "";
+  const d = new Date(dateStr+"T00:00:00");
+  return `${EN_WEEKDAYS[d.getDay()]}, ${EN_MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
+
+function escapeHtml(s){
+  return (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function buildGalleryHtml(s, theme){
+  const placeholderIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 16l-5.5-5-4 4-2-2L3 18"/></svg>`;
+  const photosForGallery = s.photos.filter(Boolean).length ? s.photos.filter(Boolean) : [null,null,null,null];
+  return photosForGallery.map((photo,i) => {
+    let extraClass = "";
+    if(s.theme==="gold") extraClass = (i%4===0 || i%4===3) ? " wide" : "";
+    if(s.theme==="rose") extraClass = " rot-"+(i%3);
+    const inner = photo
+      ? `<img src="${photo}" alt="photo ${i+1}">`
+      : `${placeholderIcon}<span>រូបភាព ${i+1}</span>`;
+    return `<div class="gallery-item${extraClass}"><div class="frame${photo?" photo":""}">${inner}</div></div>`;
+  }).join("");
+}
+
+function buildSection(s, t, lang){
+  const L = LABELS[lang];
+  const isKm = lang === "km";
+  const groom = isKm ? s.groomName : (s.groomNameEn || s.groomName);
+  const bride = isKm ? s.brideName : (s.brideNameEn || s.brideName);
+  const eyebrow = isKm ? s.eyebrow : (s.eyebrowEn || s.eyebrow);
+  const welcome = isKm ? s.welcomeText : (s.welcomeTextEn || s.welcomeText);
+  const host1 = isKm ? s.host1 : (s.host1En || s.host1);
+  const host2 = isKm ? s.host2 : (s.host2En || s.host2);
+  const venueName = isKm ? s.venueName : (s.venueNameEn || s.venueName);
+  const venueAddr = isKm ? s.venueAddr : (s.venueAddrEn || s.venueAddr);
+  const displayDate = isKm ? kmDate(s.eventDate) : enDate(s.eventDate);
+
+  const ornamentSvg = t.ornate
+    ? `<svg width="18" height="18" viewBox="0 0 20 20"><path d="M10 2 C10 8 4 8 4 12 C4 16 10 16 10 18 C10 16 16 16 16 12 C16 8 10 8 10 2 Z" fill="none" stroke="var(--accent-2)" stroke-width="1.2"/></svg>`
+    : ``;
+  const divider = `<div class="divider"><span class="rule"></span>${ornamentSvg}<span class="rule"></span></div>`;
+
+  const timelineHtml = s.timeline.map(item => {
+    const time = isKm ? item.time : (item.timeEn || item.time);
+    const name = isKm ? item.name : (item.nameEn || item.name);
+    return `<div class="tl-item"><div class="tl-time">${escapeHtml(time)}</div><p class="tl-name">${escapeHtml(name)}</p></div>`;
+  }).join("");
+
+  const galleryHtml = buildGalleryHtml(s, t);
+  const galleryClass = "gallery gallery-" + s.theme;
+
+  const mapsQuery = encodeURIComponent(venueName + ", " + venueAddr);
+  const mapsUrl = (s.venueMapLink && s.venueMapLink.trim())
+    ? s.venueMapLink.trim()
+    : `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+
+  const contactsHtml = (s.contacts||[]).filter(c => c.name || c.phone).map(c => {
+    const cname = isKm ? c.name : (c.nameEn || c.name);
+    return `<div class="contact-card"><p class="contact-name">${escapeHtml(cname)}</p>${c.phone ? `<a class="contact-phone" href="tel:${escapeHtml(c.phone.replace(/\s+/g,""))}">${escapeHtml(c.phone)}</a>` : ""}</div>`;
+  }).join("");
+
+  const heroStyle = s.coverPhoto
+    ? ` style="background-image:linear-gradient(180deg, rgba(0,0,0,.42) 0%, rgba(0,0,0,.5) 40%, rgba(0,0,0,.66) 100%), url('${s.coverPhoto}');background-size:cover;background-position:center;"`
+    : "";
+  const heroClass = s.coverPhoto ? "hero has-cover" : "hero";
+  const suf = "-" + lang;
+
+  return `<section id="section${suf}" class="lang-section lang-${lang}" style="display:${isKm ? "block" : "none"}">
+<section class="${heroClass}"${heroStyle}>
+<p class="guest-line" id="guestLine${suf}" style="display:none"></p>
+<p class="eyebrow">${escapeHtml(eyebrow)}</p>
+<h1 class="names display">${escapeHtml(groom)}<span class="amp">${escapeHtml(L.and)}</span>${escapeHtml(bride)}</h1>
+<p class="hero-date">${displayDate}</p>
+</section>
+<section><div class="wrap"><div class="welcome">
+<p>${escapeHtml(welcome)}</p>
+<div class="hosts">${escapeHtml(host1)}<br>${escapeHtml(host2)}</div>
+</div></div></section>
+${divider}
+<section><div class="wrap">
+<h2 class="section-title display">${L.countdownTitle}</h2>
+<p class="section-sub">${L.countdownSub}</p>
+<div class="countdown" id="countdown${suf}">
+<div class="cd-unit"><div class="cd-num" id="cd-d${suf}">00</div><div class="cd-label">${L.days}</div></div>
+<div class="cd-unit"><div class="cd-num" id="cd-h${suf}">00</div><div class="cd-label">${L.hours}</div></div>
+<div class="cd-unit"><div class="cd-num" id="cd-m${suf}">00</div><div class="cd-label">${L.minutes}</div></div>
+<div class="cd-unit"><div class="cd-num" id="cd-s${suf}">00</div><div class="cd-label">${L.seconds}</div></div>
+</div></div></section>
+${divider}
+<section><div class="wrap">
+<h2 class="section-title display">${L.programTitle}</h2>
+<p class="section-sub">${displayDate}</p>
+<div class="timeline">${timelineHtml}</div>
+</div></section>
+${divider}
+<section><div class="wrap">
+<h2 class="section-title display">${L.galleryTitle}</h2>
+<p class="section-sub">${L.gallerySub}</p>
+<div class="${galleryClass}">${galleryHtml}</div>
+</div></section>
+${divider}
+<section><div class="wrap">
+<h2 class="section-title display">${L.venueTitle}</h2>
+<div class="venue-card">
+<p class="venue-name display">${escapeHtml(venueName)}</p>
+<p class="venue-addr">${escapeHtml(venueAddr)}</p>
+<a class="map-btn" href="${escapeHtml(mapsUrl)}" target="_blank" rel="noopener">${L.mapBtn}</a>
+</div>
+</div></section>
+${contactsHtml ? `${divider}<section><div class="wrap">
+<h2 class="section-title display">${L.contactsTitle}</h2>
+<p class="section-sub">${L.contactsSub}</p>
+<div class="contact-grid">${contactsHtml}</div>
+</div></section>` : ""}
+<footer><div class="thanks display">${L.thanks}</div><div>${escapeHtml(groom)} ${L.and} ${escapeHtml(bride)}</div></footer>
+</section>`;
+}
+
+function renderInvitation(s){
+  const t = THEMES[s.theme];
+  const targetIso = (s.eventDate && s.startTime) ? `${s.eventDate}T${s.startTime}:00+07:00` : "";
+  const kmSection = buildSection(s, t, "km");
+  const enSection = buildSection(s, t, "en");
+  const LKM = LABELS.km, LEN = LABELS.en;
+
+  return `<!DOCTYPE html><html lang="km"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(s.groomName)} & ${escapeHtml(s.brideName)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Moul&family=Battambang:wght@400;700&family=Suwannaphum&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--card:${t.card};--border:${t.border};--radius:${t.radius};--display-font:${t.display};--body-font:${t.body};--display-font-en:${t.displayEn};--body-font-en:${t.bodyEn};}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
+.display{font-family:var(--display-font);color:var(--accent-1);}
+.lang-en{font-family:var(--body-font-en);font-style:italic;}
+.lang-en .display{font-family:var(--display-font-en);font-style:normal;}
+.lang-en .hero-date,.lang-en .tl-time,.lang-en .contact-phone,.lang-en .map-btn,.lang-en .cd-label{font-style:normal;}
+.wrap{max-width:680px;margin:0 auto;padding:0 24px;}
+.hero{padding:80px 24px 60px;text-align:center;background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%), var(--bg);}
+.eyebrow{font-size:15px;color:var(--ink);opacity:.75;margin:0 0 24px;}
+.guest-line{font-size:15px;font-weight:700;color:var(--accent-1);margin:0 0 10px;letter-spacing:.01em;}
+.hero.has-cover .guest-line{color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.55);}
+.names{font-size:clamp(30px,8vw,52px);line-height:1.5;margin:0;}
+.names .amp{display:block;font-family:var(--body-font);font-size:0.4em;color:var(--accent-2);margin:6px 0;}
+.lang-en .names .amp{font-family:var(--body-font-en);font-style:italic;}
+.hero-date{margin-top:24px;font-size:17px;color:var(--accent-1);}
+.hero.has-cover{padding-top:150px;padding-bottom:100px;}
+.hero.has-cover .eyebrow{color:#fff;opacity:.92;text-shadow:0 2px 10px rgba(0,0,0,.55);}
+.hero.has-cover .names{color:#fff;text-shadow:0 4px 18px rgba(0,0,0,.55), 0 1px 4px rgba(0,0,0,.85);}
+.hero.has-cover .names .amp{color:var(--accent-2);}
+.hero.has-cover .hero-date{color:#fff;opacity:.95;text-shadow:0 2px 10px rgba(0,0,0,.55);}
+section{padding:52px 0;}
+.section-title{font-size:26px;text-align:center;margin:0 0 6px;}
+.section-sub{text-align:center;color:var(--ink);opacity:.7;font-size:14px;margin:0 0 32px;}
+.divider{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 auto;max-width:680px;padding:0 24px;}
+.divider .rule{height:1px;width:56px;background:linear-gradient(90deg,transparent,var(--accent-2),transparent);}
+.welcome{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:38px 32px;text-align:center;}
+.welcome p{font-size:16px;margin:0;}
+.hosts{margin-top:22px;font-size:16px;color:var(--accent-1);font-weight:600;}
+.countdown{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
+.cd-unit{width:76px;padding:16px 0;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);}
+.cd-num{font-size:26px;font-weight:700;color:var(--accent-1);font-variant-numeric:tabular-nums;font-style:normal;}
+.cd-label{font-size:12px;color:var(--ink);opacity:.7;margin-top:3px;}
+.timeline{position:relative;padding-left:26px;border-left:1px solid var(--border);}
+.tl-item{position:relative;padding-bottom:28px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-item::before{content:"";position:absolute;left:-31px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 0 4px var(--bg);}
+.tl-time{font-size:13px;color:var(--accent-2);font-weight:600;margin-bottom:3px;font-style:normal;}
+.tl-name{font-size:16.5px;margin:0;}
+.frame{border:1px solid var(--border);background:color-mix(in srgb, var(--accent-1) 8%, var(--bg));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--ink);opacity:.6;overflow:hidden;}
+.frame.photo{opacity:1;}
+.frame img{width:100%;height:100%;object-fit:cover;display:block;}
+.frame svg{width:28px;height:28px;}
+.frame span{font-size:11.5px;font-style:normal;}
+.gallery-gold{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.gallery-gold .gallery-item.wide{grid-column:span 2;}
+.gallery-gold .frame{aspect-ratio:4/3;border-radius:var(--radius);padding:0;}
+.gallery-gold .gallery-item.wide .frame{aspect-ratio:16/9;}
+.gallery-rose{display:flex;flex-wrap:wrap;justify-content:center;gap:26px 18px;padding:6px 4px;}
+.gallery-rose .gallery-item{width:calc(33.333% - 18px);}
+.gallery-rose .frame{aspect-ratio:1/1.05;border-radius:2px;padding:10px 10px 24px;background:var(--card);box-shadow:0 8px 18px rgba(0,0,0,.1);}
+.gallery-rose .gallery-item.rot-0 .frame{transform:rotate(-3deg);}
+.gallery-rose .gallery-item.rot-1 .frame{transform:rotate(2.5deg);}
+.gallery-rose .gallery-item.rot-2 .frame{transform:rotate(-1.5deg);}
+@media(max-width:480px){.gallery-rose .gallery-item{width:calc(50% - 14px);}}
+.gallery-minimal{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;}
+.gallery-minimal .frame{aspect-ratio:1/1;border-radius:0;border:none;padding:0;}
+@media(max-width:480px){.gallery-minimal{grid-template-columns:repeat(2,1fr);}}
+.venue-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px;text-align:center;}
+.venue-name{font-size:22px;margin:0 0 8px;}
+.venue-addr{color:var(--ink);opacity:.75;font-size:14.5px;margin:0 0 22px;}
+.map-btn{display:inline-block;padding:12px 26px;border-radius:999px;background:var(--accent-1);color:#fff;text-decoration:none;font-size:14px;font-style:normal;}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.contact-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;text-align:center;}
+.contact-name{font-size:15.5px;margin:0 0 6px;}
+.contact-phone{display:inline-block;color:var(--accent-1);font-weight:600;text-decoration:none;font-size:15px;font-style:normal;}
+footer{text-align:center;padding:48px 24px 52px;color:var(--ink);opacity:.75;font-size:14px;}
+footer .thanks{font-size:19px;color:var(--accent-1);opacity:1;margin-bottom:8px;}
+.lang-toggle{position:fixed;top:16px;right:16px;z-index:100;display:flex;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.14);}
+.lang-toggle button{border:none;background:none;padding:8px 16px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--ink);font-family:'Kantumruy Pro',sans-serif;font-style:normal;}
+.lang-toggle button.active{background:var(--accent-1);color:#fff;}
+@media(max-width:480px){.hero{padding:64px 18px 48px;}.welcome{padding:30px 20px;}.lang-toggle{top:10px;right:10px;}.lang-toggle button{padding:7px 12px;font-size:12px;}}
+</style></head><body>
+<div class="lang-toggle">
+  <button id="btn-km" class="active" type="button">${LKM.toggleKm}</button>
+  <button id="btn-en" type="button">${LEN.toggleEn}</button>
+</div>
+${kmSection}
+${enSection}
+<script>(function(){
+var target=${targetIso ? `"${targetIso}"` : "null"};
+var t=target?new Date(target).getTime():0;
+function pad(n){return String(n).padStart(2,"0");}
+var messages={km:"${LKM.congrats}",en:"${LEN.congrats}"};
+function tick(){
+  if(!t){return;}
+  var diff=t-Date.now();
+  ["km","en"].forEach(function(lang){
+    var el=document.getElementById("countdown-"+lang);
+    if(!el) return;
+    if(diff<=0){
+      el.innerHTML='<div class="cd-unit" style="width:auto;padding:16px 26px;"><div class="cd-num" style="font-size:18px;">'+messages[lang]+'</div></div>';
+      return;
+    }
+    document.getElementById("cd-d-"+lang).textContent=pad(Math.floor(diff/86400000));
+    document.getElementById("cd-h-"+lang).textContent=pad(Math.floor((diff%86400000)/3600000));
+    document.getElementById("cd-m-"+lang).textContent=pad(Math.floor((diff%3600000)/60000));
+    document.getElementById("cd-s-"+lang).textContent=pad(Math.floor((diff%60000)/1000));
+  });
+  if(diff<=0){clearInterval(timer);}
+}
+tick();var timer=setInterval(tick,1000);
+
+try{
+  var guestParams=new URLSearchParams(window.location.search);
+  var guestName=guestParams.get('to');
+  if(guestName){
+    var gk=document.getElementById('guestLine-km');
+    var ge=document.getElementById('guestLine-en');
+    if(gk){ gk.textContent='ជូនចំពោះ '+guestName; gk.style.display='block'; }
+    if(ge){ ge.textContent='Dear '+guestName+','; ge.style.display='block'; }
+  }
+}catch(e){}
+
+function setLang(lang){
+  document.getElementById("section-km").style.display = lang==="km" ? "block" : "none";
+  document.getElementById("section-en").style.display = lang==="en" ? "block" : "none";
+  document.getElementById("btn-km").classList.toggle("active", lang==="km");
+  document.getElementById("btn-en").classList.toggle("active", lang==="en");
+}
+document.getElementById("btn-km").addEventListener("click", function(){ setLang("km"); });
+document.getElementById("btn-en").addEventListener("click", function(){ setLang("en"); });
+
+var fxType=${JSON.stringify(s.effect || "none")};
+var fxColor1=${JSON.stringify(t.accent1)};
+var fxColor2=${JSON.stringify(t.accent2)};
+if(fxType!=="none"){
+  var fxCanvas=document.createElement("canvas");
+  fxCanvas.id="fx-canvas";
+  fxCanvas.style.cssText="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40;";
+  document.body.appendChild(fxCanvas);
+  var fxCtx=fxCanvas.getContext("2d");
+  function fxResize(){ fxCanvas.width=window.innerWidth; fxCanvas.height=window.innerHeight; }
+  fxResize();
+  window.addEventListener("resize", fxResize);
+
+  var fxCount = fxType==="snow" ? 70 : (fxType==="stars" ? 50 : 40);
+  function fxSpawn(initial){
+    return {
+      x: Math.random()*fxCanvas.width,
+      y: initial ? Math.random()*fxCanvas.height : -10,
+      r: fxType==="snow" ? (2+Math.random()*3) : (fxType==="petals" ? (5+Math.random()*5) : (2+Math.random()*2)),
+      speed: fxType==="snow" ? (0.6+Math.random()*1.2) : (fxType==="petals" ? (0.5+Math.random()*1) : (0.8+Math.random()*1.5)),
+      drift: Math.random()*1-0.5,
+      angle: Math.random()*Math.PI*2,
+      spin: (Math.random()*0.02)-0.01,
+      sway: Math.random()*Math.PI*2,
+      swaySpeed: 0.01+Math.random()*0.02,
+      opacity: fxType==="stars" ? (0.35+Math.random()*0.65) : (0.6+Math.random()*0.4)
+    };
+  }
+  var fxParticles=[];
+  for(var fi=0; fi<fxCount; fi++){ fxParticles.push(fxSpawn(true)); }
+
+  function fxDrawPetal(p){
+    fxCtx.save();
+    fxCtx.translate(p.x,p.y);
+    fxCtx.rotate(p.angle);
+    fxCtx.globalAlpha=p.opacity;
+    fxCtx.fillStyle=fxColor1;
+    fxCtx.beginPath();
+    fxCtx.ellipse(0,0,p.r,p.r*0.6,0,0,Math.PI*2);
+    fxCtx.fill();
+    fxCtx.restore();
+  }
+  function fxDrawSnow(p){
+    fxCtx.beginPath();
+    fxCtx.globalAlpha=p.opacity;
+    fxCtx.fillStyle="#ffffff";
+    fxCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    fxCtx.fill();
+  }
+  function fxDrawStar(p){
+    fxCtx.save();
+    fxCtx.translate(p.x,p.y);
+    fxCtx.rotate(p.angle);
+    fxCtx.globalAlpha=p.opacity;
+    fxCtx.fillStyle=fxColor2;
+    var spikes=4, outer=p.r*2, inner=p.r*0.7;
+    fxCtx.beginPath();
+    for(var si=0; si<spikes*2; si++){
+      var rad = si%2===0 ? outer : inner;
+      var ang = (Math.PI/spikes)*si;
+      fxCtx.lineTo(Math.cos(ang)*rad, Math.sin(ang)*rad);
+    }
+    fxCtx.closePath();
+    fxCtx.fill();
+    fxCtx.restore();
+  }
+  function fxLoop(){
+    fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+    fxParticles.forEach(function(p){
+      p.y+=p.speed;
+      p.sway+=p.swaySpeed;
+      p.x+=Math.sin(p.sway)*0.6+p.drift*0.2;
+      p.angle+=p.spin;
+      if(p.y>fxCanvas.height+20 || p.x<-20 || p.x>fxCanvas.width+20){ Object.assign(p, fxSpawn(false)); }
+      if(fxType==="snow") fxDrawSnow(p);
+      else if(fxType==="stars") fxDrawStar(p);
+      else fxDrawPetal(p);
+    });
+    requestAnimationFrame(fxLoop);
+  }
+  fxLoop();
+}
+})();<\/script>
+</body></html>`;
+}
+
+// ---------- Builder UI wiring ----------
+const $ = id => document.getElementById(id);
+
+function buildThemePicker(){
+  const grid = $("themeGrid");
+  grid.innerHTML = Object.keys(THEMES).map(key => {
+    const t = THEMES[key];
+    return `<div class="theme-card${state.theme===key?" active":""}" data-theme="${key}">
+      <div class="theme-swatch" style="background:${t.swatch}"></div>
+      <span>${t.label}</span>
+    </div>`;
+  }).join("");
+  grid.querySelectorAll(".theme-card").forEach(card => {
+    card.addEventListener("click", () => {
+      state.theme = card.dataset.theme;
+      buildThemePicker();
+      update();
+    });
+  });
+}
+
+function buildEffectPicker(){
+  const grid = $("effectGrid");
+  grid.innerHTML = Object.keys(EFFECTS).map(key => {
+    const e = EFFECTS[key];
+    return `<div class="effect-card${state.effect===key?" active":""}" data-effect="${key}">
+      <div class="effect-icon">${e.icon}</div>
+      <span>${e.label}</span>
+    </div>`;
+  }).join("");
+  grid.querySelectorAll(".effect-card").forEach(card => {
+    card.addEventListener("click", () => {
+      state.effect = card.dataset.effect;
+      buildEffectPicker();
+      update();
+    });
+  });
+}
+
+function buildTimeline(){
+  const list = $("timelineList");
+  list.innerHTML = state.timeline.map((item,i) => `
+    <div class="item-card" data-i="${i}">
+      <div class="tl-row">
+        <input type="text" class="tl-time-in" value="${(item.time||"").replace(/"/g,"&quot;")}" placeholder="ម៉ោង">
+        <input type="text" class="tl-name-in" value="${(item.name||"").replace(/"/g,"&quot;")}" placeholder="ឈ្មោះកម្មវិធី (ខ្មែរ)">
+        <button class="icon-btn tl-remove" type="button" title="លុប">×</button>
+      </div>
+      <div class="lang-tag">English</div>
+      <div class="tl-row en-row">
+        <input type="text" class="tl-time-en-in" value="${(item.timeEn||"").replace(/"/g,"&quot;")}" placeholder="Time">
+        <input type="text" class="tl-name-en-in" value="${(item.nameEn||"").replace(/"/g,"&quot;")}" placeholder="Program Name (English)">
+      </div>
+    </div>`).join("");
+  list.querySelectorAll(".item-card").forEach(row => {
+    const i = +row.dataset.i;
+    row.querySelector(".tl-time-in").addEventListener("input", e => { state.timeline[i].time = e.target.value; update(); });
+    row.querySelector(".tl-name-in").addEventListener("input", e => { state.timeline[i].name = e.target.value; update(); });
+    row.querySelector(".tl-time-en-in").addEventListener("input", e => { state.timeline[i].timeEn = e.target.value; update(); });
+    row.querySelector(".tl-name-en-in").addEventListener("input", e => { state.timeline[i].nameEn = e.target.value; update(); });
+    row.querySelector(".tl-remove").addEventListener("click", () => { state.timeline.splice(i,1); buildTimeline(); update(); });
+  });
+}
+
+function buildCoverPhoto(){
+  const grid = $("coverGrid");
+  if(state.coverPhoto){
+    grid.innerHTML = `<div class="photo-slot" style="grid-column:span 2;">
+      <img src="${state.coverPhoto}"><button class="photo-clear" type="button" id="coverClear">×</button>
+    </div>`;
+    $("coverClear").addEventListener("click", () => { state.coverPhoto = null; buildCoverPhoto(); update(); });
+  } else {
+    grid.innerHTML = `<div class="photo-slot add-tile" style="grid-column:span 2;">
+      <span>+ បញ្ចូលរូបភាពគម្រប</span>
+      <input type="file" accept="image/*" id="coverInput">
+    </div>`;
+    $("coverInput").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => { state.coverPhoto = ev.target.result; buildCoverPhoto(); update(); };
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
+function buildContacts(){
+  const list = $("contactList");
+  list.innerHTML = state.contacts.map((c,i) => `
+    <div class="item-card" data-i="${i}">
+      <div class="tl-row" style="grid-template-columns:1fr 110px 30px;">
+        <input type="text" class="ct-name-in" value="${(c.name||"").replace(/"/g,"&quot;")}" placeholder="ឈ្មោះ (ខ្មែរ)">
+        <input type="text" class="ct-phone-in" value="${(c.phone||"").replace(/"/g,"&quot;")}" placeholder="លេខទូរស័ព្ទ">
+        <button class="icon-btn ct-remove" type="button" title="លុប">×</button>
+      </div>
+      <div class="lang-tag">English name</div>
+      <div class="tl-row en-row">
+        <input type="text" class="ct-name-en-in" style="grid-column:1/-1;" value="${(c.nameEn||"").replace(/"/g,"&quot;")}" placeholder="Name (English)">
+      </div>
+    </div>`).join("");
+  list.querySelectorAll(".item-card").forEach(row => {
+    const i = +row.dataset.i;
+    row.querySelector(".ct-name-in").addEventListener("input", e => { state.contacts[i].name = e.target.value; update(); });
+    row.querySelector(".ct-phone-in").addEventListener("input", e => { state.contacts[i].phone = e.target.value; update(); });
+    row.querySelector(".ct-name-en-in").addEventListener("input", e => { state.contacts[i].nameEn = e.target.value; update(); });
+    row.querySelector(".ct-remove").addEventListener("click", () => { state.contacts.splice(i,1); buildContacts(); update(); });
+  });
+}
+
+function buildPhotos(){
+  state.photos = state.photos.filter(Boolean);
+  const grid = $("photoGrid");
+  const existing = state.photos.map((src,i) => `
+    <div class="photo-slot" data-i="${i}">
+      <img src="${src}"><button class="photo-clear" type="button" data-i="${i}">×</button>
+    </div>`).join("");
+  const addTile = state.photos.length < MAX_PHOTOS
+    ? `<div class="photo-slot add-tile">
+        <span>+ បញ្ចូល<br>(${state.photos.length}/${MAX_PHOTOS})</span>
+        <input type="file" accept="image/*" id="addPhotoInput" multiple>
+      </div>`
+    : "";
+  grid.innerHTML = existing + addTile;
+
+  const addInput = $("addPhotoInput");
+  if(addInput){
+    addInput.addEventListener("change", e => {
+      const files = Array.from(e.target.files || []);
+      const remaining = MAX_PHOTOS - state.photos.length;
+      const toAdd = files.slice(0, remaining);
+      if(!toAdd.length) return;
+      let loaded = 0;
+      toAdd.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          state.photos.push(ev.target.result);
+          loaded++;
+          if(loaded === toAdd.length){ buildPhotos(); update(); }
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+  }
+  grid.querySelectorAll(".photo-clear").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const i = +e.target.dataset.i;
+      state.photos.splice(i,1);
+      buildPhotos(); update();
+    });
+  });
+}
+
+function normalizeBaseUrl(url){
+  url = (url || "").trim();
+  if(!url) return "";
+  if(!/^https?:\/\//i.test(url)) url = "https://" + url;
+  if(!url.endsWith("/")) url += "/";
+  return url;
+}
+
+function copyText(text, btnEl){
+  function done(){
+    if(!btnEl) return;
+    const original = btnEl.textContent;
+    btnEl.textContent = "បានចម្លង!";
+    btnEl.classList.add("copied");
+    setTimeout(() => { btnEl.textContent = original; btnEl.classList.remove("copied"); }, 1500);
+  }
+  function fallback(){
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed"; ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand("copy"); } catch(e) {}
+    document.body.removeChild(ta);
+    done();
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(fallback);
+  } else {
+    fallback();
+  }
+}
+
+function buildGuestLinks(){
+  const base = normalizeBaseUrl($("baseUrl").value);
+  const names = $("guestNames").value.split("\n").map(n => n.trim()).filter(Boolean);
+  const listEl = $("guestLinksList");
+
+  state.guestLinksBase = $("baseUrl").value;
+  state.guestNamesRaw = $("guestNames").value;
+  saveState_safe();
+
+  if(!base){
+    listEl.innerHTML = '<p class="guest-empty-hint">សូមបញ្ចូល URL គេហទំព័រជាមុនសិន (ឧ. https://username.github.io/wedding/)</p>';
+    return;
+  }
+  if(!names.length){
+    listEl.innerHTML = '<p class="guest-empty-hint">សូមបញ្ចូលឈ្មោះភ្ញៀវយ៉ាងហោចណាស់ម្នាក់ម្នាក់ក្នុងមួយបន្ទាត់</p>';
+    return;
+  }
+
+  const links = names.map(name => ({ name, url: base + "?to=" + encodeURIComponent(name) }));
+
+  listEl.innerHTML = links.map((l,i) => `
+    <div class="guest-link-row">
+      <div class="guest-link-info">
+        <div class="guest-link-name">${escapeHtml(l.name)}</div>
+        <div class="guest-link-url">${escapeHtml(l.url)}</div>
+      </div>
+      <button class="copy-btn" type="button" data-i="${i}">ចម្លង</button>
+    </div>`).join("") +
+    `<button class="copy-all-btn" id="copyAllLinksBtn" type="button">ចម្លងលីងទាំងអស់ (${links.length})</button>`;
+
+  listEl.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const link = links[+btn.dataset.i];
+      copyText(link.name + ": " + link.url, btn);
+    });
+  });
+  const copyAllBtn = $("copyAllLinksBtn");
+  if(copyAllBtn){
+    copyAllBtn.addEventListener("click", () => {
+      const allText = links.map(l => l.name + ": " + l.url).join("\n");
+      copyText(allText, copyAllBtn);
+    });
+  }
+}
+
+function saveState_safe(){ try{ saveDraft(); }catch(e){} }
+
+function restoreGuestLinksUI(){
+  $("baseUrl").value = state.guestLinksBase || "";
+  $("guestNames").value = state.guestNamesRaw || "";
+  $("genLinksBtn").addEventListener("click", buildGuestLinks);
+  if(state.guestLinksBase && state.guestNamesRaw){
+    buildGuestLinks();
+  }
+}
+
+function buildTemplateChips(){
+  const specs = [
+    { id:"tpl-eyebrow-km", items:TEMPLATES.eyebrow.km, target:"eyebrow", toggleLabel:"មើលគំរូ", hideLabel:"លាក់គំរូ" },
+    { id:"tpl-eyebrow-en", items:TEMPLATES.eyebrow.en, target:"eyebrowEn", toggleLabel:"Show templates", hideLabel:"Hide templates" },
+    { id:"tpl-welcome-km", items:TEMPLATES.welcomeText.km, target:"welcomeText", toggleLabel:"មើលគំរូ", hideLabel:"លាក់គំរូ" },
+    { id:"tpl-welcome-en", items:TEMPLATES.welcomeText.en, target:"welcomeTextEn", toggleLabel:"Show templates", hideLabel:"Hide templates" }
+  ];
+  function truncate(text, max){
+    return text.length > max ? text.slice(0, max).trim() + "…" : text;
+  }
+  specs.forEach(spec => {
+    const row = $(spec.id);
+    if(!row) return;
+    row.className = "template-preview-wrap";
+
+    const toggleBtn = document.createElement("button");
+    toggleBtn.type = "button";
+    toggleBtn.className = "tpl-toggle-btn";
+    toggleBtn.textContent = spec.toggleLabel + " (" + spec.items.length + ")";
+
+    const list = document.createElement("div");
+    list.className = "template-preview-list";
+    list.style.display = "none";
+    list.innerHTML = spec.items.map((text,i) =>
+      `<button type="button" class="template-chip-lg" data-i="${i}" title="${text.replace(/"/g,"&quot;")}">
+         <span class="tpl-num">គំរូ ${i+1}</span>
+         <span class="tpl-text">${truncate(text, 90).replace(/</g,"&lt;")}</span>
+       </button>`
+    ).join("");
+
+    toggleBtn.addEventListener("click", () => {
+      const expanded = list.style.display !== "none";
+      list.style.display = expanded ? "none" : "flex";
+      toggleBtn.textContent = (expanded ? spec.toggleLabel : spec.hideLabel) + " (" + spec.items.length + ")";
+      toggleBtn.classList.toggle("expanded", !expanded);
+    });
+
+    row.innerHTML = "";
+    row.appendChild(toggleBtn);
+    row.appendChild(list);
+
+    list.querySelectorAll(".template-chip-lg").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const text = spec.items[+chip.dataset.i];
+        state[spec.target] = text;
+        const el = $(spec.target);
+        if(el) el.value = text;
+        list.querySelectorAll(".template-chip-lg").forEach(c => c.classList.remove("chosen"));
+        chip.classList.add("chosen");
+        update();
+      });
+    });
+  });
+}
+
+function bindSimpleFields(){
+  const map = {
+    groomName:"groomName", brideName:"brideName", eyebrow:"eyebrow",
+    groomNameEn:"groomNameEn", brideNameEn:"brideNameEn", eyebrowEn:"eyebrowEn",
+    eventDate:"eventDate", startTime:"startTime",
+    welcomeText:"welcomeText", host1:"host1", host2:"host2",
+    welcomeTextEn:"welcomeTextEn", host1En:"host1En", host2En:"host2En",
+    venueName:"venueName", venueAddr:"venueAddr",
+    venueNameEn:"venueNameEn", venueAddrEn:"venueAddrEn",
+    venueMapLink:"venueMapLink"
+  };
+  Object.entries(map).forEach(([id,key]) => {
+    const el = $(id);
+    el.value = state[key] || "";
+    el.addEventListener("input", () => { state[key] = el.value; update(); });
+  });
+}
+
+function update(){
+  saveDraft();
+  $("frame").srcdoc = renderInvitation(state);
+}
+
+$("addTimeline").addEventListener("click", () => {
+  state.timeline.push({time:"", name:"", timeEn:"", nameEn:""});
+  buildTimeline();
+  update();
+});
+
+$("addContact").addEventListener("click", () => {
+  state.contacts.push({name:"", phone:"", nameEn:""});
+  buildContacts();
+  update();
+});
+
+$("downloadBtn").addEventListener("click", async () => {
+  const html = renderInvitation(state);
+  const filename = "wedding-invitation-" + (state.groomName || "invitation").replace(/[^\w\u1780-\u17FF]/g, "") + ".html";
+  try {
+    const downloads = await claude.use("downloads");
+    if (downloads) {
+      try {
+        await downloads.save({ filename, data: html });
+        return;
+      } catch (err) {
+        if (err && err.code === "declined") return;
+        // fall through to manual fallback on other errors
+      }
+    }
+  } catch (e) { /* capability unavailable here, fall back below */ }
+
+  const blob = new Blob([html], {type:"text/html"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+});
+
+// Mobile tabs
+const tabEdit = $("tabEdit"), tabPreview = $("tabPreview"), panel = $("panel");
+tabEdit.addEventListener("click", () => { panel.classList.remove("hide"); tabEdit.classList.add("active"); tabPreview.classList.remove("active"); });
+tabPreview.addEventListener("click", () => { panel.classList.add("hide"); tabPreview.classList.add("active"); tabEdit.classList.remove("active"); });
+
+// Resizable panel
+const resizer = $("resizer"), appEl = document.querySelector(".app");
+let resizing = false;
+function setPanelWidth(px){
+  const clamped = Math.max(280, Math.min(720, px));
+  appEl.style.gridTemplateColumns = clamped + "px 6px 1fr";
+  try{ localStorage.setItem("wib-panelw", clamped); }catch(e){}
+}
+try{
+  const savedW = localStorage.getItem("wib-panelw");
+  if(savedW) setPanelWidth(+savedW);
+}catch(e){}
+resizer.addEventListener("mousedown", () => {
+  resizing = true;
+  resizer.classList.add("active");
+  document.body.style.userSelect = "none";
+});
+window.addEventListener("mousemove", e => {
+  if(!resizing) return;
+  setPanelWidth(e.clientX);
+});
+window.addEventListener("mouseup", () => {
+  if(!resizing) return;
+  resizing = false;
+  resizer.classList.remove("active");
+  document.body.style.userSelect = "";
+});
+resizer.addEventListener("touchstart", () => { resizing = true; }, {passive:true});
+window.addEventListener("touchmove", e => {
+  if(!resizing) return;
+  setPanelWidth(e.touches[0].clientX);
+}, {passive:true});
+window.addEventListener("touchend", () => { resizing = false; });
+
+buildThemePicker();
+buildEffectPicker();
+buildTimeline();
+buildContacts();
+buildPhotos();
+buildCoverPhoto();
+buildTemplateChips();
+bindSimpleFields();
+restoreGuestLinksUI();
+update();
+</script>
+</body>
+</html>
