@@ -6,7 +6,8 @@
 <title>កម្មវិធីបង្កើតធៀបអញ្ជើញ (ខ្មែរ/English)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Moul&family=Battambang:wght@400;700&family=Suwannaphum&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Bokor&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{
   --b-bg:#F4F2EF; --b-panel:#FFFFFF; --b-ink:#2B2620; --b-sub:#726A5F;
@@ -42,16 +43,19 @@ input[type=text],input[type=date],input[type=time],textarea{
 }
 textarea{resize:vertical;min-height:64px;}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.theme-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.theme-card{border:2px solid var(--b-line);border-radius:8px;padding:8px;cursor:pointer;text-align:center;}
+.style-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:26px;}
+.style-col{margin-bottom:0;}
+.style-col legend{margin-bottom:10px;}
+.theme-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+.theme-card{border:2px solid var(--b-line);border-radius:7px;padding:4px;cursor:pointer;text-align:center;}
 .theme-card.active{border-color:var(--b-accent);}
-.theme-swatch{height:34px;border-radius:5px;margin-bottom:6px;}
-.theme-card span{font-size:11.5px;}
-.effect-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.effect-card{border:2px solid var(--b-line);border-radius:8px;padding:10px 8px;cursor:pointer;text-align:center;}
+.theme-swatch{height:20px;border-radius:4px;margin-bottom:3px;}
+.theme-card span{font-size:9.5px;line-height:1.2;display:block;}
+.effect-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.effect-card{border:2px solid var(--b-line);border-radius:7px;padding:5px 3px;cursor:pointer;text-align:center;}
 .effect-card.active{border-color:var(--b-accent);}
-.effect-icon{font-size:20px;margin-bottom:4px;}
-.effect-card span{font-size:11.5px;display:block;}
+.effect-icon{font-size:14px;margin-bottom:2px;line-height:1;}
+.effect-card span{font-size:9.5px;display:block;line-height:1.2;}
 .template-row{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;}
 .template-chip{border:1px solid var(--b-line);background:var(--b-bg);color:var(--b-sub);font-size:11.5px;padding:5px 10px;border-radius:999px;cursor:pointer;}
 .template-chip:hover{border-color:var(--b-accent);color:var(--b-accent);}
@@ -73,20 +77,14 @@ textarea{resize:vertical;min-height:64px;}
 .icon-btn{background:none;border:1px solid var(--b-line);border-radius:6px;width:30px;height:34px;cursor:pointer;color:var(--b-sub);font-size:15px;}
 .add-btn{width:100%;padding:9px;border:1px dashed var(--b-line);border-radius:6px;background:none;color:var(--b-sub);font-size:13px;cursor:pointer;margin-top:2px;}
 .photo-hint{font-size:12px;color:var(--b-sub);margin:-8px 0 12px;}
-.photo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.photo-slot{aspect-ratio:4/3;border:1px solid var(--b-line);border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--b-bg);}
-.photo-slot img{width:100%;height:100%;object-fit:cover;}
-.photo-slot span{font-size:11px;color:var(--b-sub);text-align:center;padding:0 6px;}
-.photo-slot.add-tile{border:1px dashed var(--b-line);cursor:pointer;}
-.photo-slot.add-tile input{position:absolute;inset:0;opacity:0;cursor:pointer;}
-.guest-link-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--b-line);border-radius:8px;margin-bottom:6px;background:var(--b-bg);}
-.guest-link-info{flex:1;min-width:0;}
-.guest-link-name{font-size:13px;font-weight:600;color:var(--b-ink);margin-bottom:2px;}
-.guest-link-url{font-size:11px;color:var(--b-sub);word-break:break-all;}
-.copy-btn{flex-shrink:0;border:1px solid var(--b-accent);background:none;color:var(--b-accent);font-size:12px;padding:6px 11px;border-radius:6px;cursor:pointer;white-space:nowrap;}
-.copy-btn.copied{background:var(--b-accent);color:var(--b-accent-ink);border-color:var(--b-accent);}
-.copy-all-btn{width:100%;margin-top:6px;padding:10px;border-radius:7px;border:none;background:var(--b-accent);color:var(--b-accent-ink);font-size:13.5px;font-weight:600;cursor:pointer;}
-.guest-empty-hint{font-size:12.5px;color:var(--b-sub);text-align:center;padding:10px 0;margin:0;}
+.photo-grid{display:flex;flex-direction:column;gap:6px;}
+.photo-file-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--b-line);border-radius:6px;background:var(--b-bg);}
+.photo-file-row .filename-text{flex:1;font-size:12.5px;color:var(--b-ink);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0;}
+.photo-file-row .photo-clear{position:static;width:20px;height:20px;flex-shrink:0;background:none;color:var(--b-sub);border:1px solid var(--b-line);}
+.photo-file-row .photo-clear:hover{color:var(--b-accent);border-color:var(--b-accent);}
+.photo-add-row{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border:1px dashed var(--b-line);border-radius:6px;color:var(--b-sub);font-size:12.5px;cursor:pointer;position:relative;}
+.guest-empty-hint{font-size:12.5px;color:var(--b-sub);text-align:center;padding:10px 0 0;margin:0;}
+.photo-add-row input{position:absolute;inset:0;opacity:0;cursor:pointer;}
 .photo-clear{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:4px;width:20px;height:20px;font-size:12px;cursor:pointer;z-index:2;}
 .preview-col{display:flex;flex-direction:column;height:100vh;}
 .toolbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--b-line);gap:12px;flex-wrap:wrap;}
@@ -96,6 +94,18 @@ textarea{resize:vertical;min-height:64px;}
 .frame-wrap{flex:1;overflow:auto;padding:26px;display:flex;justify-content:center;background:var(--b-bg);}
 iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);border-radius:10px;background:#fff;}
 .mobile-tabs{display:none;}
+.pay-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+.pay-overlay.show{display:flex;}
+.pay-modal{background:var(--b-panel);border-radius:14px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3);}
+.pay-modal h3{margin:0 0 6px;font-size:16px;color:var(--b-ink);}
+.pay-modal .pay-amount{font-size:22px;font-weight:700;color:var(--b-accent);margin:0 0 16px;}
+.pay-modal .pay-qr-wrap{background:#fff;border-radius:10px;padding:14px;margin:0 0 16px;min-height:220px;display:flex;align-items:center;justify-content:center;}
+.pay-modal .pay-qr-wrap img{max-width:100%;display:block;}
+.pay-modal .pay-status{font-size:13px;color:var(--b-sub);margin:0 0 16px;min-height:18px;}
+.pay-modal .pay-spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--b-line);border-top-color:var(--b-accent);border-radius:50%;animation:pay-spin 0.8s linear infinite;margin-right:6px;vertical-align:-2px;}
+@keyframes pay-spin{to{transform:rotate(360deg);}}
+.pay-modal .pay-cancel{width:100%;padding:10px;border-radius:8px;border:1px solid var(--b-line);background:none;color:var(--b-sub);font-size:13px;cursor:pointer;}
+.pay-modal .pay-retry{width:100%;padding:10px;border-radius:8px;border:none;background:var(--b-accent);color:var(--b-accent-ink);font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:8px;display:none;}
 @media(max-width:860px){
   .app{grid-template-columns:1fr;grid-template-rows:1fr;}
   .resizer{display:none;}
@@ -119,22 +129,24 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 <div class="app">
   <aside class="panel" id="panel">
     <p class="brand">កម្មវិធីបង្កើតធៀបអញ្ជើញអាពាហ៍ពិពាហ៍</p>
-    <p class="brand-sub">បំពេញព័ត៌មាន ជ្រើសរើសទម្រង់ រួចទាញយកជាឯកសារ HTML (ខ្មែរ + English ជាមួយប៊ូតុងប្តូរភាសា)</p>
+    <p class="brand-sub">បំពេញព័ត៌មាន ជ្រើសរើសទម្រង់ រួចទាញយកជាឯកសារធៀបអញ្ជើញផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវនីមួយៗ (ខ្មែរ + English ជាមួយប៊ូតុងប្តូរភាសា)</p>
 
-    <fieldset>
-      <legend>ទម្រង់</legend>
-      <div class="theme-grid" id="themeGrid"></div>
-    </fieldset>
+    <div class="style-row">
+      <fieldset class="style-col">
+        <legend>ទម្រង់</legend>
+        <div class="theme-grid" id="themeGrid"></div>
+      </fieldset>
 
-    <fieldset>
-      <legend>បែបផែនចលនា (ពេលភ្ញៀវចុចមើល)</legend>
-      <div class="effect-grid" id="effectGrid"></div>
-    </fieldset>
+      <fieldset class="style-col">
+        <legend>បែបផែនចលនា</legend>
+        <div class="effect-grid" id="effectGrid"></div>
+      </fieldset>
+    </div>
 
     <fieldset>
       <legend>រូបភាពគម្រប (Cover)</legend>
       <p class="photo-hint">រូបភាពរួម ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា</p>
-      <div class="photo-grid" id="coverGrid" style="grid-template-columns:1fr 1fr;"></div>
+      <div class="photo-grid" id="coverGrid"></div>
     </fieldset>
 
     <fieldset>
@@ -187,6 +199,8 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 
     <fieldset>
       <legend>កម្មវិធីពិធី (ខ្មែរ + English)</legend>
+      <p class="photo-hint" style="margin:-2px 0 8px;">កម្មវិធីជាក់ស្តែងអាចប្រែប្រួលទៅតាមការណែនាំរបស់អាចារ្យ/ក្រុមរៀបចំពិធីរបស់អ្នក — គំរូខាងក្រោមសម្រាប់ជាចំណុចយោងតែប៉ុណ្ណោះ សូមកែតម្រូវឲ្យត្រូវនឹងការណែនាំជាក់ស្តែង</p>
+      <div class="template-row" id="tpl-timeline"></div>
       <div id="timelineList"></div>
       <button class="add-btn" id="addTimeline" type="button">+ បន្ថែមកម្មវិធី</button>
     </fieldset>
@@ -207,7 +221,9 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <legend class="sub">Venue — English</legend>
       <div class="field"><label>Venue Name</label><input type="text" id="venueNameEn" placeholder="e.g. ... Restaurant"></div>
       <div class="field"><label>Address</label><textarea id="venueAddrEn" placeholder="Street, commune, district, city/province"></textarea></div>
-      <div class="field"><label>តំណភ្ជាប់ Google Maps (ស្រេចចិត្ត — ប្រើរួមទាំងពីរភាសា)</label><input type="text" id="venueMapLink" placeholder="ទុកទទេ ប្រសិនបើចង់ឲ្យប្រព័ន្ធស្វែងរកដោយស្វ័យប្រវត្តិ"></div>
+      <div class="field"><label>តំណភ្ជាប់ Google Maps (ស្រេចចិត្ត — ប្រើរួមទាំងពីរភាសា)</label>
+        <p class="photo-hint" style="margin:-4px 0 8px;">ចម្លងតំណភ្ជាប់ពី Google Maps ដោយផ្ទាល់ (ស្វែងរកទីតាំង → Share → Copy link)។ ទុកទទេ ប៊ូតុងទីតាំងនឹងមិនបង្ហាញទេ</p>
+        <input type="text" id="venueMapLink" placeholder="https://maps.app.goo.gl/..."></div>
     </fieldset>
 
     <fieldset>
@@ -217,29 +233,37 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
     </fieldset>
 
     <fieldset>
-      <legend>លីងផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវ (Guest Links)</legend>
-      <p class="photo-hint" style="margin-top:-2px;">
-        បន្ទាប់ពីអ្នកបានផុសគេហទំព័រនេះលើ GitHub Pages រួច ដាក់ URL ខាងក្រោម និងឈ្មោះភ្ញៀវម្នាក់ម្តងក្នុងមួយបន្ទាត់ ដើម្បីបង្កើតលីងផ្ទាល់ខ្លួន (ភ្ញៀវម្នាក់លីងមួយ) ដែលបង្ហាញឈ្មោះគាត់ដោយស្វ័យប្រវត្តិនៅលើកាត។
-      </p>
-      <div class="field"><label>URL គេហទំព័រ (Base URL)</label>
-        <input type="text" id="baseUrl" placeholder="https://username.github.io/wedding/"></div>
+      <legend>ធៀបអញ្ជើញផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវ (Guest Copies)</legend>
       <div class="field"><label>បញ្ជីឈ្មោះភ្ញៀវ (មួយបន្ទាត់ម្នាក់)</label>
-        <textarea id="guestNames" style="min-height:110px;" placeholder="ចាន់ សុវណ្ណា
+        <textarea id="guestNamesFile" style="min-height:110px;" placeholder="ចាន់ សុវណ្ណា
 សុខ ស្រីពៅ
 លោក គង់ សុភាព"></textarea></div>
-      <button class="add-btn" id="genLinksBtn" type="button">បង្កើតលីងទាំងអស់</button>
-      <div id="guestLinksList" style="margin-top:12px;"></div>
+      <button class="add-btn" id="genFilesBtn" type="button">ទាញយកឯកសារភ្ញៀវទាំងអស់ (ZIP)</button>
+      <p class="guest-empty-hint" id="genFilesStatus"></p>
     </fieldset>
   </aside>
+
 
   <div class="resizer" id="resizer"></div>
 
   <div class="preview-col" id="previewCol">
     <div class="toolbar">
       <span class="toolbar-title">មើលសាកល្បង</span>
-      <button class="btn btn-primary" id="downloadBtn">ទាញយកជា index.html</button>
     </div>
     <div class="frame-wrap"><iframe id="frame"></iframe></div>
+  </div>
+</div>
+
+<div class="pay-overlay" id="payOverlay">
+  <div class="pay-modal">
+    <h3>ស្កេនដើម្បីទូទាត់ប្រាក់</h3>
+    <p class="pay-amount" id="payAmount">$2.00</p>
+    <div class="pay-qr-wrap" id="payQrWrap">
+      <span class="pay-status"><span class="pay-spinner"></span>កំពុងបង្កើត QR...</span>
+    </div>
+    <p class="pay-status" id="payStatus">សូមស្កេនដោយកម្មវិធីធនាគារ ឬ Bakong</p>
+    <button class="pay-retry" id="payRetryBtn" type="button">បង្កើត QR ថ្មី</button>
+    <button class="pay-cancel" id="payCancelBtn" type="button">បោះបង់</button>
   </div>
 </div>
 
@@ -259,7 +283,22 @@ const THEMES = {
     bg:"#F7F4EE", ink:"#1F1B16", accent1:"#1F1B16", accent2:"#6B6142",
     card:"#FFFFFF", border:"rgba(31,27,22,0.15)", radius:"0px",
     display:"'Battambang',serif", body:"'Kantumruy Pro',sans-serif", ornate:false,
-    displayEn:"'Playfair Display',serif", bodyEn:"'Cormorant Garamond',serif" }
+    displayEn:"'Playfair Display',serif", bodyEn:"'Cormorant Garamond',serif" },
+  royal:{ label:"នគរ", swatch:"linear-gradient(135deg,#1B3A6B,#C9A227)",
+    bg:"#F5F6FA", ink:"#1B2440", accent1:"#1B3A6B", accent2:"#C9A227",
+    card:"#FFFFFF", border:"rgba(27,58,107,0.18)", radius:"4px",
+    display:"'Bokor',serif", body:"'Kantumruy Pro',sans-serif", ornate:true,
+    displayEn:"'EB Garamond',serif", bodyEn:"'EB Garamond',serif" },
+  emerald:{ label:"ម្រកត", swatch:"linear-gradient(135deg,#1F5C45,#C9A227)",
+    bg:"#F2F8F5", ink:"#1E3B2F", accent1:"#1F5C45", accent2:"#C9A227",
+    card:"#FFFFFF", border:"rgba(31,92,69,0.18)", radius:"4px",
+    display:"'Angkor',serif", body:"'Battambang',sans-serif", ornate:true,
+    displayEn:"'Tangerine',cursive", bodyEn:"'Cormorant Garamond',serif" },
+  blush:{ label:"ផ្កាឈូក", swatch:"linear-gradient(135deg,#C76B84,#E0A458)",
+    bg:"#FFF8F5", ink:"#4A2E2A", accent1:"#C76B84", accent2:"#E0A458",
+    card:"#FFFFFF", border:"rgba(199,107,132,0.18)", radius:"4px",
+    display:"'Moulpali',serif", body:"'Kantumruy Pro',sans-serif", ornate:true,
+    displayEn:"'Marck Script',cursive", bodyEn:"'Cormorant Garamond',serif" }
 };
 
 const KM_WEEKDAYS = ["អាទិត្យ","ចន្ទ","អង្គារ","ពុធ","ព្រហស្បតិ៍","សុក្រ","សៅរ៍"];
@@ -320,6 +359,49 @@ const TEMPLATES = {
   }
 };
 
+const TIMELINE_PRESETS = [
+  {
+    label:"កម្មវិធីព្រឹក (សំខាន់ៗ)",
+    labelEn:"Morning Ceremony (Essentials)",
+    items:[
+      {time:"៦:០០ ព្រឹក", name:"ពិធីហែជំនូន", timeEn:"6:00 AM", nameEn:"Gift Procession Ceremony"},
+      {time:"៧:០០ ព្រឹក", name:"ពិធីសូត្រមន្ត ជូនពរដល់ព្រះសង្ឃ", timeEn:"7:00 AM", nameEn:"Blessing by Buddhist Monks"},
+      {time:"៨:០០ ព្រឹក", name:"ពិធីសំពះផ្ការ", timeEn:"8:00 AM", nameEn:"Flower Blessing Ceremony"},
+      {time:"៩:០០ ព្រឹក", name:"ពិធីកាត់សក់ (ស្រង់សក់)", timeEn:"9:00 AM", nameEn:"Hair Cutting Ceremony"},
+      {time:"១០:០០ ព្រឹក", name:"ពិធីបង្វិលពពិល", timeEn:"10:00 AM", nameEn:"Candle Circling Ceremony"},
+      {time:"១១:០០ ព្រឹក", name:"ពិធីជូនកូនក្រមុំចូលបន្ទប់", timeEn:"11:00 AM", nameEn:"Bridal Chamber Ceremony"},
+      {time:"១២:០០ ថ្ងៃត្រង់", name:"អាហារថ្ងៃត្រង់ អញ្ជើញភ្ញៀវ", timeEn:"12:00 PM", nameEn:"Lunch Reception"}
+    ]
+  },
+  {
+    label:"កម្មវិធីពេញលេញ (ព្រឹក + ល្ងាច)",
+    labelEn:"Full Day (Morning + Evening)",
+    items:[
+      {time:"៦:០០ ព្រឹក", name:"ពិធីហែជំនូន", timeEn:"6:00 AM", nameEn:"Gift Procession Ceremony"},
+      {time:"៧:០០ ព្រឹក", name:"ពិធីសូត្រមន្ត ជូនពរដល់ព្រះសង្ឃ", timeEn:"7:00 AM", nameEn:"Blessing by Buddhist Monks"},
+      {time:"៨:០០ ព្រឹក", name:"ពិធីសំពះផ្ការ", timeEn:"8:00 AM", nameEn:"Flower Blessing Ceremony"},
+      {time:"៩:០០ ព្រឹក", name:"ពិធីកាត់សក់ (ស្រង់សក់)", timeEn:"9:00 AM", nameEn:"Hair Cutting Ceremony"},
+      {time:"១០:០០ ព្រឹក", name:"ពិធីបង្វិលពពិល", timeEn:"10:00 AM", nameEn:"Candle Circling Ceremony"},
+      {time:"១១:០០ ព្រឹក", name:"ពិធីជូនកូនក្រមុំចូលបន្ទប់", timeEn:"11:00 AM", nameEn:"Bridal Chamber Ceremony"},
+      {time:"១២:០០ ថ្ងៃត្រង់", name:"អាហារថ្ងៃត្រង់ អញ្ជើញភ្ញៀវ", timeEn:"12:00 PM", nameEn:"Lunch Reception"},
+      {time:"៥:០០ ល្ងាច", name:"ភ្ញៀវអញ្ជើញចូលរួមអបអរសាទរ", timeEn:"5:00 PM", nameEn:"Guests Arrive & Celebration Begins"},
+      {time:"៦:០០ ល្ងាច", name:"ពិធីជូនពរកូនកម្លោះកូនក្រមុំ", timeEn:"6:00 PM", nameEn:"Blessing the Newlyweds"},
+      {time:"៧:០០ ល្ងាច", name:"ពិធីកាត់នំខេក និងអាហារពេលល្ងាច", timeEn:"7:00 PM", nameEn:"Cake Cutting & Dinner"}
+    ]
+  },
+  {
+    label:"ទទួលភ្ញៀវល្ងាចតែមួយ",
+    labelEn:"Evening Reception Only",
+    items:[
+      {time:"៥:៣០ ល្ងាច", name:"ភ្ញៀវអញ្ជើញចូលរួម", timeEn:"5:30 PM", nameEn:"Guests Arrive"},
+      {time:"៦:០០ ល្ងាច", name:"ពិធីស្វាគមន៍កូនកម្លោះកូនក្រមុំ", timeEn:"6:00 PM", nameEn:"Welcoming the Newlyweds"},
+      {time:"៦:៣០ ល្ងាច", name:"ពិធីជូនពរ និងផ្តល់អំណោយ", timeEn:"6:30 PM", nameEn:"Blessings & Gift Giving"},
+      {time:"៧:០០ ល្ងាច", name:"ពិធីកាត់នំខេក", timeEn:"7:00 PM", nameEn:"Cake Cutting Ceremony"},
+      {time:"៧:៣០ ល្ងាច", name:"អាហារពេលល្ងាច និងកម្សាន្ត", timeEn:"7:30 PM", nameEn:"Dinner & Entertainment"}
+    ]
+  }
+];
+
 const defaultState = {
   theme:"gold",
   effect:"petals",
@@ -350,9 +432,10 @@ const defaultState = {
     {name:"", phone:"", nameEn:""}
   ],
   photos:[],
+  photoNames:[],
   coverPhoto:null,
-  guestLinksBase:"",
-  guestNamesRaw:""
+  coverPhotoName:"",
+  guestNamesFileRaw:""
 };
 const MAX_PHOTOS = 10;
 
@@ -362,6 +445,7 @@ try{
   if(saved) state = Object.assign(JSON.parse(JSON.stringify(defaultState)), JSON.parse(saved));
 }catch(e){}
 state.photos = (state.photos || []).filter(Boolean);
+state.photoNames = state.photoNames || [];
 
 function saveDraft(){ try{ localStorage.setItem("wib-draft-v2", JSON.stringify(state)); }catch(e){} }
 
@@ -421,10 +505,7 @@ function buildSection(s, t, lang){
   const galleryHtml = buildGalleryHtml(s, t);
   const galleryClass = "gallery gallery-" + s.theme;
 
-  const mapsQuery = encodeURIComponent(venueName + ", " + venueAddr);
-  const mapsUrl = (s.venueMapLink && s.venueMapLink.trim())
-    ? s.venueMapLink.trim()
-    : `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+  const mapsUrl = (s.venueMapLink && s.venueMapLink.trim()) ? s.venueMapLink.trim() : "";
 
   const contactsHtml = (s.contacts||[]).filter(c => c.name || c.phone).map(c => {
     const cname = isKm ? c.name : (c.nameEn || c.name);
@@ -437,9 +518,12 @@ function buildSection(s, t, lang){
   const heroClass = s.coverPhoto ? "hero has-cover" : "hero";
   const suf = "-" + lang;
 
+  const guestLineText = s.__guestName ? (isKm ? `ជូនចំពោះ ${s.__guestName}` : `Dear ${s.__guestName},`) : "";
+  const guestLineAttrs = guestLineText ? "" : ` style="display:none"`;
+
   return `<section id="section${suf}" class="lang-section lang-${lang}" style="display:${isKm ? "block" : "none"}">
+<p class="guest-line" id="guestLine${suf}"${guestLineAttrs}>${escapeHtml(guestLineText)}</p>
 <section class="${heroClass}"${heroStyle}>
-<p class="guest-line" id="guestLine${suf}" style="display:none"></p>
 <p class="eyebrow">${escapeHtml(eyebrow)}</p>
 <h1 class="names display">${escapeHtml(groom)}<span class="amp">${escapeHtml(L.and)}</span>${escapeHtml(bride)}</h1>
 <p class="hero-date">${displayDate}</p>
@@ -476,7 +560,7 @@ ${divider}
 <div class="venue-card">
 <p class="venue-name display">${escapeHtml(venueName)}</p>
 <p class="venue-addr">${escapeHtml(venueAddr)}</p>
-<a class="map-btn" href="${escapeHtml(mapsUrl)}" target="_blank" rel="noopener">${L.mapBtn}</a>
+${mapsUrl ? `<a class="map-btn" href="${escapeHtml(mapsUrl)}" target="_blank" rel="noopener">${L.mapBtn}</a>` : ""}
 </div>
 </div></section>
 ${contactsHtml ? `${divider}<section><div class="wrap">
@@ -494,13 +578,14 @@ function renderInvitation(s){
   const kmSection = buildSection(s, t, "km");
   const enSection = buildSection(s, t, "en");
   const LKM = LABELS.km, LEN = LABELS.en;
+  const bodyClass = s.__guestName ? " class=\"guest-mode\"" : "";
 
   return `<!DOCTYPE html><html lang="km"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${escapeHtml(s.groomName)} & ${escapeHtml(s.brideName)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Moul&family=Battambang:wght@400;700&family=Suwannaphum&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Bokor&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
 <style>
 :root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--card:${t.card};--border:${t.border};--radius:${t.radius};--display-font:${t.display};--body-font:${t.body};--display-font-en:${t.displayEn};--body-font-en:${t.bodyEn};}
 *{box-sizing:border-box}
@@ -512,8 +597,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body-font)
 .wrap{max-width:680px;margin:0 auto;padding:0 24px;}
 .hero{padding:80px 24px 60px;text-align:center;background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%), var(--bg);}
 .eyebrow{font-size:15px;color:var(--ink);opacity:.75;margin:0 0 24px;}
-.guest-line{font-size:15px;font-weight:700;color:var(--accent-1);margin:0 0 10px;letter-spacing:.01em;}
-.hero.has-cover .guest-line{color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.55);}
+.guest-line{position:sticky;top:0;z-index:70;display:block;width:100%;margin:0;padding:13px 20px;font-size:15px;font-weight:700;letter-spacing:.03em;text-align:center;color:#fff;background:linear-gradient(90deg, var(--accent-1), var(--accent-2));box-shadow:0 4px 16px rgba(0,0,0,.2);font-style:normal;}
+.lang-en .guest-line{font-style:normal;}
 .names{font-size:clamp(30px,8vw,52px);line-height:1.5;margin:0;}
 .names .amp{display:block;font-family:var(--body-font);font-size:0.4em;color:var(--accent-2);margin:6px 0;}
 .lang-en .names .amp{font-family:var(--body-font-en);font-style:italic;}
@@ -524,6 +609,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body-font)
 .hero.has-cover .names .amp{color:var(--accent-2);}
 .hero.has-cover .hero-date{color:#fff;opacity:.95;text-shadow:0 2px 10px rgba(0,0,0,.55);}
 section{padding:52px 0;}
+.lang-section{padding:0;}
 .section-title{font-size:26px;text-align:center;margin:0 0 6px;}
 .section-sub{text-align:center;color:var(--ink);opacity:.7;font-size:14px;margin:0 0 32px;}
 .divider{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 auto;max-width:680px;padding:0 24px;}
@@ -573,8 +659,9 @@ footer .thanks{font-size:19px;color:var(--accent-1);opacity:1;margin-bottom:8px;
 .lang-toggle{position:fixed;top:16px;right:16px;z-index:100;display:flex;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.14);}
 .lang-toggle button{border:none;background:none;padding:8px 16px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--ink);font-family:'Kantumruy Pro',sans-serif;font-style:normal;}
 .lang-toggle button.active{background:var(--accent-1);color:#fff;}
-@media(max-width:480px){.hero{padding:64px 18px 48px;}.welcome{padding:30px 20px;}.lang-toggle{top:10px;right:10px;}.lang-toggle button{padding:7px 12px;font-size:12px;}}
-</style></head><body>
+body.guest-mode .lang-toggle{top:62px;}
+@media(max-width:480px){.hero{padding:64px 18px 48px;}.welcome{padding:30px 20px;}.lang-toggle{top:10px;right:10px;}.lang-toggle button{padding:7px 12px;font-size:12px;}body.guest-mode .lang-toggle{top:56px;}}
+</style></head><body${bodyClass}>
 <div class="lang-toggle">
   <button id="btn-km" class="active" type="button">${LKM.toggleKm}</button>
   <button id="btn-en" type="button">${LEN.toggleEn}</button>
@@ -613,6 +700,7 @@ try{
     var ge=document.getElementById('guestLine-en');
     if(gk){ gk.textContent='ជូនចំពោះ '+guestName; gk.style.display='block'; }
     if(ge){ ge.textContent='Dear '+guestName+','; ge.style.display='block'; }
+    document.body.classList.add('guest-mode');
   }
 }catch(e){}
 
@@ -712,6 +800,13 @@ if(fxType!=="none"){
 }
 
 // ---------- Builder UI wiring ----------
+// ---------------------------------------------------------------------
+// Bakong KHQR payment gate — EDIT THESE TWO LINES after you deploy
+// wedding-code.gs as a Web App (see setup notes at the top of that file).
+// ---------------------------------------------------------------------
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvSGm-uY1Qz_H1XNbZ2yXyu3IlnD-s_1Xp6HK_C2_34VsKR65VC3E8zNdXQYnmrHdf/exec"; // e.g. https://script.google.com/macros/s/AKfycb.../exec
+const DOWNLOAD_PRICE_USD = 2; // change this any time — price shown on the QR
+
 const $ = id => document.getElementById(id);
 
 function buildThemePicker(){
@@ -767,10 +862,10 @@ function buildTimeline(){
     </div>`).join("");
   list.querySelectorAll(".item-card").forEach(row => {
     const i = +row.dataset.i;
-    row.querySelector(".tl-time-in").addEventListener("input", e => { state.timeline[i].time = e.target.value; update(); });
-    row.querySelector(".tl-name-in").addEventListener("input", e => { state.timeline[i].name = e.target.value; update(); });
-    row.querySelector(".tl-time-en-in").addEventListener("input", e => { state.timeline[i].timeEn = e.target.value; update(); });
-    row.querySelector(".tl-name-en-in").addEventListener("input", e => { state.timeline[i].nameEn = e.target.value; update(); });
+    row.querySelector(".tl-time-in").addEventListener("input", e => { state.timeline[i].time = e.target.value; scheduleUpdate(); });
+    row.querySelector(".tl-name-in").addEventListener("input", e => { state.timeline[i].name = e.target.value; scheduleUpdate(); });
+    row.querySelector(".tl-time-en-in").addEventListener("input", e => { state.timeline[i].timeEn = e.target.value; scheduleUpdate(); });
+    row.querySelector(".tl-name-en-in").addEventListener("input", e => { state.timeline[i].nameEn = e.target.value; scheduleUpdate(); });
     row.querySelector(".tl-remove").addEventListener("click", () => { state.timeline.splice(i,1); buildTimeline(); update(); });
   });
 }
@@ -778,12 +873,13 @@ function buildTimeline(){
 function buildCoverPhoto(){
   const grid = $("coverGrid");
   if(state.coverPhoto){
-    grid.innerHTML = `<div class="photo-slot" style="grid-column:span 2;">
-      <img src="${state.coverPhoto}"><button class="photo-clear" type="button" id="coverClear">×</button>
+    grid.innerHTML = `<div class="photo-file-row">
+      <span class="filename-text" title="${(state.coverPhotoName||"").replace(/"/g,"&quot;")}">${(state.coverPhotoName||"រូបភាពគម្រប").replace(/</g,"&lt;")}</span>
+      <button class="photo-clear" type="button" id="coverClear">×</button>
     </div>`;
-    $("coverClear").addEventListener("click", () => { state.coverPhoto = null; buildCoverPhoto(); update(); });
+    $("coverClear").addEventListener("click", () => { state.coverPhoto = null; state.coverPhotoName = ""; buildCoverPhoto(); update(); });
   } else {
-    grid.innerHTML = `<div class="photo-slot add-tile" style="grid-column:span 2;">
+    grid.innerHTML = `<div class="photo-add-row">
       <span>+ បញ្ចូលរូបភាពគម្រប</span>
       <input type="file" accept="image/*" id="coverInput">
     </div>`;
@@ -791,7 +887,7 @@ function buildCoverPhoto(){
       const file = e.target.files[0];
       if(!file) return;
       const reader = new FileReader();
-      reader.onload = ev => { state.coverPhoto = ev.target.result; buildCoverPhoto(); update(); };
+      reader.onload = ev => { state.coverPhoto = ev.target.result; state.coverPhotoName = file.name; buildCoverPhoto(); update(); };
       reader.readAsDataURL(file);
     });
   }
@@ -813,23 +909,29 @@ function buildContacts(){
     </div>`).join("");
   list.querySelectorAll(".item-card").forEach(row => {
     const i = +row.dataset.i;
-    row.querySelector(".ct-name-in").addEventListener("input", e => { state.contacts[i].name = e.target.value; update(); });
-    row.querySelector(".ct-phone-in").addEventListener("input", e => { state.contacts[i].phone = e.target.value; update(); });
-    row.querySelector(".ct-name-en-in").addEventListener("input", e => { state.contacts[i].nameEn = e.target.value; update(); });
+    row.querySelector(".ct-name-in").addEventListener("input", e => { state.contacts[i].name = e.target.value; scheduleUpdate(); });
+    row.querySelector(".ct-phone-in").addEventListener("input", e => { state.contacts[i].phone = e.target.value; scheduleUpdate(); });
+    row.querySelector(".ct-name-en-in").addEventListener("input", e => { state.contacts[i].nameEn = e.target.value; scheduleUpdate(); });
     row.querySelector(".ct-remove").addEventListener("click", () => { state.contacts.splice(i,1); buildContacts(); update(); });
   });
 }
 
 function buildPhotos(){
-  state.photos = state.photos.filter(Boolean);
+  if(state.photos.length !== state.photoNames.length){
+    state.photoNames = state.photos.map((_,i) => state.photoNames[i] || `រូបភាព ${i+1}`);
+  }
+  const zipped = state.photos.map((src,i) => ({src, name: state.photoNames[i]})).filter(p => p.src);
+  state.photos = zipped.map(p => p.src);
+  state.photoNames = zipped.map(p => p.name);
   const grid = $("photoGrid");
-  const existing = state.photos.map((src,i) => `
-    <div class="photo-slot" data-i="${i}">
-      <img src="${src}"><button class="photo-clear" type="button" data-i="${i}">×</button>
+  const existing = zipped.map((p,i) => `
+    <div class="photo-file-row" data-i="${i}">
+      <span class="filename-text" title="${(p.name||"").replace(/"/g,"&quot;")}">${(p.name||"").replace(/</g,"&lt;")}</span>
+      <button class="photo-clear" type="button" data-i="${i}">×</button>
     </div>`).join("");
   const addTile = state.photos.length < MAX_PHOTOS
-    ? `<div class="photo-slot add-tile">
-        <span>+ បញ្ចូល<br>(${state.photos.length}/${MAX_PHOTOS})</span>
+    ? `<div class="photo-add-row">
+        <span>+ បញ្ចូលរូបភាព (${state.photos.length}/${MAX_PHOTOS})</span>
         <input type="file" accept="image/*" id="addPhotoInput" multiple>
       </div>`
     : "";
@@ -847,6 +949,7 @@ function buildPhotos(){
         const reader = new FileReader();
         reader.onload = ev => {
           state.photos.push(ev.target.result);
+          state.photoNames.push(file.name);
           loaded++;
           if(loaded === toAdd.length){ buildPhotos(); update(); }
         };
@@ -859,98 +962,159 @@ function buildPhotos(){
       e.stopPropagation();
       const i = +e.target.dataset.i;
       state.photos.splice(i,1);
+      state.photoNames.splice(i,1);
       buildPhotos(); update();
     });
   });
 }
 
-function normalizeBaseUrl(url){
-  url = (url || "").trim();
-  if(!url) return "";
-  if(!/^https?:\/\//i.test(url)) url = "https://" + url;
-  if(!url.endsWith("/")) url += "/";
-  return url;
+function safeFileName(name){
+  return (name || "guest").trim().replace(/[^\w\u1780-\u17FF]+/g, "_").replace(/^_+|_+$/g, "") || "guest";
 }
 
-function copyText(text, btnEl){
-  function done(){
-    if(!btnEl) return;
-    const original = btnEl.textContent;
-    btnEl.textContent = "បានចម្លង!";
-    btnEl.classList.add("copied");
-    setTimeout(() => { btnEl.textContent = original; btnEl.classList.remove("copied"); }, 1500);
-  }
-  function fallback(){
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.position = "fixed"; ta.style.left = "-9999px";
-    document.body.appendChild(ta);
-    ta.focus(); ta.select();
-    try { document.execCommand("copy"); } catch(e) {}
-    document.body.removeChild(ta);
-    done();
-  }
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(done).catch(fallback);
-  } else {
-    fallback();
-  }
-}
+// ---- Personalized guest files: baked-in, zipped, no hosting needed ----
+async function generateGuestFiles(){
+  const statusEl = $("genFilesStatus");
+  const names = $("guestNamesFile").value.split("\n").map(n => n.trim()).filter(Boolean);
+  state.guestNamesFileRaw = $("guestNamesFile").value;
+  saveDraft();
 
-function buildGuestLinks(){
-  const base = normalizeBaseUrl($("baseUrl").value);
-  const names = $("guestNames").value.split("\n").map(n => n.trim()).filter(Boolean);
-  const listEl = $("guestLinksList");
-
-  state.guestLinksBase = $("baseUrl").value;
-  state.guestNamesRaw = $("guestNames").value;
-  saveState_safe();
-
-  if(!base){
-    listEl.innerHTML = '<p class="guest-empty-hint">សូមបញ្ចូល URL គេហទំព័រជាមុនសិន (ឧ. https://username.github.io/wedding/)</p>';
-    return;
-  }
   if(!names.length){
-    listEl.innerHTML = '<p class="guest-empty-hint">សូមបញ្ចូលឈ្មោះភ្ញៀវយ៉ាងហោចណាស់ម្នាក់ម្នាក់ក្នុងមួយបន្ទាត់</p>';
+    statusEl.textContent = "សូមបញ្ចូលឈ្មោះភ្ញៀវយ៉ាងហោចណាស់ម្នាក់ម្នាក់ក្នុងមួយបន្ទាត់";
     return;
   }
+  if(typeof JSZip === "undefined"){
+    statusEl.textContent = "មិនអាចផ្ទុកម៉ូឌុល ZIP បាន សូមព្យាយាមម្តងទៀត ឬពិនិត្យការតភ្ជាប់អ៊ីនធឺណិត";
+    return;
+  }
+  statusEl.textContent = "កំពុងបង្កើតឯកសារ...";
 
-  const links = names.map(name => ({ name, url: base + "?to=" + encodeURIComponent(name) }));
-
-  listEl.innerHTML = links.map((l,i) => `
-    <div class="guest-link-row">
-      <div class="guest-link-info">
-        <div class="guest-link-name">${escapeHtml(l.name)}</div>
-        <div class="guest-link-url">${escapeHtml(l.url)}</div>
-      </div>
-      <button class="copy-btn" type="button" data-i="${i}">ចម្លង</button>
-    </div>`).join("") +
-    `<button class="copy-all-btn" id="copyAllLinksBtn" type="button">ចម្លងលីងទាំងអស់ (${links.length})</button>`;
-
-  listEl.querySelectorAll(".copy-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const link = links[+btn.dataset.i];
-      copyText(link.name + ": " + link.url, btn);
-    });
+  const zip = new JSZip();
+  const usedNames = {};
+  names.forEach(name => {
+    const guestState = Object.assign({}, state, { __guestName: name });
+    const html = renderInvitation(guestState);
+    let base = safeFileName(name);
+    let finalName = base;
+    let n = 2;
+    while(usedNames[finalName]){ finalName = base + "-" + n; n++; }
+    usedNames[finalName] = true;
+    zip.file(finalName + ".html", html);
   });
-  const copyAllBtn = $("copyAllLinksBtn");
-  if(copyAllBtn){
-    copyAllBtn.addEventListener("click", () => {
-      const allText = links.map(l => l.name + ": " + l.url).join("\n");
-      copyText(allText, copyAllBtn);
-    });
+
+  try{
+    const blob = await zip.generateAsync({ type:"blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "guest-invitations.zip";
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    statusEl.textContent = `បានទាញយក ${names.length} ឯកសារ ក្នុង ZIP មួយ — ស្រាយ (unzip) រួចផ្ញើឯកសារនីមួយៗទៅភ្ញៀវផ្ទាល់`;
+  }catch(e){
+    statusEl.textContent = "មានបញ្ហាកើតឡើងពេលបង្កើត ZIP សូមព្យាយាមម្តងទៀត";
+  }
+}
+$("genFilesBtn").addEventListener("click", () => {
+  const statusEl = $("genFilesStatus");
+  const names = $("guestNamesFile").value.split("\n").map(n => n.trim()).filter(Boolean);
+  state.guestNamesFileRaw = $("guestNamesFile").value;
+  saveDraft();
+  if(!names.length){
+    statusEl.textContent = "សូមបញ្ចូលឈ្មោះភ្ញៀវយ៉ាងហោចណាស់ម្នាក់ម្នាក់ក្នុងមួយបន្ទាត់";
+    return;
+  }
+  statusEl.textContent = "";
+  if(isUnlocked()){
+    generateGuestFiles();
+  } else {
+    startPayment();
+  }
+});
+
+// ---------------------------------------------------------------------
+// Bakong KHQR payment gate
+// ---------------------------------------------------------------------
+const PAID_FLAG_KEY = "wib-paid-unlock";
+let payPollTimer = null;
+let payCurrentMd5 = null;
+
+function isUnlocked(){
+  try{ return localStorage.getItem(PAID_FLAG_KEY) === "1"; }catch(e){ return false; }
+}
+function setUnlocked(){
+  try{ localStorage.setItem(PAID_FLAG_KEY, "1"); }catch(e){}
+}
+function stopPaymentPolling(){
+  if(payPollTimer){ clearInterval(payPollTimer); payPollTimer = null; }
+}
+function closePaymentModal(){
+  stopPaymentPolling();
+  $("payOverlay").classList.remove("show");
+}
+
+async function startPayment(){
+  if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf("REPLACE_WITH") === 0){
+    $("genFilesStatus").textContent = "កំហុសការកំណត់៖ សូមដាក់ APPS_SCRIPT_URL ក្នុងកូដសិន (មើលកំណត់ចំណាំក្នុងឯកសារ .gs)";
+    return;
+  }
+  $("payOverlay").classList.add("show");
+  $("payAmount").textContent = "$" + DOWNLOAD_PRICE_USD.toFixed(2);
+  $("payRetryBtn").style.display = "none";
+  $("payQrWrap").innerHTML = '<span class="pay-status"><span class="pay-spinner"></span>កំពុងបង្កើត QR...</span>';
+  $("payStatus").textContent = "សូមរង់ចាំ...";
+
+  try{
+    const resp = await fetch(`${APPS_SCRIPT_URL}?action=createPayment&amount=${DOWNLOAD_PRICE_USD}`);
+    const data = await resp.json();
+    if(!data.success){
+      $("payQrWrap").innerHTML = '<span class="pay-status">មិនអាចបង្កើត QR បានទេ</span>';
+      $("payStatus").textContent = data.reason || "សូមព្យាយាមម្តងទៀត";
+      $("payRetryBtn").style.display = "block";
+      return;
+    }
+    payCurrentMd5 = data.md5;
+    $("payQrWrap").innerHTML = `<img src="data:image/png;base64,${data.image}" alt="KHQR">`;
+    $("payStatus").textContent = "សូមស្កេនដោយកម្មវិធីធនាគារ ឬ Bakong";
+    startPaymentPolling();
+  }catch(e){
+    $("payQrWrap").innerHTML = '<span class="pay-status">មានបញ្ហាតភ្ជាប់</span>';
+    $("payStatus").textContent = "សូមពិនិត្យអ៊ីនធឺណិត ហើយព្យាយាមម្តងទៀត";
+    $("payRetryBtn").style.display = "block";
   }
 }
 
-function saveState_safe(){ try{ saveDraft(); }catch(e){} }
+function startPaymentPolling(){
+  stopPaymentPolling();
+  payPollTimer = setInterval(async () => {
+    if(!payCurrentMd5) return;
+    try{
+      const resp = await fetch(`${APPS_SCRIPT_URL}?action=checkStatus&md5=${encodeURIComponent(payCurrentMd5)}`);
+      const data = await resp.json();
+      if(data.success){
+        stopPaymentPolling();
+        setUnlocked();
+        $("payStatus").textContent = "ទូទាត់ជោគជ័យ! កំពុងបង្កើតឯកសារ...";
+        setTimeout(() => {
+          closePaymentModal();
+          generateGuestFiles();
+        }, 700);
+      } else if(data.status === "expired"){
+        stopPaymentPolling();
+        $("payQrWrap").innerHTML = '<span class="pay-status">QR ផុតកំណត់ហើយ</span>';
+        $("payStatus").textContent = "សូមបង្កើត QR ថ្មី";
+        $("payRetryBtn").style.display = "block";
+      } else if(data.status === "scanned"){
+        $("payStatus").textContent = "បានស្កេនហើយ កំពុងរង់ចាំបញ្ជាក់ការទូទាត់...";
+      }
+    }catch(e){ /* transient network error — keep polling */ }
+  }, 3000);
+}
 
-function restoreGuestLinksUI(){
-  $("baseUrl").value = state.guestLinksBase || "";
-  $("guestNames").value = state.guestNamesRaw || "";
-  $("genLinksBtn").addEventListener("click", buildGuestLinks);
-  if(state.guestLinksBase && state.guestNamesRaw){
-    buildGuestLinks();
-  }
+$("payCancelBtn").addEventListener("click", closePaymentModal);
+$("payRetryBtn").addEventListener("click", startPayment);
+
+function restoreGuestFilesUI(){
+  $("guestNamesFile").value = state.guestNamesFileRaw || "";
 }
 
 function buildTemplateChips(){
@@ -1008,6 +1172,50 @@ function buildTemplateChips(){
   });
 }
 
+function buildTimelineTemplates(){
+  const row = $("tpl-timeline");
+  if(!row) return;
+  row.className = "template-preview-wrap";
+
+  const toggleBtn = document.createElement("button");
+  toggleBtn.type = "button";
+  toggleBtn.className = "tpl-toggle-btn";
+  toggleBtn.textContent = "ជ្រើសរើសគំរូកម្មវិធីពិធី (" + TIMELINE_PRESETS.length + ")";
+
+  const list = document.createElement("div");
+  list.className = "template-preview-list";
+  list.style.display = "none";
+  list.innerHTML = TIMELINE_PRESETS.map((preset,i) => {
+    const previewKm = preset.items.map(it => it.name).join(" → ");
+    return `<button type="button" class="template-chip-lg" data-i="${i}" title="${previewKm.replace(/"/g,"&quot;")}">
+       <span class="tpl-num">${(preset.label+" · "+preset.labelEn).replace(/</g,"&lt;")}</span>
+       <span class="tpl-text">${previewKm.replace(/</g,"&lt;")} — (${preset.items.length} ចំណុច)</span>
+     </button>`;
+  }).join("");
+
+  toggleBtn.addEventListener("click", () => {
+    const expanded = list.style.display !== "none";
+    list.style.display = expanded ? "none" : "flex";
+    toggleBtn.textContent = (expanded ? "ជ្រើសរើសគំរូកម្មវិធីពិធី" : "លាក់គំរូកម្មវិធីពិធី") + " (" + TIMELINE_PRESETS.length + ")";
+    toggleBtn.classList.toggle("expanded", !expanded);
+  });
+
+  row.innerHTML = "";
+  row.appendChild(toggleBtn);
+  row.appendChild(list);
+
+  list.querySelectorAll(".template-chip-lg").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const preset = TIMELINE_PRESETS[+chip.dataset.i];
+      state.timeline = JSON.parse(JSON.stringify(preset.items));
+      list.querySelectorAll(".template-chip-lg").forEach(c => c.classList.remove("chosen"));
+      chip.classList.add("chosen");
+      buildTimeline();
+      update();
+    });
+  });
+}
+
 function bindSimpleFields(){
   const map = {
     groomName:"groomName", brideName:"brideName", eyebrow:"eyebrow",
@@ -1022,13 +1230,22 @@ function bindSimpleFields(){
   Object.entries(map).forEach(([id,key]) => {
     const el = $(id);
     el.value = state[key] || "";
-    el.addEventListener("input", () => { state[key] = el.value; update(); });
+    el.addEventListener("input", () => { state[key] = el.value; scheduleUpdate(); });
   });
 }
 
 function update(){
   saveDraft();
   $("frame").srcdoc = renderInvitation(state);
+}
+
+let updateTimer = null;
+function scheduleUpdate(){
+  saveDraft();
+  if(updateTimer) clearTimeout(updateTimer);
+  updateTimer = setTimeout(() => {
+    $("frame").srcdoc = renderInvitation(state);
+  }, 450);
 }
 
 $("addTimeline").addEventListener("click", () => {
@@ -1041,30 +1258,6 @@ $("addContact").addEventListener("click", () => {
   state.contacts.push({name:"", phone:"", nameEn:""});
   buildContacts();
   update();
-});
-
-$("downloadBtn").addEventListener("click", async () => {
-  const html = renderInvitation(state);
-  const filename = "wedding-invitation-" + (state.groomName || "invitation").replace(/[^\w\u1780-\u17FF]/g, "") + ".html";
-  try {
-    const downloads = await claude.use("downloads");
-    if (downloads) {
-      try {
-        await downloads.save({ filename, data: html });
-        return;
-      } catch (err) {
-        if (err && err.code === "declined") return;
-        // fall through to manual fallback on other errors
-      }
-    }
-  } catch (e) { /* capability unavailable here, fall back below */ }
-
-  const blob = new Blob([html], {type:"text/html"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
 });
 
 // Mobile tabs
@@ -1109,12 +1302,13 @@ window.addEventListener("touchend", () => { resizing = false; });
 buildThemePicker();
 buildEffectPicker();
 buildTimeline();
+buildTimelineTemplates();
 buildContacts();
 buildPhotos();
 buildCoverPhoto();
 buildTemplateChips();
 bindSimpleFields();
-restoreGuestLinksUI();
+restoreGuestFilesUI();
 update();
 </script>
 </body>
