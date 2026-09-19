@@ -257,7 +257,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 <div class="pay-overlay" id="payOverlay">
   <div class="pay-modal">
     <h3>ស្កេនដើម្បីទូទាត់ប្រាក់</h3>
-    <p class="pay-amount" id="payAmount">$2.00</p>
+    <p class="pay-amount" id="payAmount">$20.00</p>
     <div class="pay-qr-wrap" id="payQrWrap">
       <span class="pay-status"><span class="pay-spinner"></span>កំពុងបង្កើត QR...</span>
     </div>
@@ -805,7 +805,7 @@ if(fxType!=="none"){
 // wedding-code.gs as a Web App (see setup notes at the top of that file).
 // ---------------------------------------------------------------------
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvSGm-uY1Qz_H1XNbZ2yXyu3IlnD-s_1Xp6HK_C2_34VsKR65VC3E8zNdXQYnmrHdf/exec"; // e.g. https://script.google.com/macros/s/AKfycb.../exec
-const DOWNLOAD_PRICE_USD = 2; // change this any time — price shown on the QR
+const DOWNLOAD_PRICE_USD = 20; // change this any time — price shown on the QR
 
 const $ = id => document.getElementById(id);
 
@@ -1058,7 +1058,7 @@ async function startPayment(){
     return;
   }
   $("payOverlay").classList.add("show");
-  $("payAmount").textContent = "$" + DOWNLOAD_PRICE_USD.toFixed(2);
+  $("payAmount").textContent = "$" + DOWNLOAD_PRICE_USD.toFixed(20);
   $("payRetryBtn").style.display = "none";
   $("payQrWrap").innerHTML = '<span class="pay-status"><span class="pay-spinner"></span>កំពុងបង្កើត QR...</span>';
   $("payStatus").textContent = "សូមរង់ចាំ...";
