@@ -145,8 +145,9 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 
     <fieldset>
       <legend>រូបភាពគម្រប (Cover)</legend>
-      <p class="photo-hint">រូបភាពរួម ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា</p>
+      <p class="photo-hint">រូបភាពរួម ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា (រូបភាពត្រូវបានបង្រួមទំហំដោយស្វ័យប្រវត្តិ)</p>
       <div class="photo-grid" id="coverGrid"></div>
+      <p class="guest-empty-hint" id="coverStatus"></p>
     </fieldset>
 
     <fieldset>
@@ -228,16 +229,19 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 
     <fieldset>
       <legend>រូបភាព (Pre-wedding) — រួម</legend>
-      <p class="photo-hint">បញ្ចូលបានតិច-ច្រើនតាមចិត្ត (រហូតដល់ ១០ សន្លឹក) ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា</p>
+      <p class="photo-hint">បញ្ចូលបានតិច-ច្រើនតាមចិត្ត (រហូតដល់ ១០ សន្លឹក) ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា (រូបភាពត្រូវបានបង្រួមទំហំដោយស្វ័យប្រវត្តិ)</p>
       <div class="photo-grid" id="photoGrid"></div>
+      <p class="guest-empty-hint" id="photoStatus"></p>
     </fieldset>
 
     <fieldset>
       <legend>ធៀបអញ្ជើញផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវ (Guest Copies)</legend>
+      <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;">ទាញយកបានច្រើនបំផុត <b>៣០ នាក់ក្នុងមួយដង</b>។ បើមានភ្ញៀវលើសពី ៣០ នាក់ សូមបែងចែកជាក្រុមៗ៖ ទាញយកក្រុមទី ១ (៣០ នាក់ដំបូង) រួចលុបឈ្មោះទាំងនោះចេញ ហើយបិទភ្ជាប់ក្រុមបន្ទាប់ដើម្បីទាញយកម្តងទៀត។ ការទូទាត់មានសុពលភាព ៣០ ថ្ងៃ ដូច្នេះមិនចាំបាច់បង់ថ្មីសម្រាប់ក្រុមបន្ទាប់ ដរាបណាមិនប្តូរឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធី។</p>
       <div class="field"><label>បញ្ជីឈ្មោះភ្ញៀវ (មួយបន្ទាត់ម្នាក់)</label>
         <textarea id="guestNamesFile" style="min-height:110px;" placeholder="ចាន់ សុវណ្ណា
 សុខ ស្រីពៅ
 លោក គង់ សុភាព"></textarea></div>
+      <p class="guest-empty-hint" id="guestCount" style="padding:0 0 10px;text-align:right;"></p>
       <button class="add-btn" id="genFilesBtn" type="button">ទាញយកឯកសារភ្ញៀវទាំងអស់ (ZIP)</button>
       <p class="guest-empty-hint" id="genFilesStatus"></p>
     </fieldset>
@@ -801,11 +805,13 @@ if(fxType!=="none"){
 
 // ---------- Builder UI wiring ----------
 // ---------------------------------------------------------------------
-// Bakong KHQR payment gate — EDIT THESE TWO LINES after you deploy
-// wedding-code.gs as a Web App (see setup notes at the top of that file).
+// Bakong KHQR payment gate — set APPS_SCRIPT_URL to your deployed
+// wedding-code.gs Web App (/exec) URL.
 // ---------------------------------------------------------------------
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvSGm-uY1Qz_H1XNbZ2yXyu3IlnD-s_1Xp6HK_C2_34VsKR65VC3E8zNdXQYnmrHdf/exec"; // e.g. https://script.google.com/macros/s/AKfycb.../exec
-const DOWNLOAD_PRICE_USD = 20; // change this any time — price shown on the QR
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvSGm-uY1Qz_H1XNbZ2yXyu3IlnD-s_1Xp6HK_C2_34VsKR65VC3E8zNdXQYnmrHdf/exec";
+// Display-only default. The REAL price is fixed on the server (PRICE in
+// wedding-code.gs); the modal updates to the server's amount once the QR is made.
+const DOWNLOAD_PRICE_USD = 20;
 
 const $ = id => document.getElementById(id);
 
@@ -877,18 +883,24 @@ function buildCoverPhoto(){
       <span class="filename-text" title="${(state.coverPhotoName||"").replace(/"/g,"&quot;")}">${(state.coverPhotoName||"រូបភាពគម្រប").replace(/</g,"&lt;")}</span>
       <button class="photo-clear" type="button" id="coverClear">×</button>
     </div>`;
-    $("coverClear").addEventListener("click", () => { state.coverPhoto = null; state.coverPhotoName = ""; buildCoverPhoto(); update(); });
+    $("coverClear").addEventListener("click", () => { state.coverPhoto = null; state.coverPhotoName = ""; setImgStatus("coverStatus", ""); buildCoverPhoto(); update(); });
   } else {
     grid.innerHTML = `<div class="photo-add-row">
       <span>+ បញ្ចូលរូបភាពគម្រប</span>
       <input type="file" accept="image/*" id="coverInput">
     </div>`;
-    $("coverInput").addEventListener("change", e => {
+    $("coverInput").addEventListener("change", async e => {
       const file = e.target.files[0];
       if(!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => { state.coverPhoto = ev.target.result; state.coverPhotoName = file.name; buildCoverPhoto(); update(); };
-      reader.readAsDataURL(file);
+      setImgStatus("coverStatus", "កំពុងបង្រួមរូបភាព...");
+      try{
+        const data = await compressImage(file, IMG_COVER);
+        state.coverPhoto = data; state.coverPhotoName = file.name;
+        buildCoverPhoto(); update();
+        setImgStatus("coverStatus", "បានបង្រួម៖ " + fmtSize(file.size) + " → " + fmtSize(dataUrlBytes(data)));
+      }catch(err){
+        setImgStatus("coverStatus", "មិនអាចបើករូបភាពនេះបានទេ សូមជ្រើសរើសរូបភាព JPG/PNG ផ្សេង");
+      }
     });
   }
 }
@@ -939,22 +951,26 @@ function buildPhotos(){
 
   const addInput = $("addPhotoInput");
   if(addInput){
-    addInput.addEventListener("change", e => {
+    addInput.addEventListener("change", async e => {
       const files = Array.from(e.target.files || []);
       const remaining = MAX_PHOTOS - state.photos.length;
       const toAdd = files.slice(0, remaining);
       if(!toAdd.length) return;
-      let loaded = 0;
-      toAdd.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = ev => {
-          state.photos.push(ev.target.result);
+      setImgStatus("photoStatus", "កំពុងបង្រួមរូបភាព...");
+      let before = 0, after = 0, ok = 0, failed = 0;
+      for(const file of toAdd){
+        try{
+          const data = await compressImage(file, IMG_GALLERY);
+          state.photos.push(data);
           state.photoNames.push(file.name);
-          loaded++;
-          if(loaded === toAdd.length){ buildPhotos(); update(); }
-        };
-        reader.readAsDataURL(file);
-      });
+          before += file.size; after += dataUrlBytes(data); ok++;
+        }catch(err){ failed++; }
+      }
+      buildPhotos(); update();
+      let msg = ok ? "បានបង្រួម " + ok + " សន្លឹក៖ " + fmtSize(before) + " → " + fmtSize(after) : "";
+      if(failed) msg += (msg ? " · " : "") + "មិនអាចបើករូបភាព " + failed + " សន្លឹក";
+      if(files.length > remaining) msg += (msg ? " · " : "") + "បន្ថែមបានត្រឹម " + MAX_PHOTOS + " សន្លឹក";
+      setImgStatus("photoStatus", msg);
     });
   }
   grid.querySelectorAll(".photo-clear").forEach(btn => {
@@ -966,6 +982,73 @@ function buildPhotos(){
       buildPhotos(); update();
     });
   });
+}
+
+const MAX_GUESTS_PER_DOWNLOAD = 30;           // guests per ZIP download
+const IMG_COVER   = { maxDim:1600, quality:0.78 }; // cover photo compression
+const IMG_GALLERY = { maxDim:1200, quality:0.72 }; // pre-wedding photos compression
+
+function setImgStatus(id, text){ const el = $(id); if(el) el.textContent = text || ""; }
+function fmtSize(bytes){
+  if(bytes >= 1048576) return (bytes/1048576).toFixed(1) + " MB";
+  return Math.max(1, Math.round(bytes/1024)) + " KB";
+}
+function dataUrlBytes(s){ return Math.round((s.length - s.indexOf(",") - 1) * 0.75); }
+
+// Resize (longest side <= maxDim) and re-encode as JPEG. PNG transparency
+// becomes a white background. Falls back to the original file on any error.
+function compressImage(file, opts){
+  return new Promise((resolve, reject) => {
+    if(!file.type || file.type.indexOf("image/") !== 0){ reject(new Error("not_image")); return; }
+    const fallback = () => {
+      const r = new FileReader();
+      r.onload = ev => resolve(ev.target.result);
+      r.onerror = () => reject(new Error("read_failed"));
+      r.readAsDataURL(file);
+    };
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      try{
+        const scale = Math.min(1, opts.maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+        const w = Math.max(1, Math.round(img.naturalWidth * scale));
+        const h = Math.max(1, Math.round(img.naturalHeight * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        const out = canvas.toDataURL("image/jpeg", opts.quality);
+        URL.revokeObjectURL(url);
+        resolve(out);
+      }catch(err){ URL.revokeObjectURL(url); fallback(); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); fallback(); };
+    img.src = url;
+  });
+}
+
+function guestNameList(){
+  return $("guestNamesFile").value.split("\n").map(n => n.trim()).filter(Boolean);
+}
+function updateGuestCount(){
+  const el = $("guestCount");
+  if(!el) return;
+  const n = guestNameList().length;
+  el.textContent = n + " / " + MAX_GUESTS_PER_DOWNLOAD + " នាក់";
+  el.style.color = n > MAX_GUESTS_PER_DOWNLOAD ? "#C0392B" : "";
+  el.style.fontWeight = n > MAX_GUESTS_PER_DOWNLOAD ? "700" : "";
+}
+function checkGuestLimit(names){
+  if(names.length > MAX_GUESTS_PER_DOWNLOAD){
+    $("genFilesStatus").textContent =
+      "ទាញយកបានតែ " + MAX_GUESTS_PER_DOWNLOAD + " នាក់ក្នុងមួយដងប៉ុណ្ណោះ (អ្នកបានបញ្ចូល " + names.length +
+      " នាក់)។ សូមកាត់ឈ្មោះលើស " + (names.length - MAX_GUESTS_PER_DOWNLOAD) +
+      " ចេញ ទាញយកក្រុមនេះសិន រួចបិទភ្ជាប់ឈ្មោះក្រុមបន្ទាប់ដើម្បីទាញយកម្តងទៀត";
+    return false;
+  }
+  return true;
 }
 
 function safeFileName(name){
@@ -983,6 +1066,7 @@ async function generateGuestFiles(){
     statusEl.textContent = "សូមបញ្ចូលឈ្មោះភ្ញៀវយ៉ាងហោចណាស់ម្នាក់ម្នាក់ក្នុងមួយបន្ទាត់";
     return;
   }
+  if(!checkGuestLimit(names)) return;
   if(typeof JSZip === "undefined"){
     statusEl.textContent = "មិនអាចផ្ទុកម៉ូឌុល ZIP បាន សូមព្យាយាមម្តងទៀត ឬពិនិត្យការតភ្ជាប់អ៊ីនធឺណិត";
     return;
@@ -1023,6 +1107,7 @@ $("genFilesBtn").addEventListener("click", () => {
     statusEl.textContent = "សូមបញ្ចូលឈ្មោះភ្ញៀវយ៉ាងហោចណាស់ម្នាក់ម្នាក់ក្នុងមួយបន្ទាត់";
     return;
   }
+  if(!checkGuestLimit(names)) return;
   statusEl.textContent = "";
   if(isUnlocked()){
     generateGuestFiles();
@@ -1038,11 +1123,19 @@ const PAID_FLAG_KEY = "wib-paid-unlock";
 let payPollTimer = null;
 let payCurrentMd5 = null;
 
+// The payment is tied to THIS wedding (names + date) and lasts 30 days.
+// Changing the names or the date requires a new payment.
+function unlockKey(){
+  return [state.groomName, state.brideName, state.groomNameEn, state.brideNameEn, state.eventDate].join("|");
+}
 function isUnlocked(){
-  try{ return localStorage.getItem(PAID_FLAG_KEY) === "1"; }catch(e){ return false; }
+  try{
+    const d = JSON.parse(localStorage.getItem(PAID_FLAG_KEY) || "null");
+    return !!d && d.key === unlockKey() && (Date.now() - d.t) < 30*24*3600*1000;
+  }catch(e){ return false; }
 }
 function setUnlocked(){
-  try{ localStorage.setItem(PAID_FLAG_KEY, "1"); }catch(e){}
+  try{ localStorage.setItem(PAID_FLAG_KEY, JSON.stringify({ key: unlockKey(), t: Date.now() })); }catch(e){}
 }
 function stopPaymentPolling(){
   if(payPollTimer){ clearInterval(payPollTimer); payPollTimer = null; }
@@ -1058,13 +1151,13 @@ async function startPayment(){
     return;
   }
   $("payOverlay").classList.add("show");
-  $("payAmount").textContent = "$" + DOWNLOAD_PRICE_USD.toFixed(20);
+  $("payAmount").textContent = "$" + DOWNLOAD_PRICE_USD.toFixed(2);
   $("payRetryBtn").style.display = "none";
   $("payQrWrap").innerHTML = '<span class="pay-status"><span class="pay-spinner"></span>កំពុងបង្កើត QR...</span>';
   $("payStatus").textContent = "សូមរង់ចាំ...";
 
   try{
-    const resp = await fetch(`${APPS_SCRIPT_URL}?action=createPayment&amount=${DOWNLOAD_PRICE_USD}`);
+    const resp = await fetch(`${APPS_SCRIPT_URL}?action=createPayment`);
     const data = await resp.json();
     if(!data.success){
       $("payQrWrap").innerHTML = '<span class="pay-status">មិនអាចបង្កើត QR បានទេ</span>';
@@ -1073,6 +1166,7 @@ async function startPayment(){
       return;
     }
     payCurrentMd5 = data.md5;
+    if(data.amount){ $("payAmount").textContent = "$" + Number(data.amount).toFixed(2); }
     $("payQrWrap").innerHTML = `<img src="data:image/png;base64,${data.image}" alt="KHQR">`;
     $("payStatus").textContent = "សូមស្កេនដោយកម្មវិធីធនាគារ ឬ Bakong";
     startPaymentPolling();
@@ -1115,6 +1209,8 @@ $("payRetryBtn").addEventListener("click", startPayment);
 
 function restoreGuestFilesUI(){
   $("guestNamesFile").value = state.guestNamesFileRaw || "";
+  $("guestNamesFile").addEventListener("input", updateGuestCount);
+  updateGuestCount();
 }
 
 function buildTemplateChips(){
