@@ -1168,7 +1168,10 @@ async function startPayment(){
     payCurrentMd5 = data.md5;
     if(data.amount){ $("payAmount").textContent = "$" + Number(data.amount).toFixed(2); }
     const cleanImage = (data.image || "").replace(/[\r\n\s]/g, "");
-    $("payQrWrap").innerHTML = `<img src="data:image/png;base64,${cleanImage}" alt="KHQR">`;
+    const imgSrc = cleanImage.indexOf("data:image") === 0
+      ? cleanImage
+      : `data:image/png;base64,${cleanImage}`;
+    $("payQrWrap").innerHTML = `<img src="${imgSrc}" alt="KHQR">`;
     $("payStatus").textContent = "សូមស្កេនដោយកម្មវិធីធនាគារ ឬ Bakong";
     startPaymentPolling();
   }catch(e){
