@@ -106,6 +106,21 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 @keyframes pay-spin{to{transform:rotate(360deg);}}
 .pay-modal .pay-cancel{width:100%;padding:10px;border-radius:8px;border:1px solid var(--b-line);background:none;color:var(--b-sub);font-size:13px;cursor:pointer;}
 .pay-modal .pay-retry{width:100%;padding:10px;border-radius:8px;border:none;background:var(--b-accent);color:var(--b-accent-ink);font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:8px;display:none;}
+.pay-modal .pay-link{background:none;border:none;color:var(--b-accent);font-size:12.5px;cursor:pointer;text-decoration:underline;margin:10px 0 0;padding:0;}
+.code-entry{display:none;margin:0 0 14px;text-align:left;}
+.code-entry.show{display:block;}
+.code-entry input{width:100%;padding:9px 11px;border:1px solid var(--b-line);border-radius:6px;background:var(--b-bg);color:var(--b-ink);font-family:inherit;font-size:14px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+.code-entry .code-submit{width:100%;padding:10px;border-radius:8px;border:none;background:var(--b-accent);color:var(--b-accent-ink);font-size:13.5px;font-weight:600;cursor:pointer;}
+.code-success{display:none;text-align:left;background:color-mix(in srgb, var(--b-accent) 10%, var(--b-bg));border:1px solid var(--b-accent);border-radius:8px;padding:12px 14px;margin:0 0 14px;}
+.code-success.show{display:block;}
+.code-success p{margin:0 0 8px;font-size:12.5px;color:var(--b-sub);line-height:1.5;}
+.code-success .code-value{display:flex;align-items:center;gap:8px;}
+.code-success .code-text{flex:1;font-family:monospace;font-size:16px;font-weight:700;letter-spacing:.08em;color:var(--b-ink);background:var(--b-panel);border:1px dashed var(--b-accent);border-radius:6px;padding:8px 10px;text-align:center;}
+.code-success .code-copy{border:1px solid var(--b-line);background:var(--b-panel);color:var(--b-sub);border-radius:6px;width:34px;height:34px;cursor:pointer;font-size:14px;flex-shrink:0;}
+.code-success .code-continue{width:100%;padding:10px;border-radius:8px;border:none;background:var(--b-accent);color:var(--b-accent-ink);font-size:13.5px;font-weight:600;cursor:pointer;margin-top:10px;}
+.access-row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.access-btn{flex:1;min-width:140px;padding:9px 8px;border-radius:6px;border:1px solid var(--b-line);background:var(--b-bg);color:var(--b-sub);font-size:12px;cursor:pointer;}
+.access-btn:hover{border-color:var(--b-accent);color:var(--b-accent);}
 @media(max-width:860px){
   .app{grid-template-columns:1fr;grid-template-rows:1fr;}
   .resizer{display:none;}
@@ -244,6 +259,12 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <p class="guest-empty-hint" id="guestCount" style="padding:0 0 10px;text-align:right;"></p>
       <button class="add-btn" id="genFilesBtn" type="button">ទាញយកឯកសារភ្ញៀវទាំងអស់ (ZIP)</button>
       <p class="guest-empty-hint" id="genFilesStatus"></p>
+      <div class="access-row">
+        <button class="access-btn" id="exportAccessBtn" type="button">នាំចេញ (Export) សិទ្ធិចូលប្រើ</button>
+        <button class="access-btn" id="importAccessBtn" type="button">នាំចូល (Import) សិទ្ធិចូលប្រើ</button>
+        <input type="file" id="importAccessFile" accept="application/json" style="display:none;">
+      </div>
+      <p class="guest-empty-hint" id="accessStatus"></p>
     </fieldset>
   </aside>
 
@@ -260,13 +281,34 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 
 <div class="pay-overlay" id="payOverlay">
   <div class="pay-modal">
-    <h3>ស្កេនដើម្បីទូទាត់ប្រាក់</h3>
-    <p class="pay-amount" id="payAmount">$20.00</p>
-    <div class="pay-qr-wrap" id="payQrWrap">
-      <span class="pay-status"><span class="pay-spinner"></span>កំពុងបង្កើត QR...</span>
+    <h3 id="payTitle">ស្កេនដើម្បីទូទាត់ប្រាក់</h3>
+    <p class="pay-amount" id="payAmount">រយៈពេល ៣០ ថ្ងៃ / Period 30 days</p>
+
+    <div id="payQrSection">
+      <div class="pay-qr-wrap" id="payQrWrap">
+        <span class="pay-status"><span class="pay-spinner"></span>កំពុងបង្កើត QR...</span>
+      </div>
+      <p class="pay-status" id="payStatus">សូមស្កេនដោយកម្មវិធីធនាគារ ឬ Bakong</p>
+      <button class="pay-retry" id="payRetryBtn" type="button">បង្កើត QR ថ្មី</button>
     </div>
-    <p class="pay-status" id="payStatus">សូមស្កេនដោយកម្មវិធីធនាគារ ឬ Bakong</p>
-    <button class="pay-retry" id="payRetryBtn" type="button">បង្កើត QR ថ្មី</button>
+
+    <div class="code-entry" id="codeEntry">
+      <label style="font-size:12.5px;color:var(--b-sub);display:block;margin-bottom:6px;">សូមបំពេញឈ្មោះកូនកម្លោះ/ក្រមុំ និងថ្ងៃពិធីខាងលើឲ្យត្រូវគ្នា រួចវាយលេខកូដ៖</label>
+      <input type="text" id="unlockCodeInput" placeholder="ឧ. WB7K2P9X" maxlength="12">
+      <button class="code-submit" id="codeSubmitBtn" type="button">ផ្ទៀងផ្ទាត់លេខកូដ</button>
+      <p class="pay-status" id="codeStatus"></p>
+    </div>
+
+    <div class="code-success" id="codeSuccess">
+      <p>ទូទាត់ជោគជ័យ! សូម <b>រក្សាទុក/screenshot</b> លេខកូដនេះ — ប្រើដើម្បីទាញយកម្តងទៀតលើ device ផ្សេង ឬក្រោយ clear cache (សុពលភាព ៣០ ថ្ងៃ)៖</p>
+      <div class="code-value">
+        <span class="code-text" id="codeText">--------</span>
+        <button class="code-copy" id="codeCopyBtn" type="button" title="ចម្លង">⧉</button>
+      </div>
+      <button class="code-continue" id="codeContinueBtn" type="button">បន្ត ទាញយកឯកសារ</button>
+    </div>
+
+    <button class="pay-link" id="haveCodeLink" type="button">មានលេខកូដរួចហើយ?</button>
     <button class="pay-cancel" id="payCancelBtn" type="button">បោះបង់</button>
   </div>
 </div>
@@ -1117,16 +1159,20 @@ $("genFilesBtn").addEventListener("click", () => {
 });
 
 // ---------------------------------------------------------------------
-// Bakong KHQR payment gate
+// Bakong KHQR payment gate + Unlock Code + Export/Import
 // ---------------------------------------------------------------------
 const PAID_FLAG_KEY = "wib-paid-unlock";
 let payPollTimer = null;
 let payCurrentMd5 = null;
 
 // The payment is tied to THIS wedding (names + date) and lasts 30 days.
-// Changing the names or the date requires a new payment.
+// Changing the names or the date requires a new payment (or the matching
+// unlock code). Names are trimmed + lowercased before comparing so small
+// typing differences (spacing, capitalization) don't cause a mismatch;
+// the date is compared as-is.
+function normName_(v){ return (v || "").trim().toLowerCase().replace(/\s+/g, " "); }
 function unlockKey(){
-  return [state.groomName, state.brideName, state.groomNameEn, state.brideNameEn, state.eventDate].join("|");
+  return [normName_(state.groomName), normName_(state.brideName), normName_(state.groomNameEn), normName_(state.brideNameEn), (state.eventDate||"").trim()].join("|");
 }
 function isUnlocked(){
   try{
@@ -1134,8 +1180,8 @@ function isUnlocked(){
     return !!d && d.key === unlockKey() && (Date.now() - d.t) < 30*24*3600*1000;
   }catch(e){ return false; }
 }
-function setUnlocked(){
-  try{ localStorage.setItem(PAID_FLAG_KEY, JSON.stringify({ key: unlockKey(), t: Date.now() })); }catch(e){}
+function setUnlocked(code){
+  try{ localStorage.setItem(PAID_FLAG_KEY, JSON.stringify({ key: unlockKey(), t: Date.now(), code: code || null })); }catch(e){}
 }
 function stopPaymentPolling(){
   if(payPollTimer){ clearInterval(payPollTimer); payPollTimer = null; }
@@ -1143,6 +1189,19 @@ function stopPaymentPolling(){
 function closePaymentModal(){
   stopPaymentPolling();
   $("payOverlay").classList.remove("show");
+  $("payQrSection").style.display = "block";
+  $("codeEntry").classList.remove("show");
+  $("codeSuccess").classList.remove("show");
+  $("codeStatus").textContent = "";
+  $("unlockCodeInput").value = "";
+}
+
+function weddingFingerprintParams_(){
+  return new URLSearchParams({
+    groomName: state.groomName || "", brideName: state.brideName || "",
+    groomNameEn: state.groomNameEn || "", brideNameEn: state.brideNameEn || "",
+    eventDate: state.eventDate || ""
+  });
 }
 
 async function startPayment(){
@@ -1151,13 +1210,17 @@ async function startPayment(){
     return;
   }
   $("payOverlay").classList.add("show");
-  $("payAmount").textContent = "$" + DOWNLOAD_PRICE_USD.toFixed(2);
+  $("payQrSection").style.display = "block";
+  $("codeEntry").classList.remove("show");
+  $("codeSuccess").classList.remove("show");
+  $("payAmount").textContent = "រយៈពេល ៣០ ថ្ងៃ / Period 30 days";
   $("payRetryBtn").style.display = "none";
   $("payQrWrap").innerHTML = '<span class="pay-status"><span class="pay-spinner"></span>កំពុងបង្កើត QR...</span>';
   $("payStatus").textContent = "សូមរង់ចាំ...";
 
   try{
-    const resp = await fetch(`${APPS_SCRIPT_URL}?action=createPayment`);
+    const params = weddingFingerprintParams_();
+    const resp = await fetch(`${APPS_SCRIPT_URL}?action=createPayment&${params.toString()}`);
     const data = await resp.json();
     if(!data.success){
       $("payQrWrap").innerHTML = '<span class="pay-status">មិនអាចបង្កើត QR បានទេ</span>';
@@ -1166,7 +1229,6 @@ async function startPayment(){
       return;
     }
     payCurrentMd5 = data.md5;
-    if(data.amount){ $("payAmount").textContent = "$" + Number(data.amount).toFixed(2); }
     const cleanImage = (data.image || "").replace(/[\r\n\s]/g, "");
     const imgSrc = cleanImage.indexOf("data:image") === 0
       ? cleanImage
@@ -1181,6 +1243,15 @@ async function startPayment(){
   }
 }
 
+function showCodeSuccess_(code){
+  stopPaymentPolling();
+  setUnlocked(code);
+  $("payQrSection").style.display = "none";
+  $("codeEntry").classList.remove("show");
+  $("codeSuccess").classList.add("show");
+  $("codeText").textContent = code || "--------";
+}
+
 function startPaymentPolling(){
   stopPaymentPolling();
   payPollTimer = setInterval(async () => {
@@ -1189,13 +1260,7 @@ function startPaymentPolling(){
       const resp = await fetch(`${APPS_SCRIPT_URL}?action=checkStatus&md5=${encodeURIComponent(payCurrentMd5)}`);
       const data = await resp.json();
       if(data.success){
-        stopPaymentPolling();
-        setUnlocked();
-        $("payStatus").textContent = "ទូទាត់ជោគជ័យ! កំពុងបង្កើតឯកសារ...";
-        setTimeout(() => {
-          closePaymentModal();
-          generateGuestFiles();
-        }, 700);
+        showCodeSuccess_(data.code);
       } else if(data.status === "expired"){
         stopPaymentPolling();
         $("payQrWrap").innerHTML = '<span class="pay-status">QR ផុតកំណត់ហើយ</span>';
@@ -1210,6 +1275,100 @@ function startPaymentPolling(){
 
 $("payCancelBtn").addEventListener("click", closePaymentModal);
 $("payRetryBtn").addEventListener("click", startPayment);
+
+$("codeContinueBtn").addEventListener("click", () => {
+  closePaymentModal();
+  generateGuestFiles();
+});
+
+// ---- "Already have a code?" — verify against server, works on any device ----
+$("haveCodeLink").addEventListener("click", () => {
+  const showing = $("codeEntry").classList.toggle("show");
+  $("payQrSection").style.display = showing ? "none" : "block";
+  $("codeSuccess").classList.remove("show");
+  stopPaymentPolling();
+});
+
+$("codeSubmitBtn").addEventListener("click", async () => {
+  const code = $("unlockCodeInput").value.trim().toUpperCase();
+  if(!code){ $("codeStatus").textContent = "សូមវាយលេខកូដ"; return; }
+  if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf("REPLACE_WITH") === 0){
+    $("codeStatus").textContent = "កំហុសការកំណត់៖ សូមដាក់ APPS_SCRIPT_URL ក្នុងកូដសិន";
+    return;
+  }
+  $("codeStatus").textContent = "កំពុងផ្ទៀងផ្ទាត់...";
+  try{
+    const params = weddingFingerprintParams_();
+    params.set("code", code);
+    const resp = await fetch(`${APPS_SCRIPT_URL}?action=verifyCode&${params.toString()}`);
+    const data = await resp.json();
+    if(data.success){
+      $("codeStatus").textContent = "";
+      setUnlocked(code);
+      closePaymentModal();
+      generateGuestFiles();
+    } else {
+      $("codeStatus").textContent = data.reason === "mismatch"
+        ? "លេខកូដត្រឹមត្រូវ ប៉ុន្តែឈ្មោះ/ថ្ងៃមិនត្រូវគ្នា — សូមបំពេញឈ្មោះកូនកម្លោះ/ក្រមុំ និងថ្ងៃពិធីឲ្យដូចដើមឲ្យបានត្រឹមត្រូវ"
+        : (data.reason === "expired" ? "លេខកូដនេះផុតសុពលភាពហើយ (លើសពី ៣០ ថ្ងៃ)" : "លេខកូដមិនត្រឹមត្រូវ");
+    }
+  }catch(e){
+    $("codeStatus").textContent = "មានបញ្ហាតភ្ជាប់ សូមព្យាយាមម្តងទៀត";
+  }
+});
+
+$("codeCopyBtn").addEventListener("click", () => {
+  const text = $("codeText").textContent;
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).catch(()=>{}); }
+  $("codeCopyBtn").textContent = "✓";
+  setTimeout(() => { $("codeCopyBtn").textContent = "⧉"; }, 1200);
+});
+
+// ---- Export / Import access (state + unlock flag) as a JSON file ----
+$("exportAccessBtn").addEventListener("click", () => {
+  const flag = (() => { try{ return JSON.parse(localStorage.getItem(PAID_FLAG_KEY) || "null"); }catch(e){ return null; } })();
+  if(!flag || flag.key !== unlockKey()){
+    $("accessStatus").textContent = "មិនទាន់មានសិទ្ធិចូលប្រើ (unlock) សម្រាប់ព័ត៌មានបច្ចុប្បន្នទេ — សូមទូទាត់ ឬផ្ទៀងផ្ទាត់លេខកូដសិន";
+    return;
+  }
+  const payload = { app: "wedding-invitation-builder", version: 1, exportedAt: Date.now(), state: state, unlock: flag };
+  const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const base = safeFileName(state.groomName || state.groomNameEn || "wedding");
+  a.href = url; a.download = base + "-access.json";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  $("accessStatus").textContent = "បានទាញយកឯកសារសិទ្ធិចូលប្រើ — ផ្ញើ/រក្សាទុកសម្រាប់ប្រើលើ device ផ្សេង";
+});
+
+$("importAccessBtn").addEventListener("click", () => $("importAccessFile").click());
+$("importAccessFile").addEventListener("change", (e) => {
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try{
+      const payload = JSON.parse(ev.target.result);
+      if(!payload || payload.app !== "wedding-invitation-builder" || !payload.state || !payload.unlock){
+        $("accessStatus").textContent = "ឯកសារនេះមិនត្រឹមត្រូវទេ";
+        return;
+      }
+      state = Object.assign({}, state, payload.state);
+      try{ localStorage.setItem(PAID_FLAG_KEY, JSON.stringify(payload.unlock)); }catch(err){}
+      buildThemePicker(); buildEffectPicker(); buildTimeline(); buildTimelineTemplates();
+      buildContacts(); buildPhotos(); buildCoverPhoto(); buildTemplateChips(); bindSimpleFields();
+      restoreGuestFilesUI(); update();
+      $("accessStatus").textContent = isUnlocked()
+        ? "នាំចូលជោគជ័យ — ព័ត៌មាន និងសិទ្ធិចូលប្រើត្រូវបានស្តារឡើងវិញ"
+        : "នាំចូលព័ត៌មានបានហើយ ប៉ុន្តែសិទ្ធិចូលប្រើផុតសុពលភាព ឬមិនត្រូវនឹងឈ្មោះ/ថ្ងៃ — សូមទាញយកម្តងទៀត";
+    }catch(err){
+      $("accessStatus").textContent = "មិនអាចអានឯកសារនេះបានទេ";
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
 
 function restoreGuestFilesUI(){
   $("guestNamesFile").value = state.guestNamesFileRaw || "";
