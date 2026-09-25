@@ -2013,6 +2013,31 @@ function publishConfigured(){
   return PUBLISH_ENDPOINT && PUBLISH_ENDPOINT.indexOf("YOUR_") !== 0;
 }
 
+// See publishWebsite(): recovers a missing state.publishToken by silently
+// re-verifying the cached unlock code against the server, when the client is
+// still genuinely unlocked (paid-flag valid) but this draft/session never
+// received (or lost) its token. Returns true if state.publishToken is now set.
+async function ensurePublishToken_(){
+  if(state.publishToken) return true;
+  if(!isUnlocked()) return false;
+  let saved = null;
+  try{ saved = JSON.parse(localStorage.getItem(paidFlagKey_()) || "null"); }catch(e){}
+  if(!saved || !saved.code) return false;
+  if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf("REPLACE_WITH") === 0) return false;
+  try{
+    const params = weddingFingerprintParams_();
+    params.set("code", saved.code);
+    const resp = await fetch(`${APPS_SCRIPT_URL}?action=verifyCode&${params.toString()}`);
+    const data = await resp.json();
+    if(data.success && data.publishToken){
+      state.publishToken = data.publishToken;
+      saveDraft();
+      return true;
+    }
+  }catch(e){ /* network error — treat as not recovered */ }
+  return false;
+}
+
 async function publishWebsite(){
   const statusEl = $("genFilesStatus");
 
@@ -2021,8 +2046,17 @@ async function publishWebsite(){
     return;
   }
   if(!state.publishToken){
-    statusEl.textContent = "⚠️ សម័យទូទាត់របស់អ្នកផុតកំណត់ សូម Unlock ម្តងទៀត (ចុច \"បង្កើតធៀបផ្ទាល់ខ្លួន\") មុននឹង Publish";
-    return;
+    // isUnlocked() (name+date, 30 days) and state.publishToken (this session
+    // only) can get out of sync — e.g. the draft was reloaded on another
+    // device, or cleared and the same names/date retyped. The paid-flag record
+    // also keeps the original unlock code, so try a silent re-verify against
+    // the server before bothering the client with anything.
+    statusEl.textContent = "កំពុងផ្ទៀងផ្ទាត់សិទ្ធិ Publish ឡើងវិញ...";
+    const recovered = await ensurePublishToken_();
+    if(!recovered){
+      statusEl.textContent = "⚠️ មិនអាច Publish បានទេ — សូមចុច \"🚀 បោះពុម្ព & យក Link ភ្ញៀវ\" ម្តងទៀត ដើម្បី Unlock (ឬចុច \"មានលេខកូដស្រាប់\" ហើយវាយលេខកូដចូល)";
+      return;
+    }
   }
 
   statusEl.textContent = "កំពុងបោះពុម្ពគេហទំព័រ...";
