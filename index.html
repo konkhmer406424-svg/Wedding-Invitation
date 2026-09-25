@@ -2038,6 +2038,19 @@ async function ensurePublishToken_(){
   return false;
 }
 
+// Opens the payment modal straight to the code-entry panel (skips the QR
+// step), optionally pre-filling a cached code — used when recovery needs the
+// client to confirm/re-submit a code themselves, since the normal path only
+// opens the modal when isUnlocked() is false and would never surface this.
+function openCodeEntry_(prefillCode){
+  $("payOverlay").classList.add("show");
+  $("payQrSection").style.display = "none";
+  $("codeSuccess").classList.remove("show");
+  $("codeEntry").classList.add("show");
+  $("codeStatus").textContent = "";
+  if(prefillCode) $("unlockCodeInput").value = prefillCode;
+}
+
 async function publishWebsite(){
   const statusEl = $("genFilesStatus");
 
@@ -2054,7 +2067,14 @@ async function publishWebsite(){
     statusEl.textContent = "កំពុងផ្ទៀងផ្ទាត់សិទ្ធិ Publish ឡើងវិញ...";
     const recovered = await ensurePublishToken_();
     if(!recovered){
-      statusEl.textContent = "⚠️ មិនអាច Publish បានទេ — សូមចុច \"🚀 បោះពុម្ព & យក Link ភ្ញៀវ\" ម្តងទៀត ដើម្បី Unlock (ឬចុច \"មានលេខកូដស្រាប់\" ហើយវាយលេខកូដចូល)";
+      // Silent recovery failed. The main button won't reopen this panel on
+      // its own (isUnlocked() is still true, so it just calls publishWebsite()
+      // again) — so open the code-entry panel directly instead of pointing at
+      // a control the client can't actually reach.
+      let saved = null;
+      try{ saved = JSON.parse(localStorage.getItem(paidFlagKey_()) || "null"); }catch(e){}
+      statusEl.textContent = "⚠️ មិនអាច Publish បានទេ — សូមផ្ទៀងផ្ទាត់លេខកូដម្តងទៀតខាងក្រោម";
+      openCodeEntry_(saved && saved.code);
       return;
     }
   }
