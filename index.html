@@ -398,10 +398,15 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 
 <div class="pay-overlay" id="payOverlay">
   <div class="pay-modal">
-    <h3 id="payTitle">ស្កេនដើម្បីទូទាត់ប្រាក់</h3>
-    <p class="pay-amount" id="payAmount">រយៈពេល ៣០ ថ្ងៃ / Period 30 days</p>
+    <h3 id="payTitle">ចង់បន្តយ៉ាងណា?</h3>
+    <p class="pay-amount" id="payAmount">ជ្រើសរើសមួយខាងក្រោម</p>
 
-    <div id="payQrSection">
+    <div id="payChoice" style="display:block;margin:14px 0 4px;">
+      <button class="add-btn" id="choiceGenerateQrBtn" type="button" style="width:100%;margin-bottom:8px;">💳 បង្កើត KHQR ទូទាត់ថ្មី ($20 / ៣០ថ្ងៃ)</button>
+      <button class="add-btn" id="choiceHaveCodeBtn" type="button" style="width:100%;background:var(--b-bg);color:var(--b-text);border:1px solid var(--b-line);">🔑 មានលេខកូដរួចហើយ</button>
+    </div>
+
+    <div id="payQrSection" style="display:none;">
       <div class="pay-qr-wrap" id="payQrWrap">
         <span class="pay-status"><span class="pay-spinner"></span>កំពុងបង្កើត QR...</span>
       </div>
@@ -425,7 +430,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <button class="code-continue" id="codeContinueBtn" type="button">បន្ត ទាញយកឯកសារ</button>
     </div>
 
-    <button class="pay-link" id="haveCodeLink" type="button">មានលេខកូដរួចហើយ?</button>
+    <button class="pay-link" id="haveCodeLink" type="button" style="display:none;">មានលេខកូដរួចហើយ?</button>
     <button class="pay-cancel" id="payCancelBtn" type="button">បោះបង់</button>
   </div>
 </div>
@@ -1358,9 +1363,8 @@ function buildThemePicker(){
   const grid = $("themeGrid");
   grid.innerHTML = Object.keys(THEMES).map(key => {
     const t = THEMES[key];
-    return `<div class="theme-card${state.theme===key?" active":""}" data-theme="${key}">
+    return `<div class="theme-card${state.theme===key?" active":""}" data-theme="${key}" title="${escapeHtml(t.label)}">
       <div class="theme-swatch" style="background:${t.swatch}"></div>
-      <span>${t.label}</span>
     </div>`;
   }).join("");
   grid.querySelectorAll(".theme-card").forEach(card => {
@@ -1376,9 +1380,8 @@ function buildEffectPicker(){
   const grid = $("effectGrid");
   grid.innerHTML = Object.keys(EFFECTS).map(key => {
     const e = EFFECTS[key];
-    return `<div class="effect-card${state.effect===key?" active":""}" data-effect="${key}">
+    return `<div class="effect-card${state.effect===key?" active":""}" data-effect="${key}" title="${escapeHtml(e.label)}">
       <div class="effect-icon">${e.icon}</div>
-      <span>${e.label}</span>
     </div>`;
   }).join("");
   grid.querySelectorAll(".effect-card").forEach(card => {
@@ -1395,9 +1398,8 @@ function buildKbachPicker(){
   const grid = $("kbachGrid");
   grid.innerHTML = Object.keys(KBACH_FRAME_STYLES).map(key => {
     const k = KBACH_FRAME_STYLES[key];
-    return `<div class="effect-card${state.frameStyle===key?" active":""}" data-kbach="${key}">
+    return `<div class="effect-card${state.frameStyle===key?" active":""}" data-kbach="${key}" title="${escapeHtml(k.label)}">
       <div class="effect-icon">${k.icon}</div>
-      <span>${k.label}</span>
     </div>`;
   }).join("");
   grid.querySelectorAll(".effect-card").forEach(card => {
@@ -1417,9 +1419,8 @@ function buildCoverGridPicker(){
   const grid = $("coverGridPicker");
   grid.innerHTML = COVER_STYLE_KEYS.map(key => {
     const c = COVER_STYLES[key];
-    return `<div class="effect-card${state.openStyle===key?" active":""}" data-cover="${key}">
+    return `<div class="effect-card${state.openStyle===key?" active":""}" data-cover="${key}" title="${escapeHtml(c.label)}">
       <div class="effect-icon">${COVER_ICONS[key] || "•"}</div>
-      <span>${c.label}</span>
     </div>`;
   }).join("");
   grid.querySelectorAll(".effect-card").forEach(card => {
@@ -2039,16 +2040,34 @@ async function ensurePublishToken_(){
 }
 
 // Opens the payment modal straight to the code-entry panel (skips the QR
-// step), optionally pre-filling a cached code — used when recovery needs the
-// client to confirm/re-submit a code themselves, since the normal path only
-// opens the modal when isUnlocked() is false and would never surface this.
+// step and the choice screen), optionally pre-filling a cached code — used
+// when recovery needs the client to confirm/re-submit a code themselves,
+// and by the "🔑 មានលេខកូដរួចហើយ" choice button.
 function openCodeEntry_(prefillCode){
   $("payOverlay").classList.add("show");
+  $("payTitle").textContent = "វាយលេខកូដ";
+  $("payAmount").textContent = "";
+  $("payChoice").style.display = "none";
   $("payQrSection").style.display = "none";
   $("codeSuccess").classList.remove("show");
   $("codeEntry").classList.add("show");
+  $("haveCodeLink").style.display = "none";
   $("codeStatus").textContent = "";
   if(prefillCode) $("unlockCodeInput").value = prefillCode;
+}
+
+// Opens the payment modal to the first choice screen: generate a fresh KHQR
+// to pay, or enter a code already obtained — instead of jumping straight
+// into KHQR generation the way the button used to.
+function openPaymentChoice_(){
+  $("payOverlay").classList.add("show");
+  $("payTitle").textContent = "ចង់បន្តយ៉ាងណា?";
+  $("payAmount").textContent = "ជ្រើសរើសមួយខាងក្រោម";
+  $("payChoice").style.display = "block";
+  $("payQrSection").style.display = "none";
+  $("codeEntry").classList.remove("show");
+  $("codeSuccess").classList.remove("show");
+  $("haveCodeLink").style.display = "none";
 }
 
 async function publishWebsite(){
@@ -2146,11 +2165,11 @@ function generateGuestLinks(){
 function renderGuestLinksResult(results){
   const el = $("guestLinksResult");
   if(!el) return;
-  const rows = results.map(r => `
+  const rows = results.map((r, i) => `
     <tr>
       <td style="padding:6px 8px;border-top:1px solid var(--b-line);">ជូនចំពោះ ${escapeHtml(r.name)}</td>
       <td style="padding:6px 8px;border-top:1px solid var(--b-line);word-break:break-all;">${r.ok ? `<a href="${r.url}" target="_blank" rel="noopener">${r.url}</a>` : '<span style="color:#C0392B;">បរាជ័យ</span>'}</td>
-      <td style="padding:6px 8px;border-top:1px solid var(--b-line);">${r.ok ? `<button type="button" class="copy-link-btn" data-url="${escapeHtml(r.url)}" style="font-size:12px;padding:4px 8px;">ចម្លង</button>` : ""}</td>
+      <td style="padding:6px 8px;border-top:1px solid var(--b-line);">${r.ok ? `<button type="button" class="copy-link-btn" data-idx="${i}" style="font-size:12px;padding:4px 8px;">ចម្លង</button>` : ""}</td>
     </tr>`).join("");
 
   el.innerHTML = `
@@ -2167,9 +2186,16 @@ function renderGuestLinksResult(results){
       </div>
     </div>`;
 
+  // Per-row copy now copies BOTH the name and the link together (one click),
+  // same "ជូនចំពោះ <name>: <url>" format used by "ចម្លងទាំងអស់" below — looked
+  // up by index into `results` instead of a data-url attribute, so it isn't
+  // just the bare link anymore.
   el.querySelectorAll(".copy-link-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      navigator.clipboard.writeText(btn.dataset.url).then(() => {
+      const r = results[Number(btn.dataset.idx)];
+      if(!r || !r.ok) return;
+      const text = `ជូនចំពោះ ${r.name}: ${r.url}`;
+      navigator.clipboard.writeText(text).then(() => {
         const old = btn.textContent;
         btn.textContent = "បានចម្លង!";
         setTimeout(() => { btn.textContent = old; }, 1500);
@@ -2212,7 +2238,7 @@ $("uploadFilesBtn").addEventListener("click", () => {
       generateGuestLinks();
     }
   } else {
-    startPayment();
+    openPaymentChoice_();
   }
 });
 
@@ -2253,7 +2279,8 @@ function stopPaymentPolling(){
 function closePaymentModal(){
   stopPaymentPolling();
   $("payOverlay").classList.remove("show");
-  $("payQrSection").style.display = "block";
+  $("payChoice").style.display = "block";
+  $("payQrSection").style.display = "none";
   $("codeEntry").classList.remove("show");
   $("codeSuccess").classList.remove("show");
   $("codeStatus").textContent = "";
@@ -2261,10 +2288,17 @@ function closePaymentModal(){
 }
 
 function weddingFingerprintParams_(){
+  // Send the SAME normalized values used by unlockKey()/isUnlocked() (trimmed,
+  // lowercased, extra spaces collapsed). Previously this sent the raw text,
+  // so a trivial difference invisible to the eye — a trailing space, a
+  // capital vs lowercase letter in an English name — made the client think
+  // it was still "unlocked" while the server received different text and
+  // rejected it as a mismatch. Keeping both sides normalized the same way
+  // fixes that class of false mismatch.
   return new URLSearchParams({
-    groomName: state.groomName || "", brideName: state.brideName || "",
-    groomNameEn: state.groomNameEn || "", brideNameEn: state.brideNameEn || "",
-    eventDate: state.eventDate || ""
+    groomName: normName_(state.groomName), brideName: normName_(state.brideName),
+    groomNameEn: normName_(state.groomNameEn), brideNameEn: normName_(state.brideNameEn),
+    eventDate: (state.eventDate || "").trim()
   });
 }
 
@@ -2274,9 +2308,12 @@ async function startPayment(){
     return;
   }
   $("payOverlay").classList.add("show");
+  $("payTitle").textContent = "ស្កេនដើម្បីទូទាត់ប្រាក់";
+  $("payChoice").style.display = "none";
   $("payQrSection").style.display = "block";
   $("codeEntry").classList.remove("show");
   $("codeSuccess").classList.remove("show");
+  $("haveCodeLink").style.display = "";
   $("payAmount").textContent = "កំពុងផ្ទុកតម្លៃ... / Loading price...";
   $("payRetryBtn").style.display = "none";
   $("payQrWrap").innerHTML = '<span class="pay-status"><span class="pay-spinner"></span>កំពុងបង្កើត QR...</span>';
@@ -2354,6 +2391,8 @@ function startPaymentPolling(){
 
 $("payCancelBtn").addEventListener("click", closePaymentModal);
 $("payRetryBtn").addEventListener("click", startPayment);
+$("choiceGenerateQrBtn").addEventListener("click", startPayment);
+$("choiceHaveCodeBtn").addEventListener("click", () => openCodeEntry_());
 
 $("codeContinueBtn").addEventListener("click", () => {
   closePaymentModal();
