@@ -1363,8 +1363,9 @@ function buildThemePicker(){
   const grid = $("themeGrid");
   grid.innerHTML = Object.keys(THEMES).map(key => {
     const t = THEMES[key];
-    return `<div class="theme-card${state.theme===key?" active":""}" data-theme="${key}" title="${escapeHtml(t.label)}">
+    return `<div class="theme-card${state.theme===key?" active":""}" data-theme="${key}">
       <div class="theme-swatch" style="background:${t.swatch}"></div>
+      <span>${t.label}</span>
     </div>`;
   }).join("");
   grid.querySelectorAll(".theme-card").forEach(card => {
@@ -1380,8 +1381,9 @@ function buildEffectPicker(){
   const grid = $("effectGrid");
   grid.innerHTML = Object.keys(EFFECTS).map(key => {
     const e = EFFECTS[key];
-    return `<div class="effect-card${state.effect===key?" active":""}" data-effect="${key}" title="${escapeHtml(e.label)}">
+    return `<div class="effect-card${state.effect===key?" active":""}" data-effect="${key}">
       <div class="effect-icon">${e.icon}</div>
+      <span>${e.label}</span>
     </div>`;
   }).join("");
   grid.querySelectorAll(".effect-card").forEach(card => {
@@ -1398,8 +1400,9 @@ function buildKbachPicker(){
   const grid = $("kbachGrid");
   grid.innerHTML = Object.keys(KBACH_FRAME_STYLES).map(key => {
     const k = KBACH_FRAME_STYLES[key];
-    return `<div class="effect-card${state.frameStyle===key?" active":""}" data-kbach="${key}" title="${escapeHtml(k.label)}">
+    return `<div class="effect-card${state.frameStyle===key?" active":""}" data-kbach="${key}">
       <div class="effect-icon">${k.icon}</div>
+      <span>${k.label}</span>
     </div>`;
   }).join("");
   grid.querySelectorAll(".effect-card").forEach(card => {
@@ -1419,8 +1422,9 @@ function buildCoverGridPicker(){
   const grid = $("coverGridPicker");
   grid.innerHTML = COVER_STYLE_KEYS.map(key => {
     const c = COVER_STYLES[key];
-    return `<div class="effect-card${state.openStyle===key?" active":""}" data-cover="${key}" title="${escapeHtml(c.label)}">
+    return `<div class="effect-card${state.openStyle===key?" active":""}" data-cover="${key}">
       <div class="effect-icon">${COVER_ICONS[key] || "•"}</div>
+      <span>${c.label}</span>
     </div>`;
   }).join("");
   grid.querySelectorAll(".effect-card").forEach(card => {
