@@ -2131,6 +2131,7 @@ async function ensurePublishToken_(){
     const data = await resp.json();
     if(data.success && data.publishToken){
       state.publishToken = data.publishToken;
+      state.publishTokenKey = unlockKey();
       saveDraft();
       return true;
     }
@@ -2176,6 +2177,9 @@ async function publishWebsite(){
     statusEl.textContent = "⚠️ មិនទាន់បានកំណត់ PUBLISH_ENDPOINT ទេ — សូមដាក់ Cloudflare Worker URL ចូល code (ស្វែងរក \"PUBLISH_ENDPOINT\")";
     return;
   }
+  if(state.publishToken && state.publishTokenKey && state.publishTokenKey !== unlockKey()){
+    state.publishToken = "";   // names/date changed since this token was issued -> it is stale; re-verify below
+  }
   if(!state.publishToken){
     // isUnlocked() (name+date, 30 days) and state.publishToken (this session
     // only) can get out of sync — e.g. the draft was reloaded on another
@@ -2198,6 +2202,7 @@ async function publishWebsite(){
   }
 
   statusEl.textContent = "កំពុងបោះពុម្ពគេហទំព័រ...";
+  const fp = Object.fromEntries(weddingFingerprintParams_().entries());   // normalized, same as unlock/verifyCode
   const slug = getSiteSlug();
   const html = renderInvitation(state); // no __guestName — page reads ?to= itself at view time
 
@@ -2208,21 +2213,28 @@ async function publishWebsite(){
       body: JSON.stringify({
         path: `sites/${slug}/index.html`, content: html,
         token: state.publishToken || "",
-        groomName: state.groomName || "", brideName: state.brideName || "",
-        groomNameEn: state.groomNameEn || "", brideNameEn: state.brideNameEn || "",
-        eventDate: state.eventDate || ""
+        groomName: fp.groomName, brideName: fp.brideName,
+        groomNameEn: fp.groomNameEn, brideNameEn: fp.brideNameEn,
+        eventDate: fp.eventDate
       })
     });
     const data = await resp.json().catch(() => ({}));
     if(!resp.ok || !data.url){ throw new Error(data.error || ("HTTP " + resp.status)); }
 
     state.publishedUrl = data.url;
+    state.publishTokenKey = unlockKey();
     saveDraft();
     statusEl.textContent = "✅ បោះពុម្ពជោគជ័យ! Link គោល: " + data.url;
     renderPublishedUrl();
     generateGuestLinks();
   }catch(e){
     console.error("Publish failed:", e);
+    if(/fingerprint_mismatch/i.test(String(e && e.message || e))){
+      state.publishToken = "";   // force a fresh verification next time
+      saveDraft();
+      statusEl.textContent = "⚠️ ឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធី មិនត្រូវនឹងអ្វីដែលបានទូទាត់ទេ។ សូមកែឱ្យដូចពេលទូទាត់ (ទាំងខ្មែរ និង English) ឬវាយលេខកូដម្តងទៀត រួចចុច Publish ម្តងទៀត។";
+      return;
+    }
     statusEl.textContent = "❌ បោះពុម្ពបរាជ័យ៖ " + (e.message || e);
   }
 }
@@ -2454,6 +2466,7 @@ function showCodeSuccess_(code, publishToken){
   stopPaymentPolling();
   setUnlocked(code);
   state.publishToken = publishToken || "";
+  state.publishTokenKey = unlockKey();
   saveDraft();
   $("payQrSection").style.display = "none";
   $("codeEntry").classList.remove("show");
@@ -2521,6 +2534,7 @@ $("codeSubmitBtn").addEventListener("click", async () => {
       $("codeStatus").textContent = "";
       setUnlocked(code);
       state.publishToken = data.publishToken || "";
+      state.publishTokenKey = unlockKey();
       saveDraft();
       closePaymentModal();
       continueAfterUnlock_();
@@ -2803,6 +2817,7 @@ function exportProject(){
   }
   const copy = JSON.parse(JSON.stringify(state));
   delete copy.publishToken;                       // secret: must not end up in a file that gets shared
+  delete copy.publishTokenKey;
   const payload = { app: BACKUP_APP_ID, version: 1, name, exportedAt: Date.now(), state: copy };
   if(includeMusic) payload.music = JSON.parse(JSON.stringify(musicAsset));
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -2829,7 +2844,7 @@ function importProject(file){
       if(!window.confirm("ការនាំចូលនឹងជំនួសព័ត៌មាន រូបភាព និងការកំណត់ទាំងអស់ដែលកំពុងកែក្នុង browser នេះ។\nបើចង់រក្សាកំណែបច្ចុប្បន្ន សូមចុច Cancel រួច Export ទុកសិន។\nបន្តនាំចូល?")) return;
       const next = normalizeImported(payload.state);
       // Same project as the one being edited: keep its publish permission so re-publishing still works.
-      if(next.siteSlug && next.siteSlug === state.siteSlug && state.publishToken) next.publishToken = state.publishToken;
+      if(next.siteSlug && next.siteSlug === state.siteSlug && state.publishToken){ next.publishToken = state.publishToken; next.publishTokenKey = state.publishTokenKey; }
       try{ localStorage.setItem("wib-draft-v2", JSON.stringify(next)); }
       catch(e){ statusEl.textContent = "ទំហំ browser ពេញ — មិនអាចនាំចូលបានទេ (ឯកសារធំពេក)"; return; }
       let musicNote = " · ឯកសារនេះគ្មានចម្រៀងទេ (ចម្រៀងដែលមានស្រាប់ក្នុង browser នេះនៅដដែល)";
