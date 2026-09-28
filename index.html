@@ -382,7 +382,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 
     <fieldset>
       <legend><span class="lg-icon">🎁</span>ធៀបអញ្ជើញផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវ (Guest Copies)</legend>
-      <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;">ទាញយកបានច្រើនបំផុត <b>៣០ នាក់ក្នុងមួយដង</b>។ បើមានភ្ញៀវលើសពី ៣០ នាក់ សូមបែងចែកជាក្រុមៗ៖ ទាញយកក្រុមទី ១ (៣០ នាក់ដំបូង) រួចលុបឈ្មោះទាំងនោះចេញ ហើយបិទភ្ជាប់ក្រុមបន្ទាប់ដើម្បីទាញយកម្តងទៀត។ ការទូទាត់មានសុពលភាព ៣០ ថ្ងៃ ដូច្នេះមិនចាំបាច់បង់ថ្មីសម្រាប់ក្រុមបន្ទាប់ ដរាបណាមិនប្តូរឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធី។</p>
+      <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;">ចុចប៊ូតុងខាងក្រោមម្តងដើម្បី Publish គេហទំព័រ រួចវានឹងបង្កើត <b>Link ផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវម្នាក់ៗ</b> ភ្លាមៗ (គ្មានកំណត់ចំនួន)។ ការទូទាត់មានសុពលភាព ៣០ ថ្ងៃ ដរាបណាមិនប្តូរឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធី។</p>
       <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;color:#C0392B;font-weight:600;">⚠️ សំខាន់៖ បន្ទាប់ពីទូទាត់រួច <u>កុំកែឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធីម្តងទៀត</u> — ព្រោះការទូទាត់ភ្ជាប់ទៅនឹងឈ្មោះ/ថ្ងៃពិតប្រាកដ។ បើកែ ប្រព័ន្ធនឹងសុំទូទាត់ថ្មី ទោះជាអ្នកមានលេខកូដក៏ដោយ (លេខកូដនឹងប្រើមិនកើតរហូតដល់អ្នកបំពេញឈ្មោះ/ថ្ងៃឲ្យដូចដើមវិញ)។</p>
       <div class="field"><label>បញ្ជីឈ្មោះភ្ញៀវ (មួយបន្ទាត់ម្នាក់)</label>
         <textarea id="guestNamesFile" style="min-height:110px;" placeholder="ចាន់ សុវណ្ណា
@@ -433,12 +433,12 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
     </div>
 
     <div class="code-success" id="codeSuccess">
-      <p>ទូទាត់ជោគជ័យ! សូម <b>រក្សាទុក/screenshot</b> លេខកូដនេះ — ប្រើដើម្បីទាញយកម្តងទៀតលើ device ផ្សេង ឬក្រោយ clear cache (សុពលភាព ៣០ ថ្ងៃ)៖</p>
+      <p>ទូទាត់ជោគជ័យ! សូម <b>រក្សាទុក/screenshot</b> លេខកូដនេះ — ប្រើដើម្បីបន្តលើ device ផ្សេង ឬក្រោយ clear cache (សុពលភាព ៣០ ថ្ងៃ)៖</p>
       <div class="code-value">
         <span class="code-text" id="codeText">--------</span>
         <button class="code-copy" id="codeCopyBtn" type="button" title="ចម្លង">⧉</button>
       </div>
-      <button class="code-continue" id="codeContinueBtn" type="button">បន្ត ទាញយកឯកសារ</button>
+      <button class="code-continue" id="codeContinueBtn" type="button">បន្ត បង្កើត Link សម្រាប់ភ្ញៀវ</button>
     </div>
 
     <button class="pay-link" id="haveCodeLink" type="button" style="display:none;">មានលេខកូដរួចហើយ?</button>
@@ -2002,9 +2002,9 @@ function updateGuestCount(){
   const el = $("guestCount");
   if(!el) return;
   const n = guestNameList().length;
-  el.textContent = n + " / " + MAX_GUESTS_PER_DOWNLOAD + " នាក់";
-  el.style.color = n > MAX_GUESTS_PER_DOWNLOAD ? "#C0392B" : "";
-  el.style.fontWeight = n > MAX_GUESTS_PER_DOWNLOAD ? "700" : "";
+  el.textContent = n + " នាក់";
+  el.style.color = "";
+  el.style.fontWeight = "";
 }
 function checkGuestLimit(names){
   if(names.length > MAX_GUESTS_PER_DOWNLOAD){
@@ -2329,16 +2329,14 @@ function renderGuestLinksResult(results){
   }
 }
 
+// After unlock (payment or code) and from the main button: publish the site once, then only make links.
+function continueAfterUnlock_(){
+  if(!state.publishedUrl) publishWebsite();
+  else generateGuestLinks();
+}
 $("uploadFilesBtn").addEventListener("click", () => {
-  if(isUnlocked()){
-    if(!state.publishedUrl){
-      publishWebsite();
-    } else {
-      generateGuestLinks();
-    }
-  } else {
-    openPaymentChoice_();
-  }
+  if(isUnlocked()) continueAfterUnlock_();
+  else openPaymentChoice_();
 });
 
 // ---------------------------------------------------------------------
@@ -2495,7 +2493,7 @@ $("choiceHaveCodeBtn").addEventListener("click", () => openCodeEntry_());
 
 $("codeContinueBtn").addEventListener("click", () => {
   closePaymentModal();
-  generateGuestFiles();
+  continueAfterUnlock_();
 });
 
 // ---- "Already have a code?" — verify against server, works on any device ----
@@ -2525,7 +2523,7 @@ $("codeSubmitBtn").addEventListener("click", async () => {
       state.publishToken = data.publishToken || "";
       saveDraft();
       closePaymentModal();
-      generateGuestFiles();
+      continueAfterUnlock_();
     } else {
       const knownReasons = {
         mismatch: "លេខកូដត្រឹមត្រូវ ប៉ុន្តែឈ្មោះ/ថ្ងៃមិនត្រូវគ្នា — សូមបំពេញឈ្មោះកូនកម្លោះ/ក្រមុំ និងថ្ងៃពិធីឲ្យដូចដើមឲ្យបានត្រឹមត្រូវ",
