@@ -2232,7 +2232,14 @@ async function publishWebsite(){
     if(/fingerprint_mismatch/i.test(String(e && e.message || e))){
       state.publishToken = "";   // force a fresh verification next time
       saveDraft();
-      statusEl.textContent = "⚠️ ឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធី មិនត្រូវនឹងអ្វីដែលបានទូទាត់ទេ។ សូមកែឱ្យដូចពេលទូទាត់ (ទាំងខ្មែរ និង English) ឬវាយលេខកូដម្តងទៀត រួចចុច Publish ម្តងទៀត។";
+      // BUGFIX: this branch used to only show a message telling the customer to
+      // "re-enter the code", but never actually opened the code-entry panel —
+      // there was nowhere for them to do that. Open it directly, the same way
+      // the silent-recovery-failed branch above already does.
+      let saved = null;
+      try{ saved = JSON.parse(localStorage.getItem(paidFlagKey_()) || "null"); }catch(err){}
+      statusEl.textContent = "⚠️ ឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធី មិនត្រូវនឹងអ្វីដែលបានទូទាត់ទេ។ សូមកែឱ្យដូចពេលទូទាត់ (ទាំងខ្មែរ និង English) ឬវាយលេខកូដម្តងទៀតខាងក្រោម រួចចុច Publish ម្តងទៀត។";
+      openCodeEntry_(saved && saved.code);
       return;
     }
     statusEl.textContent = "❌ បោះពុម្ពបរាជ័យ៖ " + (e.message || e);
