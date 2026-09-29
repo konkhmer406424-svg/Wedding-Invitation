@@ -280,7 +280,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
     <fieldset>
       <legend><span class="lg-icon">📅</span>ថ្ងៃ និង ម៉ោង (ប្រើរួមទាំងពីរភាសា)</legend>
       <div class="row2">
-        <div class="field"><label>កាលបរិច្ឆេទ</label><input type="date" id="eventDate"></div>
+        <div class="field"><label>កាលបរិច្ឆេទ</label><input type="date" id="eventDate"><div id="eventDateReadback" style="margin-top:4px;font-size:12.5px;color:var(--muted,#8a7a6a);"></div></div>
         <div class="field"><label>ម៉ោងចាប់ផ្តើម (សម្រាប់ការរាប់ថយក្រោយ)</label><input type="time" id="startTime"></div>
       </div>
     </fieldset>
@@ -2700,8 +2700,21 @@ function bindSimpleFields(){
   Object.entries(map).forEach(([id,key]) => {
     const el = $(id);
     el.value = state[key] || "";
-    el.addEventListener("input", () => { state[key] = el.value; scheduleUpdate(); });
+    el.addEventListener("input", () => {
+      state[key] = el.value;
+      if(id === "eventDate") updateEventDateReadback_();
+      scheduleUpdate();
+    });
   });
+  updateEventDateReadback_();
+}
+// Shows the date spelled out in Khmer (e.g. "ថ្ងៃអាទិត្យ ទី២២ ខែវិច្ឆិកា ឆ្នាំ2026") next to
+// the date field, so staff/customers can confirm the day and month regardless of whether
+// their browser's native date picker happens to display MM/DD/YYYY, DD/MM/YYYY, etc.
+function updateEventDateReadback_(){
+  const el = $("eventDateReadback");
+  if(!el) return;
+  el.textContent = state.eventDate ? kmDate(state.eventDate) : "";
 }
 
 function update(){
