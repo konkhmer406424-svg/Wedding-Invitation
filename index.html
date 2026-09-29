@@ -2364,7 +2364,19 @@ let payIsChecking = false; // guards against overlapping poll requests (slow net
 // unlock code). Names are trimmed + lowercased before comparing so small
 // typing differences (spacing, capitalization) don't cause a mismatch;
 // the date is compared as-is.
-function normName_(v){ return (v || "").trim().toLowerCase().replace(/\s+/g, " "); }
+function normName_(v){
+  // NFC-normalize and strip zero-width characters first: some mobile Khmer
+  // keyboards insert zero-width spaces between syllable clusters, and the
+  // same visible text can be stored as different Unicode byte sequences
+  // (NFC vs NFD). Without this, two logically-identical names could compare
+  // as different and cause a false "fingerprint mismatch" at publish time.
+  return String(v || "")
+    .normalize("NFC")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
 function unlockKey(){
   return [normName_(state.groomName), normName_(state.brideName), normName_(state.groomNameEn), normName_(state.brideNameEn), (state.eventDate||"").trim()].join("|");
 }
