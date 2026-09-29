@@ -192,6 +192,44 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 .chk-row input{margin-top:3px;}
 .profile-btn-row{display:flex;gap:6px;margin-top:8px;}
 .profile-btn-row .add-btn{width:auto;flex:1;margin-top:0;font-size:12px;padding:8px 6px;}
+/* --- ported from builder: style selects, ready templates, cover focus, timeline columns --- */
+.tl-col{min-width:0;}
+.tl-col input{width:100%;padding:7px 8px;font-size:13px;margin-bottom:6px;}
+.tl-col input:last-child{margin-bottom:0;}
+.tl-head{display:flex;justify-content:flex-end;margin-bottom:4px;}
+.style-sel-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:8px;}
+.style-sel-row select{width:100%;min-width:0;}
+.focus-pick{position:relative;display:block;width:fit-content;max-width:100%;margin:4px auto 0;border:1px solid var(--b-line);border-radius:8px;overflow:hidden;cursor:crosshair;touch-action:none;user-select:none;-webkit-user-select:none;line-height:0;background:var(--b-bg);}
+.focus-pick img{display:block;max-width:100%;max-height:300px;width:auto;height:auto;pointer-events:none;-webkit-user-drag:none;}
+.focus-dot{position:absolute;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;border:2px solid #fff;background:rgba(255,255,255,.2);box-shadow:0 0 0 2px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.45);pointer-events:none;}
+.focus-dot::after{content:"";position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.5);}
+.preset-list{display:flex;flex-direction:column;gap:8px;}
+.preset-card{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:10px 12px;border:1px solid var(--b-line);border-radius:10px;background:var(--b-bg);color:var(--b-ink);cursor:pointer;font-family:inherit;}
+.preset-card:hover{border-color:var(--b-accent);}
+.preset-card:focus-visible{outline:2px solid var(--b-accent);outline-offset:2px;}
+.preset-swatch{width:44px;height:44px;border-radius:8px;flex-shrink:0;}
+.preset-txt{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.preset-txt b{font-size:14px;}
+.preset-txt small{font-size:12px;color:var(--b-sub);line-height:1.5;}
+.style-sel-row{display:flex;flex-direction:column;gap:12px;}
+.style-sel-row .field + .field{border-top:1px solid var(--b-line);padding-top:12px;}
+.style-sel-row select[hidden],.vp-lab{display:none;}
+.style-sel-row .field{margin-bottom:0;}
+.style-sel-row label{font-size:11.5px;margin-bottom:4px;}
+
+/* --- icon pickers (no text): colour, fonts, opening screen, gallery, frame, text animation --- */
+.pick-group{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-top:1px solid var(--b-line);}
+.pick-group:first-of-type{border-top:none;padding-top:0;}
+.pick-head{flex:0 0 28px;height:54px;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;opacity:.85;cursor:help;}
+.pick-head-t{font-size:19px;font-weight:700;color:var(--b-accent);}
+.pick-grid{flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px;min-width:0;}
+.pick-tile{width:100%;height:auto;aspect-ratio:1/1;min-height:54px;padding:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--b-line);border-radius:10px;background:var(--b-panel);color:var(--b-accent);cursor:pointer;font-family:inherit;font-size:26px;line-height:1;transition:border-color .15s ease,transform .1s ease,box-shadow .15s ease;}
+.pick-tile:hover{border-color:color-mix(in srgb, var(--b-accent) 55%, var(--b-line));transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.08);}
+.pick-tile:focus-visible{outline:2px solid var(--b-accent);outline-offset:2px;}
+.pick-tile.active{border-color:var(--b-accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--b-accent) 18%, transparent);background:color-mix(in srgb, var(--b-accent) 8%, var(--b-panel));}
+.pick-tile svg{width:36px;height:36px;display:block;}
+.pick-tile .pick-swatch{width:34px;height:34px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);}
+.pick-tile .pick-sample{font-size:27px;color:var(--b-ink);}
 </style>
 </head>
 <body>
@@ -223,34 +261,39 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <p class="guest-empty-hint" id="backupStatus"></p>
     </fieldset>
 
-    <div class="style-row" style="gap:8px;">
-      <fieldset class="style-col">
-        <legend><span class="lg-icon">🎨</span>ពណ៌+រចនាអក្សរ</legend>
-        <div class="theme-grid" id="themeGrid"></div>
-      </fieldset>
+    <fieldset>
+      <legend><span class="lg-icon">🎀</span>គំរូរួចរាល់ (Ready Templates)</legend>
+      <p class="photo-hint">ចុចជ្រើសគំរូមួយ ទម្រង់ ពណ៌ អក្សរ ក្របខណ្ឌ និងអត្ថបទគំរូ ត្រូវបានដាក់ស្រេច។ បន្ទាប់មកគ្រាន់តែបញ្ចូលរូបភាព ចម្រៀង Link ផែនទី និង Link វិឌីអូ ក៏បង្ហាញភ្ញៀវបានភ្លាម។ អត្ថបទដែលបានបំពេញរួចមិនត្រូវលុបទេ។</p>
+      <div class="preset-list" id="presetList"></div>
+      <p class="photo-hint" id="presetStatus" style="margin:8px 0 0;"></p>
+    </fieldset>
 
-      <fieldset class="style-col style-col-effect">
-        <legend><span class="lg-icon">✨</span>ការទម្លាក់</legend>
-        <div class="effect-grid" id="effectGrid"></div>
-      </fieldset>
-
-      <fieldset class="style-col style-col-cover">
-        <legend><span class="lg-icon">🌸</span>ចលនាផ្កាខាងក្រោយ</legend>
-        <div class="cover-grid" id="kbachGrid"></div>
-      </fieldset>
-
-      <fieldset class="style-col style-col-cover">
-        <legend><span class="lg-icon">💌</span>ការបើកដំបូង</legend>
-        <div class="cover-grid" id="coverGridPicker"></div>
-        <label class="chk-row" style="margin-top:8px;"><input type="checkbox" id="coverAlways"><span>បង្ហាញអេក្រង់នេះ ទោះមិនមានចម្រៀងក៏ដោយ</span></label>
-      </fieldset>
-    </div>
+    <fieldset>
+      <legend><span class="lg-icon">🎨</span>ទម្រង់ (Style)</legend>
+      <div class="pick-group"><div class="pick-head" title="ពណ៌">🎨</div><div class="pick-grid" id="pickTheme"></div></div>
+      <div class="pick-group"><div class="pick-head pick-head-t" title="អក្សរខ្មែរ">ក</div><div class="pick-grid" id="pickFontKm"></div></div>
+      <div class="pick-group"><div class="pick-head pick-head-t" title="អក្សរ English">Aa</div><div class="pick-grid" id="pickFontEn"></div></div>
+      <div class="pick-group"><div class="pick-head" title="អេក្រង់បើកធៀប">💌</div><div class="pick-grid" id="pickCover"></div></div>
+      <div class="pick-group"><div class="pick-head" title="ទម្រង់រូបភាព">🖼️</div><div class="pick-grid" id="pickGallery"></div></div>
+      <div class="pick-group"><div class="pick-head" title="ស៊ុមតុបតែង">🌸</div><div class="pick-grid" id="pickKbach"></div></div>
+      <div class="pick-group"><div class="pick-head" title="ចលនាអត្ថបទពេល Scroll">✨</div><div class="pick-grid" id="pickAnim"></div></div>
+      <label class="chk-row"><input type="checkbox" id="coverAlways"><span>បង្ហាញអេក្រង់បើកធៀប ទោះមិនមានចម្រៀងក៏ដោយ (បើមានចម្រៀង អេក្រង់នេះបង្ហាញជានិច្ច)</span></label>
+    </fieldset>
 
     <fieldset>
       <legend><span class="lg-icon">📷</span>រូបភាពគម្រប (Cover)</legend>
       <p class="photo-hint">រូបភាពរួម ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា (រូបភាពត្រូវបានបង្រួមទំហំដោយស្វ័យប្រវត្តិ)</p>
       <div class="photo-grid" id="coverGrid"></div>
       <p class="guest-empty-hint" id="coverStatus"></p>
+      <div id="coverFocusBox" style="display:none;margin-top:12px;">
+        <label>ទីតាំងចំណុចច្បាស់ (ចុច ឬអូសលើរូប ត្រង់មុខមនុស្ស)</label>
+        <div class="focus-pick" id="focusPick"><img id="focusImg" alt=""><span class="focus-dot" id="focusDot"></span></div>
+        <label style="margin-top:12px;">កម្រិតព្រិលគែម <b id="coverBlurVal"></b></label>
+        <input type="range" id="coverBlur" min="0" max="40" step="1" style="width:100%;">
+        <label style="margin-top:10px;">ទំហំតំបន់ច្បាស់ <b id="coverSharpVal"></b></label>
+        <input type="range" id="coverSharp" min="30" max="95" step="1" style="width:100%;">
+        <div class="profile-btn-row" style="margin-top:10px;"><button class="access-btn" id="coverFocusReset" type="button">កំណត់ឡើងវិញ (លំនាំដើម)</button></div>
+      </div>
     </fieldset>
 
     <fieldset>
@@ -335,6 +378,9 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <div class="field"><label>តំណភ្ជាប់ Google Maps (ស្រេចចិត្ត — ប្រើរួមទាំងពីរភាសា)</label>
         <p class="photo-hint" style="margin:-4px 0 8px;">ចម្លងតំណភ្ជាប់ពី Google Maps ដោយផ្ទាល់ (ស្វែងរកទីតាំង → Share → Copy link)។ ទុកទទេ ប៊ូតុងទីតាំងនឹងមិនបង្ហាញទេ</p>
         <input type="text" id="venueMapLink" placeholder="https://maps.app.goo.gl/..."></div>
+      <div class="field"><label>កូអរដោនេទីតាំង (ស្រេចចិត្ត) — សម្រាប់បង្ហាញ pin ពណ៌តាមធៀប</label>
+        <p class="photo-hint" style="margin:-4px 0 8px;">នៅ Google Maps ចុចស្តាំ (ឬចុចជាប់) លើទីតាំង រួចចុចលេខកូអរដោនេ ដើម្បី copy ហើយបិទភ្ជាប់ទីនេះ។</p>
+        <input type="text" id="venueCoords" placeholder="11.5564, 104.9282"></div>
     </fieldset>
 
     <fieldset>
@@ -342,6 +388,13 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <p class="photo-hint">បញ្ចូលបានតិច-ច្រើនតាមចិត្ត (រហូតដល់ ១០ សន្លឹក) ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា (រូបភាពត្រូវបានបង្រួមទំហំដោយស្វ័យប្រវត្តិ)</p>
       <div class="photo-grid" id="photoGrid"></div>
       <p class="guest-empty-hint" id="photoStatus"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend><span class="lg-icon">🎬</span>វិឌីអូ (Video) — រួម</legend>
+      <p class="photo-hint">ដាក់ Link វិឌីអូ៖ YouTube (រួមទាំង Shorts), Facebook, TikTok, Vimeo ឬឯកសារ .mp4 ផ្ទាល់។ ទុកទទេ បើមិនចង់បង្ហាញ។</p>
+      <div class="field"><label for="videoUrl">Link វិឌីអូ</label>
+        <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=..."></div>
     </fieldset>
 
     <fieldset>
@@ -447,36 +500,30 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 
 <script>
 const THEMES = {
-  gold:{ label:"មាស", swatch:"linear-gradient(135deg,#6B2D5C,#B8912E)",
-    bg:"#FBF6F8", ink:"#3B2440", accent1:"#6B2D5C", accent2:"#B8912E",
-    card:"#FFFFFF", border:"rgba(107,45,92,0.18)", radius:"4px",
-    display:"'Moul',serif", body:"'Kantumruy Pro',sans-serif", ornate:true,
-    displayEn:"'Great Vibes',cursive", bodyEn:"'Cormorant Garamond',serif" },
+  gold:{ label:"មាស", swatch:"linear-gradient(135deg,#B8912E,#6B2D5C)",
+    bg:"#FBF8EF", ink:"#3B2A1C", accent1:"#B8912E", accent2:"#6B2D5C",
+    card:"#FFFFFF", border:"rgba(184,145,46,0.22)", radius:"4px",
+    ornate:true },
   rose:{ label:"ផ្កាកុលាប", swatch:"linear-gradient(135deg,#A8465A,#C9A227)",
     bg:"#FFF3F0", ink:"#402530", accent1:"#A8465A", accent2:"#C9A227",
     card:"#FFFFFF", border:"rgba(168,70,90,0.2)", radius:"4px",
-    display:"'Suwannaphum',serif", body:"'Battambang',sans-serif", ornate:true,
-    displayEn:"'Parisienne',cursive", bodyEn:"'Cormorant Garamond',serif" },
+    ornate:true },
   minimal:{ label:"សាមញ្ញ", swatch:"linear-gradient(135deg,#1F1B16,#6B6142)",
     bg:"#F7F4EE", ink:"#1F1B16", accent1:"#1F1B16", accent2:"#6B6142",
     card:"#FFFFFF", border:"rgba(31,27,22,0.15)", radius:"0px",
-    display:"'Battambang',serif", body:"'Kantumruy Pro',sans-serif", ornate:false,
-    displayEn:"'Playfair Display',serif", bodyEn:"'Cormorant Garamond',serif" },
+    ornate:false },
   royal:{ label:"នគរ", swatch:"linear-gradient(135deg,#1B3A6B,#C9A227)",
     bg:"#F5F6FA", ink:"#1B2440", accent1:"#1B3A6B", accent2:"#C9A227",
     card:"#FFFFFF", border:"rgba(27,58,107,0.18)", radius:"4px",
-    display:"'Bokor',serif", body:"'Kantumruy Pro',sans-serif", ornate:true,
-    displayEn:"'EB Garamond',serif", bodyEn:"'EB Garamond',serif" },
+    ornate:true },
   emerald:{ label:"ម្រកត", swatch:"linear-gradient(135deg,#1F5C45,#C9A227)",
     bg:"#F2F8F5", ink:"#1E3B2F", accent1:"#1F5C45", accent2:"#C9A227",
     card:"#FFFFFF", border:"rgba(31,92,69,0.18)", radius:"4px",
-    display:"'Angkor',serif", body:"'Battambang',sans-serif", ornate:true,
-    displayEn:"'Tangerine',cursive", bodyEn:"'Cormorant Garamond',serif" },
+    ornate:true },
   blush:{ label:"ផ្កាឈូក", swatch:"linear-gradient(135deg,#C76B84,#E0A458)",
     bg:"#FFF8F5", ink:"#4A2E2A", accent1:"#C76B84", accent2:"#E0A458",
     card:"#FFFFFF", border:"rgba(199,107,132,0.18)", radius:"4px",
-    display:"'Moulpali',serif", body:"'Kantumruy Pro',sans-serif", ornate:true,
-    displayEn:"'Marck Script',cursive", bodyEn:"'Cormorant Garamond',serif" }
+    ornate:true }
 };
 
 const KM_WEEKDAYS = ["អាទិត្យ","ចន្ទ","អង្គារ","ពុធ","ព្រហស្បតិ៍","សុក្រ","សៅរ៍"];
@@ -488,43 +535,91 @@ const LABELS = {
   km:{ countdownTitle:"រាប់ថយក្រោយ", countdownSub:"រយៈពេលដែលនៅសល់រហូតដល់ថ្ងៃមង្គលការ",
     days:"ថ្ងៃ", hours:"ម៉ោង", minutes:"នាទី", seconds:"វិនាទី", congrats:"សូមអបអរសាទរ!",
     programTitle:"កម្មវិធីនៃពិធីមង្គលការ", galleryTitle:"រូបភាពនៃពួកយើង",
-    gallerySub:"ដាក់រូបភាព pre-wedding របស់អ្នកជំនួសកន្លែងទាំងនេះ", venueTitle:"ទីតាំងកម្មវិធី",
+    gallerySub:"ដាក់រូបភាព pre-wedding របស់អ្នកជំនួសកន្លែងទាំងនេះ", videoTitle:"វិឌីអូនៃពួកយើង", videoSub:"សូមចុចលេងដើម្បីទស្សនា", venueTitle:"ទីតាំងកម្មវិធី",
     mapBtn:"មើលទីតាំងលើ Google Maps", calBtn:"📅 រក្សាទុកក្នុង Calendar", contactsTitle:"ទំនាក់ទំនង",
     contactsSub:"សម្រាប់ព័ត៌មានលម្អិត សូមទាក់ទងមកកាន់", thanks:"អរគុណ", and:"និង",
     toggleKm:"ខ្មែរ", toggleEn:"English" },
   en:{ countdownTitle:"Countdown", countdownSub:"Time remaining until our special day",
     days:"Days", hours:"Hours", minutes:"Minutes", seconds:"Seconds", congrats:"Congratulations!",
     programTitle:"Wedding Program", galleryTitle:"Our Moments Together",
-    gallerySub:"Your pre-wedding photos will appear here", venueTitle:"Event Location",
+    gallerySub:"Your pre-wedding photos will appear here", videoTitle:"Our Video", videoSub:"Tap play to watch", venueTitle:"Event Location",
     mapBtn:"View on Google Maps", calBtn:"📅 Save to Calendar", contactsTitle:"Contact Us",
     contactsSub:"For more details, please reach out to", thanks:"Thank You", and:"&",
     toggleKm:"ខ្មែរ", toggleEn:"English" }
 };
 
 const EFFECTS = {
+  none:{ label:"គ្មាន", icon:"–" },
   petals:{ label:"ផ្កាធ្លាក់", icon:"🌸" },
   snow:{ label:"ព្រិលធ្លាក់", icon:"❄️" },
   stars:{ label:"ផ្កាយធ្លាក់", icon:"✨" }
 };
 
-// Background flower watermark/frame styles (static, seamlessly-tiling, slow drift — not to be
-// confused with EFFECTS above, which are the falling-particle animations)
+
+// ---- Font styles: chosen separately from the colour theme (Khmer and English each have their own) ----
+const FONT_KM = {
+  moul:{ name:"Moul", display:"'Moul',serif", body:"'Kantumruy Pro',sans-serif" },
+  suwannaphum:{ name:"Suwannaphum", display:"'Suwannaphum',serif", body:"'Battambang',sans-serif" },
+  battambang:{ name:"Battambang", display:"'Battambang',serif", body:"'Kantumruy Pro',sans-serif" },
+  bokor:{ name:"Bokor", display:"'Bokor',serif", body:"'Kantumruy Pro',sans-serif" },
+  angkor:{ name:"Angkor", display:"'Angkor',serif", body:"'Battambang',sans-serif" },
+  moulpali:{ name:"Moulpali", display:"'Moulpali',serif", body:"'Kantumruy Pro',sans-serif" }
+};
+const FONT_EN = {
+  greatVibes:{ name:"Great Vibes", display:"'Great Vibes',cursive", body:"'Cormorant Garamond',serif" },
+  parisienne:{ name:"Parisienne", display:"'Parisienne',cursive", body:"'Cormorant Garamond',serif" },
+  playfair:{ name:"Playfair Display", display:"'Playfair Display',serif", body:"'Cormorant Garamond',serif" },
+  ebGaramond:{ name:"EB Garamond", display:"'EB Garamond',serif", body:"'EB Garamond',serif" },
+  tangerine:{ name:"Tangerine", display:"'Tangerine',cursive", body:"'Cormorant Garamond',serif" },
+  marckScript:{ name:"Marck Script", display:"'Marck Script',cursive", body:"'Cormorant Garamond',serif" }
+};
+// What each theme used to force. Only used to keep old drafts / saved projects looking exactly as before.
+const THEME_FONT_DEFAULTS = {
+  gold:["moul","greatVibes"], rose:["suwannaphum","parisienne"], minimal:["battambang","playfair"],
+  royal:["bokor","ebGaramond"], emerald:["angkor","tangerine"], blush:["moulpali","marckScript"]
+};
+// ---- Photo gallery layout: chosen separately from colour/font/theme ----
+const GALLERY_STYLES = {
+  grid:{ label:"ក្រឡាចត្រង្គ (រូបធំ-តូចឆ្លាស់)" },
+  classic:{ label:"ក្រឡាចត្រង្គ (ស្មើគ្នា)" },
+  polaroid:{ label:"រូបថតប៉ូឡារ៉ូអ៊ីត" },
+  square:{ label:"ក្រឡាការ៉េ" },
+  mosaic:{ label:"ម៉ូសាអ៊ិក (ចម្រុះទំហំ — លេចធ្លោ)" }
+};
+// What each colour theme used to force, before the layout became its own choice. Only used to keep old
+// drafts/projects looking the same as before.
+// ---- Text animation when the guest scrolls (chosen separately from colour/font/theme) ----
+const TEXT_ANIM_STYLES = {
+  fadeup:{ label:"លេចឡើងពីក្រោម (Fade up)" },
+  words:{ label:"ស្រាយម្តងមួយពាក្យ (Word by word)" },
+  blur:{ label:"ព្រិលទៅច្បាស់ (Blur in)" },
+  none:{ label:"គ្មាន" }
+};
+const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square", royal:"grid", emerald:"grid", blush:"grid" };
+
+// Fixed decorative Kbach Khmer border: stays anchored to the screen edges while the invitation content
+// scrolls underneath it. Colours are drawn from the active theme (--accent-1 / --accent-2 / --bg), so no
+// separate colour picker is needed here.
 const KBACH_FRAME_STYLES = {
-  diagbranch:{ label:"មែកឈើទ្រេត", icon:"🌿" },
-  fullwrap:{ label:"គ្របពេញទំព័រ", icon:"🌺" },
-  onecorner:{ label:"ស្តើងៗ (ជ្រុង)", icon:"🌷" },
-  bottomgarland:{ label:"កម្រងផ្កាបាត", icon:"🌼" },
-  sidebranch:{ label:"កម្រងផ្កាចំហៀង", icon:"🍃" },
-  scatter:{ label:"កក្រាយសេរី", icon:"✿" }
+  none:{ label:"គ្មាន" },
+  diagbranch:{ label:"មែកទ្រេត" },
+  fullwrap:{ label:"ព័ទ្ធពេញ" },
+  onecorner:{ label:"ជ្រុងតែមួយ" },
+  bottomgarland:{ label:"កម្រងក្រោម" },
+  sidebranch:{ label:"សងខាង" },
+  scatter:{ label:"ទីតាំងសេរី" }
 };
 
-// ---------- Cover opening animation + background music (ported from the internal builder) ----------
+// ---- Ready-made invitation templates: one click sets colour, fonts, cover animation, frame, gallery layout and
+// text animation, and fills EMPTY text fields with sample content. Staff then only add photos, song, map and video. ----
+const SAMPLE_NAMES = { km:["សុវណ្ណ","ស្រីល័ក្ខ"], en:["Sovann","Srey Leak"] };
+
 const ocDarkText = c => `.open-cover.oc-s-${c} .oc-guest{color:#fff;opacity:.92;text-shadow:0 1px 8px rgba(0,0,0,.5);}
 .open-cover.oc-s-${c} .oc-names{color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.55);}
 .open-cover.oc-s-${c} .oc-hint{color:#fff;opacity:.85;text-shadow:0 1px 6px rgba(0,0,0,.55);}
 .open-cover.oc-s-${c} .oc-btn{background:#fff;color:var(--ink);box-shadow:0 8px 22px rgba(0,0,0,.4);}`;
 
-const LOTUS_PETALS = [
+const LOTUS_PETALS = [   // [closed angle, open angle, closed scale, layer tint %]
   [-14,-72,.80,40],[-7,-36,.80,40],[0,0,.80,40],[7,36,.80,40],[14,72,.80,40],
   [-10,-54,.86,58],[-3,-18,.86,58],[3,18,.86,58],[10,54,.86,58],
   [-6,-32,.92,76],[0,0,.94,76],[6,32,.92,76]
@@ -533,6 +628,7 @@ const LOTUS_PETALS = [
 const COVER_STYLES = {
   door:{
     label:"ទ្វារ", finishMs:1500,
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="7" height="18" rx="1"/><rect x="13" y="3" width="7" height="18" rx="1"/><path d="M9 12v1.5M15 12v1.5"/></svg>',
     parts:c => ({ behind:'<div class="oc-leaf oc-leaf-l"></div><div class="oc-leaf oc-leaf-r"></div>' }),
     css:`.oc-s-door{background:radial-gradient(ellipse at 50% 50%,color-mix(in srgb,var(--accent-2) 45%,var(--bg)) 0%,var(--bg) 75%);perspective:1800px;}
 .oc-leaf{position:absolute;top:0;bottom:0;width:50%;z-index:2;background:linear-gradient(90deg,color-mix(in srgb,var(--accent-1) 68%,#000),var(--accent-1) 42%,color-mix(in srgb,var(--accent-1) 78%,#000));box-shadow:inset 0 0 0 5px color-mix(in srgb,var(--accent-2) 55%,transparent),inset 0 0 70px rgba(0,0,0,.4);transition:transform 1.25s cubic-bezier(.66,0,.24,1);}
@@ -548,6 +644,7 @@ ${ocDarkText("door")}`
   },
   curtain:{
     label:"វាំងនន", finishMs:1800,
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18"/><path d="M5 4c0 6-1 12-2 16h6c-1-4-2-10-2-16"/><path d="M19 4c0 6 1 12 2 16h-6c1-4 2-10 2-16"/></svg>',
     parts:c => ({ behind:'<div class="oc-drape oc-drape-l"></div><div class="oc-drape oc-drape-r"></div><div class="oc-valance"></div>' }),
     css:`.oc-s-curtain{background:radial-gradient(ellipse at 50% 45%,color-mix(in srgb,var(--accent-2) 40%,var(--bg)) 0%,var(--bg) 72%);}
 .oc-drape{position:absolute;top:0;bottom:0;width:50.4%;z-index:2;background:repeating-linear-gradient(90deg,rgba(0,0,0,.34) 0,rgba(0,0,0,0) 15px,rgba(255,255,255,.13) 30px,rgba(0,0,0,.34) 46px),linear-gradient(180deg,color-mix(in srgb,var(--accent-1) 88%,#fff) 0%,var(--accent-1) 40%,color-mix(in srgb,var(--accent-1) 62%,#000) 100%);transition:transform 1.6s cubic-bezier(.62,0,.28,1);}
@@ -561,6 +658,7 @@ ${ocDarkText("curtain")}`
   },
   lock:{
     label:"សោ", finishMs:1750,
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
     parts:c => ({
       behind:'<div class="oc-half oc-half-t"></div><div class="oc-half oc-half-b"></div>',
       top:'<div class="oc-lockbox"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="10" y="22" width="28" height="20" rx="4" fill="currentColor" fill-opacity=".15"/><path class="oc-shackle" d="M16 22v-6a8 8 0 0 1 16 0v6"/><circle cx="24" cy="31" r="2.6" fill="currentColor" stroke="none"/><path d="M24 33v4"/></svg></div>'
@@ -581,25 +679,26 @@ ${ocDarkText("curtain")}`
 @keyframes oc-led{0%,100%{box-shadow:0 0 0 8px rgba(255,255,255,.05),0 0 22px color-mix(in srgb,var(--lk) 40%,transparent);}50%{box-shadow:0 0 0 8px rgba(255,255,255,.08),0 0 38px color-mix(in srgb,var(--lk) 75%,transparent);}}
 ${ocDarkText("lock")}`
   },
-  envelope:{
-    label:"អំណោយ", finishMs:1900,
-    parts:c => ({ mid:'<div class="oc-gift"><div class="oc-gift-glow"></div><div class="oc-gift-base"><i class="oc-gift-rv"></i></div><div class="oc-gift-heart">&#9829;</div><div class="oc-gift-lid"><i class="oc-gift-rv"></i><i class="oc-gift-rh"></i></div></div>' }),
-    css:`.oc-s-envelope{background:radial-gradient(ellipse at 50% 40%,color-mix(in srgb,var(--accent-2) 22%,transparent) 0%,transparent 62%),var(--bg);}
-.oc-gift{position:relative;width:min(58vw,210px);height:min(58vw,210px);margin:0 auto 30px;perspective:900px;transition:transform .75s ease 1.1s,opacity .5s ease 1.25s;}
-.oc-gift-glow{position:absolute;inset:-25%;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent-2) 40%,transparent),transparent 68%);opacity:0;transition:opacity .5s ease .5s;}
-.open-cover.opening .oc-gift-glow{opacity:1;}
-.oc-gift-base{position:absolute;left:2%;right:2%;bottom:0;height:68%;border-radius:6px;overflow:hidden;background:linear-gradient(160deg,color-mix(in srgb,var(--accent-1) 88%,#fff),var(--accent-1) 55%,color-mix(in srgb,var(--accent-1) 68%,#000));box-shadow:0 16px 30px rgba(0,0,0,.28);}
-.oc-gift-heart{position:absolute;left:50%;bottom:20%;width:38px;height:38px;margin-left:-19px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--accent-2) 72%);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1;box-shadow:0 0 26px color-mix(in srgb,var(--accent-2) 75%,transparent);opacity:0;transform:scale(.35);transition:opacity .55s ease .55s,transform .65s ease .55s;z-index:1;}
-.open-cover.opening .oc-gift-heart{opacity:1;transform:scale(1);}
-.oc-gift-lid{position:absolute;left:-3%;right:-3%;top:0;height:32%;border-radius:6px 6px 2px 2px;overflow:hidden;background:linear-gradient(160deg,color-mix(in srgb,var(--accent-2) 85%,#fff),var(--accent-2) 55%,color-mix(in srgb,var(--accent-2) 68%,#000));box-shadow:0 8px 16px rgba(0,0,0,.25);transform-origin:50% 100%;transition:transform 1s cubic-bezier(.5,0,.22,1) .1s;z-index:3;}
-.oc-gift-rv{position:absolute;top:0;bottom:0;left:50%;width:15%;margin-left:-7.5%;background:color-mix(in srgb,#fff 55%,transparent);}
-.oc-gift-rh{position:absolute;left:0;right:0;top:35%;height:22%;background:color-mix(in srgb,#fff 55%,transparent);}
-.open-cover.opening .oc-gift-lid{transform:rotateX(-122deg) translateY(-4%);}
-.open-cover.opening .oc-gift{transform:scale(1.5);opacity:0;}
-@media(max-height:640px){.oc-gift{width:170px;height:170px;}}`
+  rings:{
+    label:"ចិញ្ចៀន", finishMs:1900,
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="15" r="5.5"/><circle cx="15.5" cy="15" r="5.5"/><path d="M12 2l1 2.2 2.2 1-2.2 1L12 8.4l-1-2.2L8.8 5.2l2.2-1z"/></svg>',
+    parts:c => ({ mid:'<div class="oc-rings"><i class="oc-ring oc-ring-a"></i><i class="oc-ring oc-ring-b"></i><span class="oc-rspark">&#10022;</span></div>' }),
+    css:`.oc-s-rings{background:radial-gradient(ellipse at 50% 42%,color-mix(in srgb,var(--accent-2) 22%,transparent) 0%,transparent 62%),var(--bg);}
+.oc-rings{position:relative;width:210px;height:112px;margin:8px auto 34px;transition:transform .7s ease 1.15s,opacity .5s ease 1.3s;animation:oc-rglow 2.6s ease-in-out infinite;}
+@keyframes oc-rglow{0%,100%{filter:drop-shadow(0 6px 10px rgba(0,0,0,.22));}50%{filter:drop-shadow(0 6px 18px color-mix(in srgb,var(--accent-2) 55%,transparent));}}
+.oc-ring{position:absolute;top:4px;width:104px;height:104px;border-radius:50%;background:conic-gradient(from 30deg,var(--c1),#fff 18%,var(--c1) 38%,var(--c2) 62%,#fff 80%,var(--c1));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 11px),#000 calc(100% - 10px));mask:radial-gradient(farthest-side,transparent calc(100% - 11px),#000 calc(100% - 10px));transition:transform 1s cubic-bezier(.5,0,.2,1);}
+.oc-ring-a{left:0;--c1:color-mix(in srgb,var(--accent-1) 80%,#fff);--c2:var(--accent-1);}
+.oc-ring-b{right:0;--c1:color-mix(in srgb,var(--accent-2) 65%,#fff);--c2:var(--accent-2);}
+.open-cover.opening .oc-ring-a{transform:translateX(34px) rotate(140deg);}
+.open-cover.opening .oc-ring-b{transform:translateX(-34px) rotate(-140deg);}
+.oc-rspark{position:absolute;left:50%;top:-14px;margin-left:-15px;font-size:30px;line-height:1;color:var(--accent-1);opacity:0;transform:scale(.2) rotate(-40deg);transition:opacity .4s ease .75s,transform .6s cubic-bezier(.3,1.6,.5,1) .75s;}
+.open-cover.opening .oc-rspark{opacity:1;transform:scale(1) rotate(0);}
+.open-cover.opening .oc-rings{transform:scale(1.5);opacity:0;animation:none;}
+@media(max-height:640px){.oc-rings{transform:scale(.8);margin-bottom:14px;}}`
   },
   lotus:{
     label:"ផ្កាឈូក", finishMs:1900,
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20c-3-2-4-6-3-10 1 2 2 3 3 4 1-1 2-2 3-4 1 4 0 8-3 10z"/><path d="M12 20c-5 0-8-3-9-7 3 0 5 1 6.5 3"/><path d="M12 20c5 0 8-3 9-7-3 0-5 1-6.5 3"/></svg>',
     parts:c => ({ mid:'<div class="oc-lotus">' + LOTUS_PETALS.map(pt => `<svg class="oc-petal" viewBox="0 0 64 118" aria-hidden="true" style="--a0:${pt[0]}deg;--a1:${pt[1]}deg;--s0:${pt[2]};--tint:${pt[3]}%"><path d="M32 117C4 92 4 34 32 1C60 34 60 92 32 117Z"/></svg>`).join("") + '<b class="oc-core"></b><em class="oc-water"></em></div>' }),
     css:`.oc-s-lotus{background:radial-gradient(ellipse at 50% 46%,color-mix(in srgb,var(--accent-2) 24%,transparent) 0%,transparent 60%),var(--bg);}
 .oc-lotus{position:relative;width:250px;height:200px;margin:4px auto 24px;transition:transform 1s cubic-bezier(.6,0,.3,1) 1s,opacity .6s ease 1.5s;}
@@ -612,26 +711,36 @@ ${ocDarkText("lock")}`
 .oc-water{position:absolute;left:6%;right:6%;bottom:0;height:22px;border-radius:50%;border:2px solid color-mix(in srgb,var(--accent-1) 35%,transparent);}
 @media(max-height:640px){.oc-lotus{transform-origin:50% 100%;height:170px;}}`
   },
-  book:{
-    label:"ក្រណាត់រមូរ", finishMs:1900,
-    parts:c => ({
-      mid:'<div class="oc-scroll"><div class="oc-scroll-rod oc-scroll-rod-t"></div><div class="oc-scroll-paper"><i></i><b>&#9829;</b><i></i></div><div class="oc-scroll-rod oc-scroll-rod-b"></div></div>'
-    }),
-    css:`.oc-s-book{background:radial-gradient(ellipse at 50% 42%,color-mix(in srgb,var(--accent-2) 20%,transparent) 0%,transparent 62%),var(--bg);}
-.oc-scroll{position:relative;display:flex;flex-direction:column;align-items:center;width:min(72vw,260px);margin:0 auto 28px;transition:transform .8s ease 1.15s,opacity .5s ease 1.3s;}
-.oc-scroll-rod{position:relative;z-index:3;width:100%;height:16px;border-radius:8px;flex:0 0 auto;background:linear-gradient(180deg,color-mix(in srgb,var(--accent-2) 88%,#fff),var(--accent-2) 55%,color-mix(in srgb,var(--accent-2) 68%,#000));box-shadow:0 4px 10px rgba(0,0,0,.3);transition:transform .95s cubic-bezier(.5,0,.22,1);}
-.oc-scroll-rod::before,.oc-scroll-rod::after{content:"";position:absolute;top:-3px;bottom:-3px;width:12px;border-radius:50%;background:color-mix(in srgb,var(--accent-2) 55%,#000);}
-.oc-scroll-rod::before{left:-6px;}
-.oc-scroll-rod::after{right:-6px;}
-.open-cover.opening .oc-scroll-rod-t{transform:translateY(-16px);}
-.open-cover.opening .oc-scroll-rod-b{transform:translateY(16px);}
-.oc-scroll-paper{width:90%;min-height:150px;margin:-4px 0;background:#fbf7ee;box-shadow:0 10px 24px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;gap:9px;color:var(--accent-2);transform:scaleY(.04);transform-origin:50% 50%;transition:transform 1.05s cubic-bezier(.5,0,.2,1) .12s;}
-.oc-scroll-paper i{display:block;height:2px;width:44px;background:linear-gradient(90deg,transparent,var(--accent-2),transparent);opacity:0;transition:opacity .4s ease .95s;}
-.oc-scroll-paper b{font-size:22px;line-height:1;font-weight:400;opacity:0;transition:opacity .4s ease .95s;}
-.open-cover.opening .oc-scroll-paper{transform:scaleY(1);}
-.open-cover.opening .oc-scroll-paper i,.open-cover.opening .oc-scroll-paper b{opacity:1;}
-.open-cover.opening .oc-scroll{transform:scale(1.4);opacity:0;}
-@media(max-height:640px){.oc-scroll{width:220px;}.oc-scroll-paper{min-height:120px;}}`
+  heart:{
+    label:"បេះដូង", finishMs:1900,
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C5 15.5 3 11.5 3 8.500a4.5 4.5 0 0 1 9-2 4.5 4.5 0 0 1 9 2c0 3-2 7-9 12.5z"/><path d="M12 6.5 10 10l3 2.500-2 4"/></svg>',
+    parts:c => {
+      const hs = '<svg viewBox="0 0 100 90" aria-hidden="true"><path d="M50 86C10 56 2 34 2 22 2 10 12 2 24 2c10 0 20 6 26 16C56 8 66 2 76 2c12 0 22 8 22 20 0 12-8 34-48 64Z"/></svg>';
+      return { mid:'<div class="oc-heart"><i class="oc-hglow"></i><div class="oc-hbeat"><div class="oc-hh oc-hh-l">' + hs + '</div><div class="oc-hh oc-hh-r">' + hs + '</div></div><u class="oc-hp">&#9829;</u><u class="oc-hp">&#9829;</u><u class="oc-hp">&#9829;</u><u class="oc-hp">&#9829;</u><u class="oc-hp">&#9829;</u></div>' };
+    },
+    css:`.oc-s-heart{background:radial-gradient(ellipse at 50% 42%,color-mix(in srgb,var(--accent-2) 20%,transparent) 0%,transparent 62%),var(--bg);}
+.oc-heart{position:relative;width:170px;height:153px;margin:4px auto 32px;transition:transform .7s ease 1.15s,opacity .5s ease 1.3s;}
+.oc-hglow{position:absolute;inset:-30%;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent-2) 45%,transparent) 0%,transparent 65%);opacity:0;transition:opacity .6s ease .35s;}
+.open-cover.opening .oc-hglow{opacity:1;}
+.oc-hbeat{position:absolute;inset:0;animation:oc-beat 1.5s ease-in-out infinite;}
+@keyframes oc-beat{0%,56%,100%{transform:scale(1);}14%{transform:scale(1.09);}28%{transform:scale(1);}42%{transform:scale(1.06);}}
+.oc-hh{position:absolute;inset:0;transition:transform .95s cubic-bezier(.5,0,.2,1),opacity .6s ease .5s;}
+.oc-hh svg{width:100%;height:100%;display:block;overflow:visible;}
+.oc-hh path{fill:var(--accent-1);stroke:var(--accent-2);stroke-width:2.5;stroke-linejoin:round;}
+.oc-hh-l{clip-path:polygon(0 0,50% 0,46% 20%,54% 40%,47% 60%,53% 80%,50% 100%,0 100%);transform-origin:50% 100%;}
+.oc-hh-r{clip-path:polygon(50% 0,100% 0,100% 100%,50% 100%,53% 80%,47% 60%,54% 40%,46% 20%);transform-origin:50% 100%;}
+.open-cover.opening .oc-hbeat{animation:none;}
+.open-cover.opening .oc-hh-l{transform:translateX(-58%) rotate(-16deg);opacity:0;}
+.open-cover.opening .oc-hh-r{transform:translateX(58%) rotate(16deg);opacity:0;}
+.oc-hp{position:absolute;left:50%;top:50%;margin:-9px 0 0 -9px;font-size:18px;line-height:1;text-decoration:none;color:var(--accent-1);opacity:0;transform:translate(0,0) scale(.3);transition:transform .9s cubic-bezier(.2,.8,.3,1) .35s,opacity .9s ease .35s;}
+.oc-hp:nth-of-type(1){--x:-84px;--y:-62px;}
+.oc-hp:nth-of-type(2){--x:80px;--y:-70px;}
+.oc-hp:nth-of-type(3){--x:-96px;--y:22px;}
+.oc-hp:nth-of-type(4){--x:92px;--y:30px;}
+.oc-hp:nth-of-type(5){--x:0;--y:-96px;}
+.open-cover.opening .oc-hp{opacity:.95;transform:translate(var(--x),var(--y)) scale(1);}
+.open-cover.opening .oc-heart{transform:scale(1.4);opacity:0;}
+@media(max-height:640px){.oc-heart{transform:scale(.78);margin-bottom:6px;}.open-cover.opening .oc-heart{transform:scale(1.1);}}`
   }
 };
 
@@ -696,51 +805,85 @@ const TEMPLATES = {
 
 const TIMELINE_PRESETS = [
   {
-    label:"កម្មវិធីព្រឹក (សំខាន់ៗ)",
-    labelEn:"Morning Ceremony (Essentials)",
+    label:"ពីរថ្ងៃ (ចូលរោងពីល្ងាច)",
+    labelEn:"Two Days (Pavilion opens the evening before)",
     items:[
-      {time:"៦:០០ ព្រឹក", name:"ពិធីហែជំនូន", timeEn:"6:00 AM", nameEn:"Gift Procession Ceremony"},
-      {time:"៧:០០ ព្រឹក", name:"ពិធីសូត្រមន្ត ជូនពរដល់ព្រះសង្ឃ", timeEn:"7:00 AM", nameEn:"Blessing by Buddhist Monks"},
-      {time:"៨:០០ ព្រឹក", name:"ពិធីសំពះផ្ការ", timeEn:"8:00 AM", nameEn:"Flower Blessing Ceremony"},
-      {time:"៩:០០ ព្រឹក", name:"ពិធីកាត់សក់ (ស្រង់សក់)", timeEn:"9:00 AM", nameEn:"Hair Cutting Ceremony"},
-      {time:"១០:០០ ព្រឹក", name:"ពិធីបង្វិលពពិល", timeEn:"10:00 AM", nameEn:"Candle Circling Ceremony"},
-      {time:"១១:០០ ព្រឹក", name:"ពិធីជូនកូនក្រមុំចូលបន្ទប់", timeEn:"11:00 AM", nameEn:"Bridal Chamber Ceremony"},
-      {time:"១២:០០ ថ្ងៃត្រង់", name:"អាហារថ្ងៃត្រង់ អញ្ជើញភ្ញៀវ", timeEn:"12:00 PM", nameEn:"Lunch Reception"}
+      {time:"ថ្ងៃទី១ · ៤:០០ រសៀល", name:"ពិធីសូត្រមន្តចម្រើនព្រះបរិត្ត", timeEn:"Day 1 · 4:00 PM", nameEn:"Monks' Chanting & Blessing"},
+      {time:"៥:០០ ល្ងាច", name:"ពិធីចងដៃ", timeEn:"5:00 PM", nameEn:"Wrist-Tying Blessing Ceremony"},
+      {time:"៥:៣០ ល្ងាច", name:"ពិធីកាត់ខានស្លា", timeEn:"5:30 PM", nameEn:"Areca Blossom Cutting Ceremony"},
+      {time:"៦:០០ ល្ងាច", name:"អាហារល្ងាច", timeEn:"6:00 PM", nameEn:"Dinner"},
+      {time:"ថ្ងៃទី២ · ៦:៣០ ព្រឹក", name:"ពិធីហែជំនូន", timeEn:"Day 2 · 6:30 AM", nameEn:"Gift Procession"},
+      {time:"៧:៣០ ព្រឹក", name:"ពិធីរាប់ផ្លែឈើ", timeEn:"7:30 AM", nameEn:"Fruit Counting Ceremony"},
+      {time:"៨:៣០ ព្រឹក", name:"ពិធីកាត់សក់បង្កក់សេរី", timeEn:"8:30 AM", nameEn:"Hair-Cutting Ceremony"},
+      {time:"៩:៣០ ព្រឹក", name:"ពិធីបង្វិលពពិល", timeEn:"9:30 AM", nameEn:"Candle Circling Ceremony"},
+      {time:"១០:៣០ ព្រឹក", name:"ពិធីចូលបន្ទប់ផ្សំដំណេក (ព្រះថោងតោងស្បៃ)", timeEn:"10:30 AM", nameEn:"Nuptial Chamber Ceremony (Preah Thong Holds the Scarf)"},
+      {time:"១២:០០ ថ្ងៃត្រង់", name:"អាហារថ្ងៃត្រង់", timeEn:"12:00 PM", nameEn:"Lunch"},
+      {time:"៥:០០ ល្ងាច", name:"ទទួលភ្ញៀវអាហារល្ងាច", timeEn:"5:00 PM", nameEn:"Evening Reception & Dinner"},
+      {time:"៦:៣០ ល្ងាច", name:"ពិធីកាត់នំឬផ្លែឈើ", timeEn:"6:30 PM", nameEn:"Cake (or Fruit) Cutting Ceremony"},
+      {time:"៧:៣០ ល្ងាច", name:"ពិធីថ្លែងអំណរគុណភ្ញៀវកេរ្តិ៍យស", timeEn:"7:30 PM", nameEn:"Thank-You Speech to Honoured Guests"},
+      {time:"៨:០០ ល្ងាច", name:"រាំអោប", timeEn:"8:00 PM", nameEn:"Slow Dance"}
     ]
   },
   {
-    label:"កម្មវិធីពេញលេញ (ព្រឹក + ល្ងាច)",
-    labelEn:"Full Day (Morning + Evening)",
+    label:"ពិធីមួយថ្ងៃ",
+    labelEn:"One-Day Wedding",
     items:[
-      {time:"៦:០០ ព្រឹក", name:"ពិធីហែជំនូន", timeEn:"6:00 AM", nameEn:"Gift Procession Ceremony"},
-      {time:"៧:០០ ព្រឹក", name:"ពិធីសូត្រមន្ត ជូនពរដល់ព្រះសង្ឃ", timeEn:"7:00 AM", nameEn:"Blessing by Buddhist Monks"},
-      {time:"៨:០០ ព្រឹក", name:"ពិធីសំពះផ្ការ", timeEn:"8:00 AM", nameEn:"Flower Blessing Ceremony"},
-      {time:"៩:០០ ព្រឹក", name:"ពិធីកាត់សក់ (ស្រង់សក់)", timeEn:"9:00 AM", nameEn:"Hair Cutting Ceremony"},
-      {time:"១០:០០ ព្រឹក", name:"ពិធីបង្វិលពពិល", timeEn:"10:00 AM", nameEn:"Candle Circling Ceremony"},
-      {time:"១១:០០ ព្រឹក", name:"ពិធីជូនកូនក្រមុំចូលបន្ទប់", timeEn:"11:00 AM", nameEn:"Bridal Chamber Ceremony"},
-      {time:"១២:០០ ថ្ងៃត្រង់", name:"អាហារថ្ងៃត្រង់ អញ្ជើញភ្ញៀវ", timeEn:"12:00 PM", nameEn:"Lunch Reception"},
-      {time:"៥:០០ ល្ងាច", name:"ភ្ញៀវអញ្ជើញចូលរួមអបអរសាទរ", timeEn:"5:00 PM", nameEn:"Guests Arrive & Celebration Begins"},
-      {time:"៦:០០ ល្ងាច", name:"ពិធីជូនពរកូនកម្លោះកូនក្រមុំ", timeEn:"6:00 PM", nameEn:"Blessing the Newlyweds"},
-      {time:"៧:០០ ល្ងាច", name:"ពិធីកាត់នំខេក និងអាហារពេលល្ងាច", timeEn:"7:00 PM", nameEn:"Cake Cutting & Dinner"}
+      {time:"៦:៣០ ព្រឹក", name:"ពិធីហែជំនូន", timeEn:"6:30 AM", nameEn:"Gift Procession"},
+      {time:"៧:០០ ព្រឹក", name:"ពិធីរាប់ផ្លែឈើ", timeEn:"7:00 AM", nameEn:"Fruit Counting Ceremony"},
+      {time:"៧:៣០ ព្រឹក", name:"ពិធីសូត្រមន្តចម្រើនព្រះបរិត្ត", timeEn:"7:30 AM", nameEn:"Monks' Chanting & Blessing"},
+      {time:"៨:៣០ ព្រឹក", name:"ពិធីបង្វិលពពិល", timeEn:"8:30 AM", nameEn:"Candle Circling Ceremony"},
+      {time:"៩:០០ ព្រឹក", name:"ពិធីកាត់សក់បង្កក់សេរី", timeEn:"9:00 AM", nameEn:"Hair-Cutting Ceremony"},
+      {time:"៩:៣០ ព្រឹក", name:"ពិធីចូលបន្ទប់ផ្សំដំណេក (ព្រះថោងតោងស្បៃ)", timeEn:"9:30 AM", nameEn:"Nuptial Chamber Ceremony (Preah Thong Holds the Scarf)"},
+      {time:"១០:០០ ព្រឹក", name:"ពិធីចងដៃ", timeEn:"10:00 AM", nameEn:"Wrist-Tying Blessing Ceremony"},
+      {time:"១០:៣០ ព្រឹក", name:"ពិធីកាត់ខានស្លា", timeEn:"10:30 AM", nameEn:"Areca Blossom Cutting Ceremony"},
+      {time:"១២:០០ ថ្ងៃត្រង់", name:"អាហារថ្ងៃត្រង់", timeEn:"12:00 PM", nameEn:"Lunch"},
+      {time:"៥:០០ ល្ងាច", name:"ទទួលភ្ញៀវអាហារល្ងាច", timeEn:"5:00 PM", nameEn:"Evening Reception & Dinner"},
+      {time:"៦:៣០ ល្ងាច", name:"ពិធីកាត់នំឬផ្លែឈើ", timeEn:"6:30 PM", nameEn:"Cake (or Fruit) Cutting Ceremony"},
+      {time:"៧:៣០ ល្ងាច", name:"ពិធីថ្លែងអំណរគុណភ្ញៀវកេរ្តិ៍យស", timeEn:"7:30 PM", nameEn:"Thank-You Speech to Honoured Guests"},
+      {time:"៨:០០ ល្ងាច", name:"រាំអោប", timeEn:"8:00 PM", nameEn:"Slow Dance"}
     ]
   },
   {
-    label:"ទទួលភ្ញៀវល្ងាចតែមួយ",
-    labelEn:"Evening Reception Only",
+    label:"ពិធីមួយព្រឹក (ចូលរោងពីល្ងាច)",
+    labelEn:"Morning Wedding (Pavilion opens the evening before)",
     items:[
-      {time:"៥:៣០ ល្ងាច", name:"ភ្ញៀវអញ្ជើញចូលរួម", timeEn:"5:30 PM", nameEn:"Guests Arrive"},
-      {time:"៦:០០ ល្ងាច", name:"ពិធីស្វាគមន៍កូនកម្លោះកូនក្រមុំ", timeEn:"6:00 PM", nameEn:"Welcoming the Newlyweds"},
-      {time:"៦:៣០ ល្ងាច", name:"ពិធីជូនពរ និងផ្តល់អំណោយ", timeEn:"6:30 PM", nameEn:"Blessings & Gift Giving"},
-      {time:"៧:០០ ល្ងាច", name:"ពិធីកាត់នំខេក", timeEn:"7:00 PM", nameEn:"Cake Cutting Ceremony"},
-      {time:"៧:៣០ ល្ងាច", name:"អាហារពេលល្ងាច និងកម្សាន្ត", timeEn:"7:30 PM", nameEn:"Dinner & Entertainment"}
+      {time:"ថ្ងៃទី១ · ៤:០០ រសៀល", name:"ពិធីសូត្រមន្តចម្រើនព្រះបរិត្ត", timeEn:"Day 1 · 4:00 PM", nameEn:"Monks' Chanting & Blessing"},
+      {time:"៥:០០ ល្ងាច", name:"ពិធីចងដៃ", timeEn:"5:00 PM", nameEn:"Wrist-Tying Blessing Ceremony"},
+      {time:"៥:៣០ ល្ងាច", name:"ពិធីកាត់ខានស្លា", timeEn:"5:30 PM", nameEn:"Areca Blossom Cutting Ceremony"},
+      {time:"៦:០០ ល្ងាច", name:"អាហារល្ងាច", timeEn:"6:00 PM", nameEn:"Dinner"},
+      {time:"ថ្ងៃទី២ · ៦:៣០ ព្រឹក", name:"ពិធីហែជំនូន", timeEn:"Day 2 · 6:30 AM", nameEn:"Gift Procession"},
+      {time:"៧:៣០ ព្រឹក", name:"ពិធីរាប់ផ្លែឈើ", timeEn:"7:30 AM", nameEn:"Fruit Counting Ceremony"},
+      {time:"៨:៣០ ព្រឹក", name:"ពិធីកាត់សក់បង្កក់សេរី", timeEn:"8:30 AM", nameEn:"Hair-Cutting Ceremony"},
+      {time:"៩:៣០ ព្រឹក", name:"ពិធីបង្វិលពពិល", timeEn:"9:30 AM", nameEn:"Candle Circling Ceremony"},
+      {time:"១០:៣០ ព្រឹក", name:"ពិធីចូលបន្ទប់ផ្សំដំណេក (ព្រះថោងតោងស្បៃ)", timeEn:"10:30 AM", nameEn:"Nuptial Chamber Ceremony (Preah Thong Holds the Scarf)"},
+      {time:"១១:០០ ព្រឹក", name:"ទទួលភ្ញៀវអាហារថ្ងៃត្រង់", timeEn:"11:00 AM", nameEn:"Lunch Reception"},
+      {time:"១២:០០ ថ្ងៃត្រង់", name:"ពិធីកាត់នំឬផ្លែឈើ", timeEn:"12:00 PM", nameEn:"Cake (or Fruit) Cutting Ceremony"},
+      {time:"១២:៣០ ថ្ងៃត្រង់", name:"ពិធីថ្លែងអំណរគុណភ្ញៀវកេរ្តិ៍យស", timeEn:"12:30 PM", nameEn:"Thank-You Speech to Honoured Guests"},
+      {time:"១:០០ រសៀល", name:"រាំអោប", timeEn:"1:00 PM", nameEn:"Slow Dance"}
     ]
   }
 ];
 
+
+const INVITATION_PRESETS = {
+  classic:{ label:"ប្រពៃណីខ្មែរ (មាស)", desc:"ផ្កាឈូកបើក · ក្របខណ្ឌព័ទ្ធពេញ · រូបធំ-តូចឆ្លាស់ · អក្សរលេចឡើង",
+    swatch:THEMES.gold.swatch, tpl:0, timeline:0, startTime:"16:00",
+    design:{ theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"grid", kbachFrame:"fullwrap", textAnim:"fadeup", openStyle:"lotus" } },
+  romantic:{ label:"ស្នេហ៍ទន់ភ្លន់ (ផ្កាឈូក)", desc:"បេះដូងបែក · កម្រងផ្កាក្រោម · រូបប៉ូឡារ៉ូអ៊ីត · អក្សរព្រិលទៅច្បាស់",
+    swatch:THEMES.blush.swatch, tpl:1, timeline:1, startTime:"06:30",
+    design:{ theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"polaroid", kbachFrame:"bottomgarland", textAnim:"blur", openStyle:"heart" } },
+  elegant:{ label:"ទំនើបថ្លៃថ្នូរ (ខៀវ-មាស)", desc:"វាំងនន · មែកសងខាង · រូបក្រឡាការ៉េ · អក្សរស្រាយម្តងមួយពាក្យ",
+    swatch:THEMES.royal.swatch, tpl:2, timeline:2, startTime:"06:30",
+    design:{ theme:"royal", fontKm:"battambang", fontEn:"playfair", galleryStyle:"square", kbachFrame:"sidebranch", textAnim:"words", openStyle:"curtain" } }
+};
+
 const defaultState = {
   theme:"gold",
-  effect:"petals",
-  frameStyle:"diagbranch",
+  fontKm:"moul",
+  fontEn:"greatVibes",
+  galleryStyle:"grid",
+  kbachFrame:"diagbranch",
+  textAnim:"fadeup",
   openStyle:"door",
   coverAlways:false,
   groomName:"", brideName:"",
@@ -765,6 +908,9 @@ const defaultState = {
   venueNameEn:"",
   venueAddrEn:"",
   venueMapLink:"",
+  coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60,
+  venueCoords:"",
+  videoUrl:"",
   contacts:[
     {name:"", phone:"", nameEn:""},
     {name:"", phone:"", nameEn:""}
@@ -777,18 +923,54 @@ const defaultState = {
   publishToken:""
 };
 const MAX_PHOTOS = 10;
-const COVER_STYLE_KEYS = ["door","curtain","lock","envelope","lotus","book"];
+const COVER_STYLE_KEYS = ["door","curtain","lock","rings","lotus","heart"];   // keep in sync with COVER_STYLES below
 
 // Background song (one per project, this device). Kept out of `state` — far too big for
 // localStorage — and stored in IndexedDB instead (see the Music block below).
 let musicAsset = null;   // { name, size, dataUrl, seconds, origSeconds, startSeconds } or null
 let musicSource = null;  // the file as picked (kept in memory only), so length/start can change without re-picking
 
+
+// Old drafts/backups: map removed style values onto the new ones so nothing looks broken.
+const _ho = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+// Data saved before these style options existed: fonts / gallery layout / frame used to be forced by the theme.
+function legacyFill_(r){
+  if(r && typeof r === "object" && !Array.isArray(r)){
+    const fd = THEME_FONT_DEFAULTS[r.theme] || THEME_FONT_DEFAULTS.gold;
+    if(r.fontKm === undefined) r.fontKm = fd[0];
+    if(r.fontEn === undefined) r.fontEn = fd[1];
+    if(r.galleryStyle === undefined) r.galleryStyle = THEME_GALLERY_DEFAULTS[r.theme] || "grid";
+    if(r.kbachFrame === undefined && typeof r.frameStyle === "string") r.kbachFrame = r.frameStyle;
+  }
+  return r;
+}
+function migrateStyle_(s){
+  if(!s || typeof s !== "object") return s;
+  delete s.effect;   // the falling effect is now chosen by each guest, not by staff
+  if(typeof s.frameStyle === "string" && s.kbachFrame === undefined) s.kbachFrame = s.frameStyle;
+  delete s.frameStyle;
+  if(s.openStyle === "envelope") s.openStyle = "rings";
+  if(s.openStyle === "book") s.openStyle = "heart";
+  const fd = THEME_FONT_DEFAULTS[s.theme] || THEME_FONT_DEFAULTS.gold;
+  if(!_ho(FONT_KM, s.fontKm)) s.fontKm = fd[0];
+  if(!_ho(FONT_EN, s.fontEn)) s.fontEn = fd[1];
+  if(!_ho(GALLERY_STYLES, s.galleryStyle)) s.galleryStyle = THEME_GALLERY_DEFAULTS[s.theme] || "grid";
+  if(!_ho(TEXT_ANIM_STYLES, s.textAnim)) s.textAnim = "fadeup";
+  if(!_ho(KBACH_FRAME_STYLES, s.kbachFrame)) s.kbachFrame = defaultState.kbachFrame;
+  if(!COVER_STYLE_KEYS.includes(s.openStyle)) s.openStyle = "door";
+  const num = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
+  s.coverBlur = num(s.coverBlur, 0, 40, 22); s.coverFocusX = num(s.coverFocusX, 0, 100, 50);
+  s.coverFocusY = num(s.coverFocusY, 0, 100, 35); s.coverSharp = num(s.coverSharp, 30, 95, 60);
+  s.venueCoords = (typeof s.venueCoords === "string") ? s.venueCoords.slice(0, 80) : "";
+  s.videoUrl = (typeof s.videoUrl === "string" && /^https?:\/\//i.test(s.videoUrl.trim())) ? s.videoUrl.trim().slice(0, 500) : "";
+  return s;
+}
 let state = JSON.parse(JSON.stringify(defaultState));
 try{
   const saved = localStorage.getItem("wib-draft-v2");
-  if(saved) state = Object.assign(JSON.parse(JSON.stringify(defaultState)), JSON.parse(saved));
+  if(saved) state = Object.assign(JSON.parse(JSON.stringify(defaultState)), legacyFill_(JSON.parse(saved)));
 }catch(e){}
+state = migrateStyle_(state);
 state.photos = (state.photos || []).filter(Boolean);
 state.photoNames = state.photoNames || [];
 
@@ -897,6 +1079,7 @@ if(ocEl){
       setTimeout(function(){
         ocEl.classList.add('finish');
         document.body.classList.remove('oc-noscroll');
+        if(typeof waStart==='function'){ try{ waStart(); }catch(e){} }
         setTimeout(function(){ if(ocEl.parentNode){ ocEl.parentNode.removeChild(ocEl); } },650);
       },reduce?0:${cfg.finishMs});
     });
@@ -911,8 +1094,8 @@ function buildGalleryHtml(s, theme){
   const photosForGallery = s.photos.filter(Boolean).length ? s.photos.filter(Boolean) : [null,null,null,null];
   return photosForGallery.map((photo,i) => {
     let extraClass = "";
-    if(s.theme==="gold") extraClass = (i%4===0 || i%4===3) ? " wide" : "";
-    if(s.theme==="rose") extraClass = " rot-"+(i%3);
+    if(s.galleryStyle==="grid") extraClass = (i%4===0 || i%4===3) ? " wide" : "";
+    if(s.galleryStyle==="polaroid") extraClass = " rot-"+(i%3);
     const inner = photo
       ? `<img src="${photo}" alt="photo ${i+1}">`
       : `${placeholderIcon}<span>រូបភាព ${i+1}</span>`;
@@ -920,10 +1103,75 @@ function buildGalleryHtml(s, theme){
   }).join("");
 }
 
+// ---------- Video (link embed) ----------
+// Turns a pasted link into a safe embed. Only http(s) links are accepted. YouTube / Facebook / TikTok / Vimeo become
+// players; a direct .mp4/.webm/.mov file becomes a <video>; any other https link becomes a "watch" button.
+function parseVideo(raw){
+  const u0 = (raw || "").trim();
+  if(!/^https?:\/\//i.test(u0)) return null;
+  let u; try{ u = new URL(u0); }catch(e){ return null; }
+  const host = u.hostname.replace(/^(www|m|web|mobile)\./, "").toLowerCase();
+  const path = u.pathname;
+  const okId = x => /^[\w-]{5,30}$/.test(x || "");
+  if(host === "youtube.com" || host === "youtube-nocookie.com" || host === "youtu.be"){
+    let id = "", vertical = false, m;
+    if(host === "youtu.be") id = path.split("/")[1];
+    else if((m = path.match(/^\/(shorts|embed|live|v)\/([\w-]+)/))){ id = m[2]; vertical = m[1] === "shorts"; }
+    else id = u.searchParams.get("v");
+    if(okId(id)) return { kind:"iframe", src:"https://www.youtube-nocookie.com/embed/" + id + "?rel=0&playsinline=1", ratio: vertical ? "9/16" : "16/9", vertical, url:u0 };
+  }
+  if(host === "vimeo.com" || host === "player.vimeo.com"){
+    const m = path.match(/(\d{6,12})/);
+    if(m) return { kind:"iframe", src:"https://player.vimeo.com/video/" + m[1], ratio:"16/9", vertical:false, url:u0 };
+  }
+  if(host === "tiktok.com"){
+    const m = path.match(/\/video\/(\d{8,25})/);
+    if(m) return { kind:"iframe", src:"https://www.tiktok.com/embed/v2/" + m[1], ratio:"9/16", vertical:true, url:u0 };
+  }
+  if(host === "facebook.com" || host === "fb.watch" || host === "fb.com"){
+    const vertical = /\/reel\//.test(path);
+    return { kind:"iframe", src:"https://www.facebook.com/plugins/video.php?href=" + encodeURIComponent(u0) + "&show_text=false", ratio: vertical ? "9/16" : "16/9", vertical, url:u0 };
+  }
+  if(/\.(mp4|webm|mov|m4v)$/i.test(path)) return { kind:"video", src:u0, ratio:"16/9", vertical:false, url:u0 };
+  return { kind:"link", src:u0, url:u0 };
+}
+// A small map preview for the venue card. Uses the coordinates inside the pasted Google Maps link when there are any,
+// otherwise searches by venue name + address. No API key needed. The embed itself is not touchable (so it never
+// traps page scrolling on a phone); tapping it opens the full map in a new tab.
+function buildMapPreview(s, lang, mapsUrl, venueName, venueAddr){
+  let q = "", pin = false;
+  const cm = (s.venueCoords || "").trim().match(/^(-?\d{1,3}(?:\.\d+)?)\s*[, ]\s*(-?\d{1,3}(?:\.\d+)?)$/);
+  const m = (cm && Math.abs(+cm[1]) <= 90 && Math.abs(+cm[2]) <= 180) ? cm : mapsUrl && (mapsUrl.match(/@(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)/) || mapsUrl.match(/!3d(-?\d{1,3}\.\d+)!4d(-?\d{1,3}\.\d+)/) || mapsUrl.match(/[?&](?:q|ll|query)=(-?\d{1,3}\.\d+)(?:,|%2C)(-?\d{1,3}\.\d+)/i));
+  if(m){ q = m[1] + "," + m[2]; pin = true; }
+  else q = [venueName, venueAddr].map(x => (x || "").trim()).filter(Boolean).join(" ").slice(0, 200);
+  if(!q) return { html:"", openUrl:mapsUrl || "" };
+  const openUrl = mapsUrl || ("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q));
+  // With coordinates: plain map centred on the spot (no Google marker) + our own pin in the theme colour.
+  // Without them: Google's search embed (it draws its own red marker).
+  const src = "https://www.google.com/maps?" + (pin ? "ll=" : "q=") + encodeURIComponent(q) + "&z=16&output=embed&hl=" + (lang === "km" ? "km" : "en");
+  const pinHtml = pin ? `<span class="map-pin-ring"></span><svg class="map-pin" viewBox="0 0 40 52" aria-hidden="true"><path d="M20 1.5C9.4 1.5 1.5 9.6 1.5 19.5 1.5 32.6 20 50.5 20 50.5S38.5 32.6 38.5 19.5C38.5 9.6 30.6 1.5 20 1.5z" fill="var(--accent-1)" stroke="#fff" stroke-width="2.5"/><circle cx="20" cy="19.5" r="7.5" fill="#fff"/><circle cx="20" cy="19.5" r="3.4" fill="var(--accent-2)"/></svg>` : "";
+  const label = lang === "km" ? "បើកផែនទី" : "Open map";
+  const html = `<div class="map-embed"><iframe src="${escapeHtml(src)}" loading="lazy" tabindex="-1" aria-hidden="true" referrerpolicy="no-referrer-when-downgrade" title="Map"></iframe>${pinHtml}<a class="map-embed-hit" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener" aria-label="${label}"></a><span class="map-embed-tag">&#128205; ${label}</span></div>`;
+  return { html, openUrl };
+}
+
+function buildVideoHtml(v, lang){
+  if(!v) return "";
+  if(v.kind === "link"){
+    const t = lang === "km" ? "មើលវិឌីអូ" : "Watch video";
+    let host = ""; try{ host = new URL(v.src).hostname.replace(/^www\./, ""); }catch(e){}
+    return `<a class="video-card" href="${escapeHtml(v.src)}" target="_blank" rel="noopener"><span class="vc-play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span><span class="vc-host">${escapeHtml(host)}</span><span class="vc-cta">${t}</span></a>`;
+  }
+  const style = `--vr:${v.ratio};${v.vertical ? "max-width:340px;" : ""}`;
+  const inner = v.kind === "video"
+    ? `<video src="${escapeHtml(v.src)}" controls playsinline preload="metadata"></video>`
+    : `<iframe src="${escapeHtml(v.src)}" loading="lazy" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Video"></iframe>`;
+  return `<div class="video-wrap" style="${style}">${inner}</div>`;
+}
+
 function buildSection(s, t, lang){
   const L = LABELS[lang];
   const isKm = lang === "km";
-  const hasCal = !!(s.eventDate && s.startTime) && !isNaN(Date.parse(`${s.eventDate}T${s.startTime}:00+07:00`));
   const groom = isKm ? s.groomName : (s.groomNameEn || s.groomName);
   const bride = isKm ? s.brideName : (s.brideNameEn || s.brideName);
   const eyebrow = isKm ? s.eyebrow : (s.eyebrowEn || s.eyebrow);
@@ -939,44 +1187,51 @@ function buildSection(s, t, lang){
     : ``;
   const divider = `<div class="divider"><span class="rule"></span>${ornamentSvg}<span class="rule"></span></div>`;
 
-  const timelineHtml = s.timeline.map(item => {
-    const time = isKm ? item.time : (item.timeEn || item.time);
-    const name = isKm ? item.name : (item.nameEn || item.name);
-    return `<div class="tl-item"><div class="tl-time">${escapeHtml(time)}</div><p class="tl-name">${escapeHtml(name)}</p></div>`;
-  }).join("");
+  const timelineRows = s.timeline.map(item => ({
+    time: isKm ? item.time : (item.timeEn || item.time),
+    name: isKm ? item.name : (item.nameEn || item.name)
+  })).filter(r => (r.time || "").trim() || (r.name || "").trim());          // rows left blank are skipped
+  const timelineHtml = timelineRows.map(r =>
+    `<div class="tl-item"><div class="tl-time">${escapeHtml(r.time)}</div><p class="tl-name">${escapeHtml(r.name)}</p></div>`
+  ).join("");
 
   const galleryHtml = buildGalleryHtml(s, t);
-  const galleryClass = "gallery gallery-" + s.theme;
+  const galleryClass = "gallery gallery-style-" + (hasOwn(GALLERY_STYLES, s.galleryStyle) ? s.galleryStyle : "grid");
 
-  const mapsUrl = (s.venueMapLink && s.venueMapLink.trim()) ? s.venueMapLink.trim() : "";
+  const mapsUrl = (s.venueMapLink && /^https?:\/\//i.test(s.venueMapLink.trim())) ? s.venueMapLink.trim() : "";   // http(s) only (blocks javascript: links)
 
   const contactsHtml = (s.contacts||[]).filter(c => c.name || c.phone).map(c => {
     const cname = isKm ? c.name : (c.nameEn || c.name);
     return `<div class="contact-card"><p class="contact-name">${escapeHtml(cname)}</p>${c.phone ? `<a class="contact-phone" href="tel:${escapeHtml(c.phone.replace(/\s+/g,""))}">${escapeHtml(c.phone)}</a>` : ""}</div>`;
   }).join("");
 
-  const heroStyle = s.coverPhoto
-    ? ` style="background-image:linear-gradient(180deg, rgba(0,0,0,.42) 0%, rgba(0,0,0,.5) 40%, rgba(0,0,0,.66) 100%), url('${s.coverPhoto}');background-size:cover;background-position:center;"`
-    : "";
+  // Cover photo: sharp in the middle, softly blurred toward the edges and tinted with the theme colour, so the
+  // couple stands out. The photo is passed once as a CSS variable and painted by three stacked layers.
+  const cnum = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
+  const cBlur = cnum(s.coverBlur, 0, 40, 22), cFx = cnum(s.coverFocusX, 0, 100, 50), cFy = cnum(s.coverFocusY, 0, 100, 35), cSharp = cnum(s.coverSharp, 30, 95, 60);
+  const heroStyle = s.coverPhoto ? ` style="--cover:url('${s.coverPhoto}');--fx:${cFx}%;--fy:${cFy}%;--blur:${cBlur}px;--rx:${cSharp}%;--ry:${Math.round(cSharp * 0.93)}%;"` : "";
+  const heroLayers = s.coverPhoto ? `<span class="hb hb-blur"></span><span class="hb hb-sharp"></span><span class="hb hb-tint"></span>` : "";
   const heroClass = s.coverPhoto ? "hero has-cover" : "hero";
   const suf = "-" + lang;
 
   const guestLineText = s.__guestName ? (isKm ? `ជូនចំពោះ ${s.__guestName}` : `Dear ${s.__guestName},`) : "";
   const guestLineAttrs = guestLineText ? "" : ` style="display:none"`;
 
-  return `<section id="section${suf}" class="lang-section lang-${lang}" style="display:${isKm ? "block" : "none"}">
-<p class="guest-line" id="guestLine${suf}"${guestLineAttrs}>${escapeHtml(guestLineText)}</p>
-<section class="${heroClass}"${heroStyle}>
-<p class="eyebrow">${escapeHtml(eyebrow)}</p>
-<h1 class="names display">${escapeHtml(groom)}<span class="amp">${escapeHtml(L.and)}</span>${escapeHtml(bride)}</h1>
-<p class="hero-date">${displayDate}</p>
-</section>
-<section><div class="wrap"><div class="welcome">
+
+  // Which sections have something to show? (In the live preview every section stays visible.)
+  const isPrev = !!s.__preview;
+  const hasWelcome = !!((welcome || "").trim() || (host1 || "").trim() || (host2 || "").trim());
+  const hasCountdown = !!(s.eventDate && s.startTime) && !isNaN(Date.parse(`${s.eventDate}T${s.startTime}:00+07:00`));
+  const hasProgram = timelineRows.length > 0;
+  const hasGallery = s.photos.filter(Boolean).length > 0;
+  const videoInfo = parseVideo(s.videoUrl);
+  const mapPrev = buildMapPreview(s, lang, mapsUrl, venueName, venueAddr);
+  const hasVenue = !!((venueName || "").trim() || (venueAddr || "").trim() || mapsUrl);
+  const secWelcome   = (isPrev || hasWelcome)   ? `<section><div class="wrap"><div class="welcome">
 <p>${escapeHtml(welcome)}</p>
 <div class="hosts">${escapeHtml(host1)}<br>${escapeHtml(host2)}</div>
-</div></div></section>
-${divider}
-<section><div class="wrap">
+</div></div></section>` : "";
+  const secCountdown = (isPrev || hasCountdown) ? `<section><div class="wrap">
 <h2 class="section-title display">${L.countdownTitle}</h2>
 <p class="section-sub">${L.countdownSub}</p>
 <div class="countdown" id="countdown${suf}">
@@ -984,33 +1239,46 @@ ${divider}
 <div class="cd-unit"><div class="cd-num" id="cd-h${suf}">00</div><div class="cd-label">${L.hours}</div></div>
 <div class="cd-unit"><div class="cd-num" id="cd-m${suf}">00</div><div class="cd-label">${L.minutes}</div></div>
 <div class="cd-unit"><div class="cd-num" id="cd-s${suf}">00</div><div class="cd-label">${L.seconds}</div></div>
-</div>${hasCal ? `<div class="cal-wrap"><button class="cal-btn" type="button" data-lang="${lang}">${L.calBtn}</button></div>` : ""}</div></section>
-${divider}
-<section><div class="wrap">
+</div>${hasCountdown ? `<div class="cal-wrap"><button class="cal-btn" type="button" data-lang="${lang}">${L.calBtn}</button></div>` : ""}</div></section>` : "";
+  const secProgram   = (isPrev || hasProgram)   ? `<section><div class="wrap">
 <h2 class="section-title display">${L.programTitle}</h2>
 <p class="section-sub">${displayDate}</p>
 <div class="timeline">${timelineHtml}</div>
-</div></section>
-${divider}
-<section><div class="wrap">
+</div></section>` : "";
+  const secGallery   = (isPrev || hasGallery)   ? `<section><div class="wrap">
 <h2 class="section-title display">${L.galleryTitle}</h2>
 <p class="section-sub">${L.gallerySub}</p>
 <div class="${galleryClass}">${galleryHtml}</div>
-</div></section>
-${divider}
-<section><div class="wrap">
+</div></section>` : "";
+  const secVideo     = videoInfo ? `<section><div class="wrap">
+<h2 class="section-title display">${L.videoTitle}</h2>
+<p class="section-sub">${L.videoSub}</p>
+${buildVideoHtml(videoInfo, lang)}
+</div></section>` : "";
+  const secVenue     = (isPrev || hasVenue)     ? `<section><div class="wrap">
 <h2 class="section-title display">${L.venueTitle}</h2>
 <div class="venue-card">
 <p class="venue-name display">${escapeHtml(venueName)}</p>
 <p class="venue-addr">${escapeHtml(venueAddr)}</p>
-${mapsUrl ? `<a class="map-btn" href="${escapeHtml(mapsUrl)}" target="_blank" rel="noopener">${L.mapBtn}</a>` : ""}
+${mapPrev.html}
+${mapPrev.openUrl ? `<a class="map-btn" href="${escapeHtml(mapPrev.openUrl)}" target="_blank" rel="noopener">${L.mapBtn}</a>` : ""}
 </div>
-</div></section>
-${contactsHtml ? `${divider}<section><div class="wrap">
+</div></section>` : "";
+  const secContacts  = contactsHtml ? `<section><div class="wrap">
 <h2 class="section-title display">${L.contactsTitle}</h2>
 <p class="section-sub">${L.contactsSub}</p>
 <div class="contact-grid">${contactsHtml}</div>
-</div></section>` : ""}
+</div></section>` : "";
+  const bodySections = [secWelcome, secCountdown, secProgram, secGallery, secVideo, secVenue, secContacts].filter(Boolean).join(divider);
+
+  return `<section id="section${suf}" class="lang-section lang-${lang}" style="display:${isKm ? "block" : "none"}">
+<p class="guest-line" id="guestLine${suf}"${guestLineAttrs}>${escapeHtml(guestLineText)}</p>
+<section class="${heroClass}"${heroStyle}>${heroLayers}
+<p class="eyebrow">${escapeHtml(eyebrow)}</p>
+<h1 class="names display">${escapeHtml(groom)}<span class="amp">${escapeHtml(L.and)}</span>${escapeHtml(bride)}</h1>
+<p class="hero-date">${displayDate}</p>
+</section>
+${bodySections}
 <footer><div class="thanks display">${L.thanks}</div><div>${escapeHtml(groom)} ${L.and} ${escapeHtml(bride)}</div></footer>
 </section>`;
 }
@@ -1073,32 +1341,36 @@ function kfWatermarkTileUri(inner, w, h){
 function buildKbachFrameOverlay(styleId, t){
   if(!styleId || styleId === "none" || !hasOwn(KBACH_FRAME_STYLES, styleId)) return "";
   const a1 = t.accent1, a2 = t.accent2, bg = t.bg;
-  let w = 140, h = 140, dx = 140, dy = 140, dur = 55, inner = "", mode = "full", stripSize = 0;
+  let w = 140, h = 140, dx = 140, dy = 140, dur = 55, inner = "", mode = "full";
 
-  if(styleId === "diagbranch"){          // ស្តើង — drift ដេក
+  if(styleId === "diagbranch"){
     w = h = 150; dx = 150; dy = 150; dur = 60;
+    mode = "diagonal";
     inner = `<g transform="translate(30,30) rotate(-15) scale(.7)">${kfSprig(a1,a2,bg,0)}</g>
 <g transform="translate(105,95) rotate(20) scale(.55)">${kfSprig(a1,a2,bg,3)}</g>`;
-  } else if(styleId === "fullwrap"){     // ស្រាលជាង — tile ធំជាង + sprig តិចជាង
-    w = h = 170; dx = 170; dy = 170; dur = 60;
-    inner = `<g transform="translate(30,30) scale(.55)">${kfSprig(a1,a2,bg,1)}</g>
-<g transform="translate(120,105) rotate(35) scale(.45)">${kfSprig(a1,a2,bg,4)}</g>`;
-  } else if(styleId === "onecorner"){    // ស្តើងបំផុត — tile ធំ
+  } else if(styleId === "fullwrap"){
+    w = h = 110; dx = 110; dy = 110; dur = 50;
+    mode = "ring";   // border band only, centre stays empty
+    inner = `<g transform="translate(20,20) scale(.6)">${kfSprig(a1,a2,bg,1)}</g>
+<g transform="translate(75,35) rotate(40) scale(.45)">${kfSprig(a1,a2,bg,3)}</g>
+<g transform="translate(45,80) rotate(-25) scale(.5)">${kfSprig(a1,a2,bg,4)}</g>`;
+  } else if(styleId === "onecorner"){
     w = h = 220; dx = 220; dy = 220; dur = 75;
+    mode = "corner";
     inner = `<g transform="translate(40,50) rotate(10) scale(.6)">${kfSprig(a1,a2,bg,2)}</g>`;
-  } else if(styleId === "bottomgarland"){ // ហូរដេក — ជាកម្រងលើគែមក្រោមតែប៉ុណ្ណោះ
+  } else if(styleId === "bottomgarland"){
     w = 130; h = 60; dx = 130; dy = 0; dur = 40;
-    mode = "bottom"; stripSize = 70;
+    mode = "bottom";
     inner = `<path d="M0,30 Q32,46 65,30 T130,30" fill="none" stroke="${a1}" stroke-width="1" opacity=".5"/>
 <g transform="translate(20,30) scale(.5)">${kfSprig(a1,a2,bg,2)}</g>
 <g transform="translate(95,30) scale(.45) rotate(20)">${kfSprig(a1,a2,bg,4)}</g>`;
-  } else if(styleId === "sidebranch"){    // ហូរឈរ — ជាកម្រងលើគែមឆ្វេង/ស្តាំតែប៉ុណ្ណោះ
+  } else if(styleId === "sidebranch"){
     w = 60; h = 130; dx = 0; dy = 130; dur = 40;
-    mode = "side"; stripSize = 55;
+    mode = "side";
     inner = `<path d="M30,0 Q46,32 30,65 T30,130" fill="none" stroke="${a1}" stroke-width="1" opacity=".5"/>
 <g transform="translate(30,20) scale(.5)">${kfSprig(a1,a2,bg,1)}</g>
 <g transform="translate(30,95) scale(.45) rotate(-20)">${kfSprig(a1,a2,bg,3)}</g>`;
-  } else if(styleId === "scatter"){       // កក្រាយសេរី — drift ដេក
+  } else if(styleId === "scatter"){
     w = h = 180; dx = 180; dy = 180; dur = 70;
     inner = [0,1,2].map(i => {
       const x = 20 + i*55, y = 30 + (i%2)*90;
@@ -1110,13 +1382,177 @@ function buildKbachFrameOverlay(styleId, t){
   const bgStyle = `background-image:url('${uri}');background-size:${w}px ${h}px;--kf-dx:${dx}px;--kf-dy:${dy}px;--kf-dur:${dur}s;`;
 
   if(mode === "bottom"){
-    return `<div class="kbach-watermark kbach-watermark-bottom" style="${bgStyle}height:${stripSize}px;" aria-hidden="true"></div>`;
+    return `<div class="kbach-watermark kbach-watermark-bottom" style="${bgStyle}height:190px;" aria-hidden="true"></div>`;
   }
   if(mode === "side"){
-    return `<div class="kbach-watermark kbach-watermark-side kbach-watermark-side-l" style="${bgStyle}width:${stripSize}px;" aria-hidden="true"></div>`
-      + `<div class="kbach-watermark kbach-watermark-side kbach-watermark-side-r" style="${bgStyle}width:${stripSize}px;" aria-hidden="true"></div>`;
+    return `<div class="kbach-watermark kbach-watermark-side-l" style="${bgStyle}width:140px;" aria-hidden="true"></div>`
+      + `<div class="kbach-watermark kbach-watermark-side-r" style="${bgStyle}width:140px;" aria-hidden="true"></div>`;
   }
-  return `<div class="kbach-watermark" style="${bgStyle}" aria-hidden="true"></div>`;
+  if(mode === "corner"){
+    return `<div class="kbach-watermark kbach-watermark-corner-br" style="${bgStyle}width:280px;height:280px;" aria-hidden="true"></div>`;
+  }
+  if(mode === "diagonal"){
+    return `<div class="kbach-watermark kbach-watermark-corner-tl" style="${bgStyle}width:320px;height:320px;" aria-hidden="true"></div>`
+      + `<div class="kbach-watermark kbach-watermark-corner-br" style="${bgStyle}width:320px;height:320px;" aria-hidden="true"></div>`;
+  }
+  if(mode === "ring"){
+    return `<div class="kbach-watermark kbach-watermark-ring" style="${bgStyle}" aria-hidden="true"></div>`;
+  }
+  return `<div class="kbach-watermark kbach-watermark-full" style="${bgStyle}" aria-hidden="true"></div>`;
+}
+// ---------- Text animation on scroll (guest invitation) ----------
+// Text/blocks start hidden and reveal once when they scroll into view. Everything is added by script and scoped
+// under body.wa-on, so if anything fails the invitation simply shows normally. Skipped for reduced-motion users.
+function buildTextAnimCss(mode){
+  if(mode === "none") return "";
+  return `body.wa-on .wa{opacity:0;transition:opacity .9s ease var(--wd,0ms),transform .9s cubic-bezier(.22,1,.36,1) var(--wd,0ms),filter .9s ease var(--wd,0ms);}
+body.wa-fadeup .wa{transform:translateY(28px);}
+body.wa-words .wa{transform:translateY(20px);}
+body.wa-blur .wa{filter:blur(12px);transform:scale(.96);}
+body.wa-on .wa.wa-in{opacity:1;transform:none;filter:none;}
+body.wa-on .wa-sp .wa-w{opacity:0;transform:translateY(.7em);transition:opacity .7s ease calc(var(--wd,0ms) + var(--wi,0ms)),transform .8s cubic-bezier(.22,1,.36,1) calc(var(--wd,0ms) + var(--wi,0ms));}
+body.wa-on .wa-sp .wa-w:not(.wa-e){display:inline-block;}
+body.wa-on .wa-sp.wa-in .wa-w{opacity:1;transform:none;}
+body.wa-on .wa.wa-now,body.wa-on .wa-sp.wa-now .wa-w{transition:none !important;}
+`;
+}
+function buildTextAnimJs(mode, isPreview){
+  if(mode === "none") return { defs:"", init:"" };
+  const defs = `
+var waMode=${JSON.stringify(mode)};
+var waPrev=${isPreview ? "true" : "false"};
+var waEls=[], waStarted=false;
+var WA_TEXT='.eyebrow,.names,.hero-date,.section-title,.section-sub,.welcome p,.hosts,.tl-time,.tl-name,.venue-name,.venue-addr,.contact-name,.thanks,footer > div:last-child';
+var WA_BLOCK='.countdown,.map-btn,.contact-phone,.map-embed,.video-card';
+function waReduced(){ try{ return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } }
+function waSplit(el){
+  var lang=el.closest('.lang-en')?'en':'km', seg=null;
+  try{ if(window.Intl&&Intl.Segmenter){ seg=new Intl.Segmenter(lang,{granularity:'word'}); } }catch(e){}
+  var plan=[], words=0;
+  Array.prototype.slice.call(el.childNodes).forEach(function(n){
+    if(n.nodeType===3){
+      var txt=n.nodeValue, pieces=[];
+      if(!txt.trim()){ return; }
+      if(seg){ Array.from(seg.segment(txt)).forEach(function(x){ pieces.push(x.segment); }); }
+      else{ var ps=txt.split(' '); ps.forEach(function(p,j){ pieces.push(p); if(j<ps.length-1){ pieces.push(' '); } }); }
+      if(!pieces.length){ pieces=[txt]; }
+      words+=pieces.filter(function(p){ return p.trim()!==''; }).length;
+      plan.push({n:n,pieces:pieces});
+    }else if(n.nodeType===1&&n.tagName!=='BR'){ words++; plan.push({n:n,isEl:true}); }
+  });
+  if(!words||words>80){ return false; }
+  var idx=0, step=Math.min(60,1500/words);
+  plan.forEach(function(p){
+    if(p.isEl){ p.n.classList.add('wa-w','wa-e'); p.n.style.setProperty('--wi',(idx++*step)+'ms'); return; }
+    var frag=document.createDocumentFragment();
+    p.pieces.forEach(function(pc){
+      if(pc.trim()===''){ frag.appendChild(document.createTextNode(pc)); return; }
+      var sp=document.createElement('span'); sp.className='wa-w'; sp.textContent=pc;
+      sp.style.setProperty('--wi',(idx++*step)+'ms'); frag.appendChild(sp);
+    });
+    p.n.parentNode.replaceChild(frag,p.n);
+  });
+  return true;
+}
+function waPrepare(){
+  if(waReduced()||!('IntersectionObserver' in window)){ return; }
+  document.body.classList.add('wa-on','wa-'+waMode);
+  Array.prototype.forEach.call(document.querySelectorAll(WA_TEXT),function(el){
+    if(waMode==='words'&&waSplit(el)){ el.classList.add('wa-sp'); }else{ el.classList.add('wa'); }
+    waEls.push(el);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(WA_BLOCK),function(el){ el.classList.add('wa'); waEls.push(el); });
+}
+function waStart(){
+  if(waStarted||!waEls.length){ return; }
+  waStarted=true;
+  var first=true, instant=false;
+  if(waPrev){ try{ instant=sessionStorage.getItem('wib-anim-seen')==='1'; sessionStorage.setItem('wib-anim-seen','1'); }catch(e){} }
+  var io=new IntersectionObserver(function(entries){
+    var vis=entries.filter(function(e){ return e.isIntersecting; }).sort(function(a,b){ return a.boundingClientRect.top-b.boundingClientRect.top; });
+    vis.forEach(function(e,i){
+      var el=e.target;
+      if(instant&&first){ el.classList.add('wa-now'); }
+      el.style.setProperty('--wd',(Math.min(i,6)*110)+'ms');
+      el.classList.add('wa-in');
+      io.unobserve(el);
+    });
+    first=false;
+  },{threshold:0.12,rootMargin:'0px 0px -6% 0px'});
+  waEls.forEach(function(el){ io.observe(el); });
+}
+`;
+  const init = `try{ waPrepare(); if(!document.querySelector('.open-cover')){ waStart(); } }catch(e){ document.body.classList.remove('wa-on'); }`;
+  return { defs, init };
+}
+
+// ---------- Fullscreen photo viewer (tap a gallery photo to enlarge) ----------
+function buildLightbox(){
+  const css = `.frame.photo{cursor:zoom-in;-webkit-tap-highlight-color:transparent;}
+.lb{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(10,8,6,.94);opacity:0;transition:opacity .25s ease;touch-action:pan-y pinch-zoom;font-style:normal;}
+.lb.open{display:flex;}
+.lb.show{opacity:1;}
+body.lb-lock{overflow:hidden;}
+.lb-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:max(56px,env(safe-area-inset-top,0px)) 12px max(48px,env(safe-area-inset-bottom,0px));}
+.lb-img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:0 10px 50px rgba(0,0,0,.6);transform:scale(.96);opacity:0;transition:transform .3s cubic-bezier(.22,1,.36,1),opacity .25s ease;user-select:none;-webkit-user-drag:none;}
+.lb.show .lb-img{transform:none;opacity:1;}
+.lb-btn{position:absolute;z-index:2;border:none;cursor:pointer;color:#fff;background:rgba(255,255,255,.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);width:44px;height:44px;border-radius:50%;font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .2s;font-family:sans-serif;}
+.lb-btn:hover{background:rgba(255,255,255,.28);}
+.lb-close{top:max(14px,env(safe-area-inset-top,0px));right:14px;}
+.lb-prev{left:12px;top:50%;margin-top:-22px;}
+.lb-next{right:12px;top:50%;margin-top:-22px;}
+.lb-count{position:absolute;left:0;right:0;bottom:max(16px,env(safe-area-inset-bottom,0px));text-align:center;color:#fff;opacity:.85;font-size:13px;letter-spacing:.06em;font-family:sans-serif;pointer-events:none;}
+.lb.single .lb-prev,.lb.single .lb-next,.lb.single .lb-count{display:none;}
+@media(max-width:480px){.lb-prev,.lb-next{width:38px;height:38px;margin-top:-19px;font-size:19px;}.lb-prev{left:6px;}.lb-next{right:6px;}}
+@media(prefers-reduced-motion:reduce){.lb,.lb-img{transition:none !important;}}
+`;
+  const html = `<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer"><button class="lb-btn lb-close" id="lbClose" type="button" aria-label="Close">&#10005;</button><button class="lb-btn lb-prev" id="lbPrev" type="button" aria-label="Previous">&#10094;</button><button class="lb-btn lb-next" id="lbNext" type="button" aria-label="Next">&#10095;</button><div class="lb-stage" id="lbStage"><img class="lb-img" id="lbImg" alt=""></div><div class="lb-count" id="lbCount"></div></div>`;
+  const js = `
+(function(){
+  var lb=document.getElementById('lb'); if(!lb) return;
+  var img=document.getElementById('lbImg'), cnt=document.getElementById('lbCount');
+  var list=[], idx=0, sx=0, sy=0, tracking=false, closing=false;
+  function show(i){
+    idx=(i+list.length)%list.length;
+    img.classList.remove('lb-swap');
+    img.src=list[idx].src;
+    cnt.textContent=(idx+1)+' / '+list.length;
+  }
+  function openAt(el){
+    var sec=el.closest('.lang-section');
+    list=Array.prototype.slice.call((sec||document).querySelectorAll('.frame.photo img'));
+    var i=list.indexOf(el); if(i<0){ return; }
+    lb.classList.toggle('single',list.length<2);
+    show(i);
+    closing=false; lb.classList.add('open'); document.body.classList.add('lb-lock');
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(!closing){ lb.classList.add('show'); } }); });
+  }
+  function closeLb(){
+    closing=true; lb.classList.remove('show'); document.body.classList.remove('lb-lock');
+    setTimeout(function(){ if(!lb.classList.contains('show')){ lb.classList.remove('open'); img.removeAttribute('src'); } },260);
+  }
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    if(t&&t.tagName==='IMG'&&t.closest&&t.closest('.frame.photo')){ openAt(t); }
+  });
+  document.getElementById('lbClose').addEventListener('click',closeLb);
+  document.getElementById('lbPrev').addEventListener('click',function(e){ e.stopPropagation(); show(idx-1); });
+  document.getElementById('lbNext').addEventListener('click',function(e){ e.stopPropagation(); show(idx+1); });
+  lb.addEventListener('click',function(e){ if(e.target===lb||e.target.id==='lbStage'){ closeLb(); } });
+  document.addEventListener('keydown',function(e){
+    if(!lb.classList.contains('open')) return;
+    if(e.key==='Escape'){ closeLb(); }
+    else if(e.key==='ArrowLeft'&&list.length>1){ show(idx-1); }
+    else if(e.key==='ArrowRight'&&list.length>1){ show(idx+1); }
+  });
+  lb.addEventListener('touchstart',function(e){ if(e.touches.length!==1){ tracking=false; return; } tracking=true; sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+  lb.addEventListener('touchend',function(e){
+    if(!tracking||list.length<2) return; tracking=false;
+    var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.4){ show(dx<0?idx+1:idx-1); }
+  },{passive:true});
+})();`;
+  return { css, html, js };
 }
 
 // ---------- "Save to Calendar" (.ics) for guests ----------
@@ -1201,52 +1637,71 @@ function buildCalendarCfg(s, targetIso){
 
 function renderInvitation(s){
   const t = THEMES[s.theme];
+  const fk = FONT_KM[hasOwn(FONT_KM, s.fontKm) ? s.fontKm : (THEME_FONT_DEFAULTS[s.theme] || THEME_FONT_DEFAULTS.gold)[0]];
+  const fe = FONT_EN[hasOwn(FONT_EN, s.fontEn) ? s.fontEn : (THEME_FONT_DEFAULTS[s.theme] || THEME_FONT_DEFAULTS.gold)[1]];
   const targetIso = (s.eventDate && s.startTime) ? `${s.eventDate}T${s.startTime}:00+07:00` : "";
   const kmSection = buildSection(s, t, "km");
   const enSection = buildSection(s, t, "en");
   const LKM = LABELS.km, LEN = LABELS.en;
   const bodyClass = s.__guestName ? " class=\"guest-mode\"" : "";
   const mp = buildMusicParts(s);
-  const kbachOverlay = buildKbachFrameOverlay(s.frameStyle, t);
+  const ta = hasOwn(TEXT_ANIM_STYLES, s.textAnim) ? s.textAnim : "fadeup";
+  const taJs = buildTextAnimJs(ta, !!s.__preview);
+  const lbx = buildLightbox();
   const calJs = (targetIso && !isNaN(Date.parse(targetIso))) ? `try{(${wibCalendarRuntime.toString()})(${JSON.stringify(buildCalendarCfg(s, targetIso)).replace(/</g, "\\u003c")});}catch(e){}` : "";
 
   return `<!DOCTYPE html><html lang="km"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${escapeHtml(s.groomName)} & ${escapeHtml(s.brideName)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Bokor&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
 <style>
-:root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--card:${t.card};--border:${t.border};--radius:${t.radius};--display-font:${t.display};--body-font:${t.body};--display-font-en:${t.displayEn};--body-font-en:${t.bodyEn};}
+:root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--card:${t.card};--border:${t.border};--radius:${t.radius};--display-font:${fk.display};--body-font:${fk.body};--display-font-en:${fe.display};--body-font-en:${fe.body};}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
+html{background:var(--bg);}
+body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
+.kbach-watermark{position:fixed;pointer-events:none;opacity:.12;background-repeat:repeat;animation:kf-drift var(--kf-dur,55s) linear infinite;}
+.kbach-watermark-full{inset:0;}
+.kbach-watermark-ring{inset:0;opacity:.2;-webkit-mask-image:linear-gradient(to right,#000 0,#000 40%,transparent 100%),linear-gradient(to left,#000 0,#000 40%,transparent 100%),linear-gradient(to bottom,#000 0,#000 40%,transparent 100%),linear-gradient(to top,#000 0,#000 40%,transparent 100%);-webkit-mask-size:min(92px,20vw) 100%,min(92px,20vw) 100%,100% min(92px,20vw),100% min(92px,20vw);-webkit-mask-position:left top,right top,left top,left bottom;-webkit-mask-repeat:no-repeat;mask-image:linear-gradient(to right,#000 0,#000 40%,transparent 100%),linear-gradient(to left,#000 0,#000 40%,transparent 100%),linear-gradient(to bottom,#000 0,#000 40%,transparent 100%),linear-gradient(to top,#000 0,#000 40%,transparent 100%);mask-size:min(92px,20vw) 100%,min(92px,20vw) 100%,100% min(92px,20vw),100% min(92px,20vw);mask-position:left top,right top,left top,left bottom;mask-repeat:no-repeat;}
+.kbach-watermark-bottom{left:0;right:0;bottom:0;-webkit-mask-image:linear-gradient(to top,#000 0%,#000 35%,transparent 100%);mask-image:linear-gradient(to top,#000 0%,#000 35%,transparent 100%);}
+.kbach-watermark-side-l{top:0;bottom:0;left:0;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 35%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 35%,transparent 100%);}
+.kbach-watermark-side-r{top:0;bottom:0;right:0;-webkit-mask-image:linear-gradient(to left,#000 0%,#000 35%,transparent 100%);mask-image:linear-gradient(to left,#000 0%,#000 35%,transparent 100%);}
+.kbach-watermark-corner-tl{top:0;left:0;-webkit-mask-image:radial-gradient(circle at 0% 0%,#000 0%,#000 45%,transparent 100%);mask-image:radial-gradient(circle at 0% 0%,#000 0%,#000 45%,transparent 100%);}
+.kbach-watermark-corner-br{bottom:0;right:0;-webkit-mask-image:radial-gradient(circle at 100% 100%,#000 0%,#000 45%,transparent 100%);mask-image:radial-gradient(circle at 100% 100%,#000 0%,#000 45%,transparent 100%);}
+@keyframes kf-drift{from{background-position:0 0;}to{background-position:var(--kf-dx,140px) var(--kf-dy,140px);}}
+@media(prefers-reduced-motion:reduce){.kbach-watermark{animation:none !important;}}
 .display{font-family:var(--display-font);color:var(--accent-1);}
 .lang-en{font-family:var(--body-font-en);font-style:italic;}
 .lang-en .display{font-family:var(--display-font-en);font-style:normal;}
 .lang-en .hero-date,.lang-en .tl-time,.lang-en .contact-phone,.lang-en .map-btn,.lang-en .cal-btn,.lang-en .cd-label{font-style:normal;}
 .wrap{max-width:680px;margin:0 auto;padding:0 24px;}
-.hero{padding:80px 24px 60px;text-align:center;background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%), var(--bg);}
-.eyebrow{font-size:15px;color:var(--ink);opacity:.75;margin:0 0 24px;}
+.hero{padding:52px 24px 36px;text-align:center;background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%), var(--bg);}
+.eyebrow{font-size:17px;color:var(--ink);opacity:.75;margin:0 0 16px;}
 .guest-line{position:sticky;top:0;z-index:70;display:block;width:100%;margin:0;padding:13px 20px;font-size:15px;font-weight:700;letter-spacing:.03em;text-align:center;color:#fff;background:linear-gradient(90deg, var(--accent-1), var(--accent-2));box-shadow:0 4px 16px rgba(0,0,0,.2);font-style:normal;}
 .lang-en .guest-line{font-style:normal;}
-.names{font-size:clamp(30px,8vw,52px);line-height:1.5;margin:0;}
+.names{font-size:clamp(36px,10vw,64px);line-height:1.4;margin:0;}
 .names .amp{display:block;font-family:var(--body-font);font-size:0.4em;color:var(--accent-2);margin:6px 0;}
 .lang-en .names .amp{font-family:var(--body-font-en);font-style:italic;}
-.hero-date{margin-top:24px;font-size:17px;color:var(--accent-1);}
-.hero.has-cover{padding-top:150px;padding-bottom:100px;}
+.hero-date{margin-top:14px;font-size:19px;color:var(--accent-1);}
+.hero.has-cover{position:relative;overflow:hidden;isolation:isolate;padding-top:150px;padding-bottom:100px;min-height:clamp(440px,85vh,720px);display:flex;flex-direction:column;justify-content:center;}
+.hb{position:absolute;pointer-events:none;background:var(--cover) var(--fx,50%) var(--fy,35%)/cover no-repeat;}
+.hb-blur{inset:calc(var(--blur,22px) * -2);z-index:-3;filter:blur(var(--blur,22px)) saturate(1.08);}
+.hb-sharp{inset:0;z-index:-2;-webkit-mask-image:radial-gradient(ellipse var(--rx,60%) var(--ry,56%) at var(--fx,50%) var(--fy,35%),#000 42%,rgba(0,0,0,.55) 68%,transparent 100%);mask-image:radial-gradient(ellipse var(--rx,60%) var(--ry,56%) at var(--fx,50%) var(--fy,35%),#000 42%,rgba(0,0,0,.55) 68%,transparent 100%);}
+.hb-tint{inset:0;z-index:-1;background:linear-gradient(180deg,transparent 80%,var(--bg) 100%),radial-gradient(ellipse 88% 82% at var(--fx,50%) var(--fy,35%),transparent 38%,color-mix(in srgb,var(--accent-1) 48%,transparent) 76%,color-mix(in srgb,var(--accent-1) 78%,#000) 100%),linear-gradient(180deg,rgba(0,0,0,.30) 0%,rgba(0,0,0,.36) 45%,rgba(0,0,0,.58) 100%);}
 .hero.has-cover .eyebrow{color:#fff;opacity:.92;text-shadow:0 2px 10px rgba(0,0,0,.55);}
 .hero.has-cover .names{color:#fff;text-shadow:0 4px 18px rgba(0,0,0,.55), 0 1px 4px rgba(0,0,0,.85);}
 .hero.has-cover .names .amp{color:var(--accent-2);}
 .hero.has-cover .hero-date{color:#fff;opacity:.95;text-shadow:0 2px 10px rgba(0,0,0,.55);}
-section{padding:52px 0;}
+section{padding:30px 0;}
 .lang-section{padding:0;}
-.section-title{font-size:26px;text-align:center;margin:0 0 6px;}
-.section-sub{text-align:center;color:var(--ink);opacity:.7;font-size:14px;margin:0 0 32px;}
+.section-title{font-size:30px;text-align:center;margin:0 0 4px;}
+.section-sub{text-align:center;color:var(--ink);opacity:.7;font-size:15px;margin:0 0 18px;}
 .divider{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 auto;max-width:680px;padding:0 24px;}
 .divider .rule{height:1px;width:56px;background:linear-gradient(90deg,transparent,var(--accent-2),transparent);}
-.welcome{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:38px 32px;text-align:center;}
-.welcome p{font-size:16px;margin:0;}
-.hosts{margin-top:22px;font-size:16px;color:var(--accent-1);font-weight:600;}
+.welcome{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:26px 32px;text-align:center;}
+.welcome p{font-size:18px;margin:0;}
+.hosts{margin-top:14px;font-size:18px;color:var(--accent-1);font-weight:600;}
 .countdown{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
 .cd-unit{width:76px;padding:16px 0;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);}
 .cd-num{font-size:26px;font-weight:700;color:var(--accent-1);font-variant-numeric:tabular-nums;font-style:normal;}
@@ -1255,63 +1710,92 @@ section{padding:52px 0;}
 .tl-item{position:relative;padding-bottom:28px;}
 .tl-item:last-child{padding-bottom:0;}
 .tl-item::before{content:"";position:absolute;left:-31px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 0 4px var(--bg);}
-.tl-time{font-size:13px;color:var(--accent-2);font-weight:600;margin-bottom:3px;font-style:normal;}
-.tl-name{font-size:16.5px;margin:0;}
-.kbach-watermark{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.4;background-repeat:repeat;animation:kf-drift var(--kf-dur,55s) linear infinite;}
-.kbach-watermark-bottom{top:auto;background-repeat:repeat-x;background-position:bottom;}
-.kbach-watermark-side{top:0;bottom:0;right:auto;background-repeat:repeat-y;}
-.kbach-watermark-side-l{left:0;background-position:left;}
-.kbach-watermark-side-r{left:auto;right:0;background-position:right;}
-@keyframes kf-drift{from{background-position:0 0;}to{background-position:var(--kf-dx) var(--kf-dy);}}
-@media(prefers-reduced-motion:reduce){.kbach-watermark{animation:none;}}
-.frame{border:1px solid var(--border);background:color-mix(in srgb, var(--accent-1) 8%, var(--bg));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--ink);opacity:.6;overflow:hidden;}
+.tl-time{font-size:14.5px;color:var(--accent-2);font-weight:600;margin-bottom:3px;font-style:normal;}
+.tl-name{font-size:18px;margin:0;}
+.frame{border:1px solid var(--border);background:color-mix(in srgb, var(--accent-1) 8%, var(--bg));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--ink);opacity:.6;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,.09);transition:transform .45s cubic-bezier(.22,1,.36,1), box-shadow .45s ease;}
 .frame.photo{opacity:1;}
-.frame img{width:100%;height:100%;object-fit:cover;display:block;}
+.frame.photo:hover{transform:translateY(-5px) scale(1.02);box-shadow:0 16px 34px rgba(0,0,0,.18);}
+.frame img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block;transition:transform .6s cubic-bezier(.22,1,.36,1);}
+.frame.photo:hover img{transform:scale(1.07);}
 .frame svg{width:28px;height:28px;}
 .frame span{font-size:11.5px;font-style:normal;}
-.gallery-gold{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
-.gallery-gold .gallery-item.wide{grid-column:span 2;}
-.gallery-gold .frame{aspect-ratio:4/3;border-radius:var(--radius);padding:0;}
-.gallery-gold .gallery-item.wide .frame{aspect-ratio:16/9;}
-.gallery-rose{display:flex;flex-wrap:wrap;justify-content:center;gap:26px 18px;padding:6px 4px;}
-.gallery-rose .gallery-item{width:calc(33.333% - 18px);}
-.gallery-rose .frame{aspect-ratio:1/1.05;border-radius:2px;padding:10px 10px 24px;background:var(--card);box-shadow:0 8px 18px rgba(0,0,0,.1);}
-.gallery-rose .gallery-item.rot-0 .frame{transform:rotate(-3deg);}
-.gallery-rose .gallery-item.rot-1 .frame{transform:rotate(2.5deg);}
-.gallery-rose .gallery-item.rot-2 .frame{transform:rotate(-1.5deg);}
-@media(max-width:480px){.gallery-rose .gallery-item{width:calc(50% - 14px);}}
-.gallery-minimal{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;}
-.gallery-minimal .frame{aspect-ratio:1/1;border-radius:0;border:none;padding:0;}
-@media(max-width:480px){.gallery-minimal{grid-template-columns:repeat(2,1fr);}}
-.venue-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px;text-align:center;}
-.venue-name{font-size:22px;margin:0 0 8px;}
-.venue-addr{color:var(--ink);opacity:.75;font-size:14.5px;margin:0 0 22px;}
+.gallery-style-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.gallery-style-grid .gallery-item.wide{grid-column:span 2;}
+.gallery-style-grid .frame{aspect-ratio:4/3;border-radius:var(--radius);padding:0;}
+.gallery-style-grid .gallery-item.wide .frame{aspect-ratio:16/9;}
+.gallery-style-classic{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.gallery-style-classic .frame{aspect-ratio:4/3;border-radius:var(--radius);padding:0;}
+.gallery-style-polaroid{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 8px;padding:6px 4px;}
+.gallery-style-polaroid .gallery-item{width:calc(33.333% - 8px);}
+.gallery-style-polaroid .frame{aspect-ratio:1/1.05;border-radius:2px;padding:10px 10px 24px;background:var(--card);box-shadow:0 8px 18px rgba(0,0,0,.1);}
+.gallery-style-polaroid .frame.photo:hover{transform:translateY(-5px) scale(1.03);}
+.gallery-style-polaroid .gallery-item.rot-0 .frame{transform:rotate(-3deg);}
+.gallery-style-polaroid .gallery-item.rot-1 .frame{transform:rotate(2.5deg);}
+.gallery-style-polaroid .gallery-item.rot-2 .frame{transform:rotate(-1.5deg);}
+.gallery-style-polaroid .gallery-item.rot-0 .frame.photo:hover{transform:rotate(-3deg) translateY(-5px) scale(1.04);}
+.gallery-style-polaroid .gallery-item.rot-1 .frame.photo:hover{transform:rotate(2.5deg) translateY(-5px) scale(1.04);}
+.gallery-style-polaroid .gallery-item.rot-2 .frame.photo:hover{transform:rotate(-1.5deg) translateY(-5px) scale(1.04);}
+@media(max-width:480px){.gallery-style-polaroid .gallery-item{width:calc(50% - 8px);}}
+.gallery-style-square{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+.gallery-style-square .frame{aspect-ratio:1/1;border-radius:0;border:none;box-shadow:none;padding:0;}
+.gallery-style-square .frame.photo:hover{transform:none;box-shadow:none;}
+@media(max-width:480px){.gallery-style-square{grid-template-columns:repeat(2,1fr);}}
+.gallery-style-mosaic{column-count:2;column-gap:8px;}
+.gallery-style-mosaic .gallery-item{display:inline-block;width:100%;break-inside:avoid;margin-bottom:8px;}
+.gallery-style-mosaic .frame{border-radius:calc(var(--radius) + 8px);padding:0;border-width:2px;position:relative;}
+.gallery-style-mosaic .frame::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent-2) 55%, transparent);pointer-events:none;}
+.gallery-style-mosaic .gallery-item:nth-child(3n+1) .frame{aspect-ratio:3/4;}
+.gallery-style-mosaic .gallery-item:nth-child(3n+2) .frame{aspect-ratio:1/1;}
+.gallery-style-mosaic .gallery-item:nth-child(3n+3) .frame{aspect-ratio:4/5;}
+.video-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;aspect-ratio:16/9;border-radius:var(--radius);overflow:hidden;text-decoration:none;color:#fff;font-style:normal;background:radial-gradient(ellipse at 50% 40%,color-mix(in srgb,var(--accent-1) 70%,#000) 0%,color-mix(in srgb,var(--accent-1) 35%,#000) 100%);box-shadow:0 8px 20px rgba(0,0,0,.14);}
+.vc-play{width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.95);color:var(--accent-1);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(0,0,0,.35);transition:transform .25s ease;}
+.vc-play svg{width:30px;height:30px;margin-left:3px;}
+.video-card:hover .vc-play{transform:scale(1.08);}
+.vc-host{font-size:13px;opacity:.8;letter-spacing:.04em;}
+.vc-cta{font-size:15px;font-weight:600;}
+.map-embed{position:relative;width:100%;aspect-ratio:16/10;margin:0 0 18px;border-radius:calc(var(--radius) - 2px);overflow:hidden;border:1px solid var(--border);background:color-mix(in srgb,var(--accent-1) 8%,var(--bg));box-shadow:0 6px 16px rgba(0,0,0,.1);}
+.map-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;}
+.map-pin{position:absolute;left:50%;top:50%;z-index:1;width:40px;height:52px;transform:translate(-50%,-100%);pointer-events:none;filter:drop-shadow(0 4px 5px rgba(0,0,0,.4));}
+.map-pin-ring{position:absolute;left:50%;top:50%;z-index:1;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:color-mix(in srgb,var(--accent-1) 45%,transparent);pointer-events:none;animation:pin-pulse 2.2s ease-out infinite;}
+@keyframes pin-pulse{0%{transform:scale(.6);opacity:.9;}100%{transform:scale(3.4);opacity:0;}}
+@media(prefers-reduced-motion:reduce){.map-pin-ring{animation:none;opacity:.4;}}
+.map-embed-hit{position:absolute;inset:0;z-index:2;display:block;}
+.map-embed-tag{position:absolute;z-index:3;left:10px;bottom:10px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.94);color:#222;font-size:12.5px;font-style:normal;box-shadow:0 2px 8px rgba(0,0,0,.25);pointer-events:none;}
+.video-wrap{position:relative;width:100%;margin:0 auto;aspect-ratio:var(--vr,16/9);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:#000;box-shadow:0 8px 20px rgba(0,0,0,.12);}\n.video-wrap iframe,.video-wrap video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000;}\n.venue-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px;text-align:center;}
+.venue-name{font-size:25px;margin:0 0 8px;}
+.venue-addr{color:var(--ink);opacity:.75;font-size:16px;margin:0 0 16px;}
 .map-btn{display:inline-block;padding:12px 26px;border-radius:999px;background:var(--accent-1);color:#fff;text-decoration:none;font-size:14px;font-style:normal;}
 .cal-wrap{text-align:center;margin-top:22px;}
 .cal-btn{display:inline-block;padding:11px 26px;border-radius:999px;border:1.5px solid var(--accent-1);background:transparent;color:var(--accent-1);font-family:inherit;font-size:14px;font-style:normal;cursor:pointer;transition:background .2s,color .2s;}
 .cal-btn:hover,.cal-btn:focus-visible{background:var(--accent-1);color:#fff;outline:none;}
 .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
 .contact-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;text-align:center;}
-.contact-name{font-size:15.5px;margin:0 0 6px;}
-.contact-phone{display:inline-block;color:var(--accent-1);font-weight:600;text-decoration:none;font-size:15px;font-style:normal;}
-footer{text-align:center;padding:48px 24px 52px;color:var(--ink);opacity:.75;font-size:14px;}
-footer .thanks{font-size:19px;color:var(--accent-1);opacity:1;margin-bottom:8px;}
-.lang-toggle{position:fixed;top:16px;right:16px;z-index:100;display:flex;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.14);}
+.contact-name{font-size:17px;margin:0 0 6px;}
+.contact-phone{display:inline-block;color:var(--accent-1);font-weight:600;text-decoration:none;font-size:16.5px;font-style:normal;}
+footer{text-align:center;padding:30px 24px 36px;color:var(--ink);opacity:.75;font-size:15px;}
+footer .thanks{font-size:22px;color:var(--accent-1);opacity:1;margin-bottom:6px;}
+.lang-toggle{position:fixed;top:16px;right:16px;z-index:100;display:flex;background:color-mix(in srgb, var(--card) 15%, transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.14);}
 .lang-toggle button{border:none;background:none;padding:8px 16px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--ink);font-family:'Kantumruy Pro',sans-serif;font-style:normal;}
-.lang-toggle button.active{background:var(--accent-1);color:#fff;}
+.lang-toggle button.active{background:color-mix(in srgb, var(--accent-1) 25%, transparent);color:#fff;}
 body.guest-mode .lang-toggle{top:62px;}
-@media(max-width:480px){.hero{padding:64px 18px 48px;}.welcome{padding:30px 20px;}.lang-toggle{top:10px;right:10px;}.lang-toggle button{padding:7px 12px;font-size:12px;}body.guest-mode .lang-toggle{top:56px;}}
-${mp.css}</style></head><body${bodyClass}>
-${kbachOverlay}
-${mp.html}
+.fx-toggle{position:fixed;top:16px;left:16px;z-index:100;display:flex;gap:2px;background:color-mix(in srgb, var(--card) 15%, transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.14);}
+.fx-toggle button{border:none;background:none;width:32px;height:32px;border-radius:50%;font-size:15px;line-height:1;cursor:pointer;color:var(--ink);display:flex;align-items:center;justify-content:center;font-style:normal;}
+.fx-toggle button.active{background:color-mix(in srgb, var(--accent-1) 25%, transparent);color:#fff;}
+body.guest-mode .fx-toggle{top:62px;}
+@media(max-width:480px){.hero{padding:40px 18px 30px;}.welcome{padding:22px 20px;}.lang-toggle{top:10px;right:10px;}.lang-toggle button{padding:7px 12px;font-size:12px;}body.guest-mode .lang-toggle{top:56px;}.fx-toggle{top:10px;left:10px;}.fx-toggle button{width:28px;height:28px;font-size:13px;}body.guest-mode .fx-toggle{top:56px;}}
+${mp.css}${buildTextAnimCss(ta)}${lbx.css}</style></head><body${bodyClass}>
+${buildKbachFrameOverlay(s.kbachFrame, t)}
 <div class="lang-toggle">
   <button id="btn-km" class="active" type="button">${LKM.toggleKm}</button>
   <button id="btn-en" type="button">${LEN.toggleEn}</button>
 </div>
+<div class="fx-toggle" id="fxToggle">${Object.keys(EFFECTS).map(key => `<button data-fx="${key}" type="button" title="${escapeHtml(EFFECTS[key].label)}">${EFFECTS[key].icon}</button>`).join("")}</div>
+${mp.html}
+${lbx.html}
 ${kmSection}
 ${enSection}
 <script>(function(){
-var target=${targetIso ? `"${targetIso}"` : "null"};
+var target=${targetIso ? JSON.stringify(targetIso).replace(/</g,"\\u003c") : "null"};
 var t=target?new Date(target).getTime():0;
 function pad(n){return String(n).padStart(2,"0");}
 var messages={km:"${LKM.congrats}",en:"${LEN.congrats}"};
@@ -1358,72 +1842,102 @@ function setLang(lang){
 document.getElementById("btn-km").addEventListener("click", function(){ setLang("km"); });
 document.getElementById("btn-en").addEventListener("click", function(){ setLang("en"); });
 
-var fxType=${JSON.stringify(s.effect || "none")};
 var fxColor1=${JSON.stringify(t.accent1)};
 var fxColor2=${JSON.stringify(t.accent2)};
-if(fxType!=="none"){
-  var fxCanvas=document.createElement("canvas");
+var fxType="none";   // each guest picks their own effect from the toggle on the invitation
+try{ var savedFx=localStorage.getItem("wib-guest-fx"); if(savedFx) fxType=savedFx; }catch(e){}
+
+var fxCanvas=null, fxCtx=null, fxParticles=[], fxAnimId=null;
+function fxResize(){ if(fxCanvas){ fxCanvas.width=window.innerWidth; fxCanvas.height=window.innerHeight; } }
+function fxStop(){
+  if(fxAnimId){ cancelAnimationFrame(fxAnimId); fxAnimId=null; }
+  if(fxCanvas){ fxCanvas.remove(); fxCanvas=null; fxCtx=null; }
+  window.removeEventListener("resize", fxResize);
+}
+function fxDrawPetal(p){
+  fxCtx.save();
+  fxCtx.translate(p.x,p.y);
+  fxCtx.rotate(p.angle);
+  fxCtx.globalAlpha=p.opacity;
+  var pr=p.r*0.6;
+  fxCtx.fillStyle=fxColor1;
+  for(var i=0;i<5;i++){
+    fxCtx.save();
+    fxCtx.rotate((Math.PI*2/5)*i);
+    fxCtx.beginPath();
+    fxCtx.ellipse(0,-pr*0.85,pr*0.5,pr*0.9,0,0,Math.PI*2);
+    fxCtx.fill();
+    fxCtx.restore();
+  }
+  fxCtx.fillStyle=fxColor2;
+  fxCtx.beginPath();
+  fxCtx.arc(0,0,pr*0.35,0,Math.PI*2);
+  fxCtx.fill();
+  fxCtx.restore();
+}
+function fxDrawSnow(p){
+  fxCtx.save();
+  fxCtx.globalAlpha=p.opacity;
+  var grad=fxCtx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*1.6);
+  grad.addColorStop(0,"rgba(255,255,255,1)");
+  grad.addColorStop(.55,"rgba(255,255,255,.8)");
+  grad.addColorStop(1,"rgba(255,255,255,0)");
+  fxCtx.fillStyle=grad;
+  fxCtx.beginPath();
+  fxCtx.arc(p.x,p.y,p.r*1.6,0,Math.PI*2);
+  fxCtx.fill();
+  fxCtx.restore();
+}
+function fxDrawStar(p){
+  fxCtx.save();
+  fxCtx.translate(p.x,p.y);
+  fxCtx.rotate(p.angle);
+  var twinkle=0.55+0.45*Math.sin((p.x+p.y)*0.02+p.angle*3);   // ភ្លឺ/ស្រអាប់ឆ្លាស់គ្នាតាមទីតាំង/ពេលវេលា
+  fxCtx.globalAlpha=p.opacity*twinkle;
+  fxCtx.shadowColor=fxColor2;
+  fxCtx.shadowBlur=p.r*2.5;
+  fxCtx.fillStyle=fxColor2;
+  var spikes=4, outer=p.r*2, inner=p.r*0.7;
+  fxCtx.beginPath();
+  for(var si=0; si<spikes*2; si++){
+    var rad = si%2===0 ? outer : inner;
+    var ang = (Math.PI/spikes)*si;
+    fxCtx.lineTo(Math.cos(ang)*rad, Math.sin(ang)*rad);
+  }
+  fxCtx.closePath();
+  fxCtx.fill();
+  fxCtx.restore();
+}
+function fxStart(type){
+  fxStop();
+  fxType=type;
+  if(type==="none") return;
+  fxCanvas=document.createElement("canvas");
   fxCanvas.id="fx-canvas";
   fxCanvas.style.cssText="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40;";
   document.body.appendChild(fxCanvas);
-  var fxCtx=fxCanvas.getContext("2d");
-  function fxResize(){ fxCanvas.width=window.innerWidth; fxCanvas.height=window.innerHeight; }
+  fxCtx=fxCanvas.getContext("2d");
   fxResize();
   window.addEventListener("resize", fxResize);
 
-  var fxCount = fxType==="snow" ? 70 : (fxType==="stars" ? 50 : 40);
+  var fxCount = type==="snow" ? 70 : (type==="stars" ? 50 : 40);
   function fxSpawn(initial){
     return {
       x: Math.random()*fxCanvas.width,
       y: initial ? Math.random()*fxCanvas.height : -10,
-      r: fxType==="snow" ? (2+Math.random()*3) : (fxType==="petals" ? (5+Math.random()*5) : (2+Math.random()*2)),
-      speed: fxType==="snow" ? (0.6+Math.random()*1.2) : (fxType==="petals" ? (0.5+Math.random()*1) : (0.8+Math.random()*1.5)),
+      r: type==="snow" ? (2+Math.random()*3) : (type==="petals" ? (5+Math.random()*5) : (2+Math.random()*2)),
+      speed: type==="snow" ? (0.6+Math.random()*1.2) : (type==="petals" ? (0.5+Math.random()*1) : (0.8+Math.random()*1.5)),
       drift: Math.random()*1-0.5,
       angle: Math.random()*Math.PI*2,
       spin: (Math.random()*0.02)-0.01,
       sway: Math.random()*Math.PI*2,
       swaySpeed: 0.01+Math.random()*0.02,
-      opacity: fxType==="stars" ? (0.35+Math.random()*0.65) : (0.6+Math.random()*0.4)
+      opacity: type==="stars" ? (0.35+Math.random()*0.65) : (0.6+Math.random()*0.4)
     };
   }
-  var fxParticles=[];
+  fxParticles=[];
   for(var fi=0; fi<fxCount; fi++){ fxParticles.push(fxSpawn(true)); }
 
-  function fxDrawPetal(p){
-    fxCtx.save();
-    fxCtx.translate(p.x,p.y);
-    fxCtx.rotate(p.angle);
-    fxCtx.globalAlpha=p.opacity;
-    fxCtx.fillStyle=fxColor1;
-    fxCtx.beginPath();
-    fxCtx.ellipse(0,0,p.r,p.r*0.6,0,0,Math.PI*2);
-    fxCtx.fill();
-    fxCtx.restore();
-  }
-  function fxDrawSnow(p){
-    fxCtx.beginPath();
-    fxCtx.globalAlpha=p.opacity;
-    fxCtx.fillStyle="#ffffff";
-    fxCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    fxCtx.fill();
-  }
-  function fxDrawStar(p){
-    fxCtx.save();
-    fxCtx.translate(p.x,p.y);
-    fxCtx.rotate(p.angle);
-    fxCtx.globalAlpha=p.opacity;
-    fxCtx.fillStyle=fxColor2;
-    var spikes=4, outer=p.r*2, inner=p.r*0.7;
-    fxCtx.beginPath();
-    for(var si=0; si<spikes*2; si++){
-      var rad = si%2===0 ? outer : inner;
-      var ang = (Math.PI/spikes)*si;
-      fxCtx.lineTo(Math.cos(ang)*rad, Math.sin(ang)*rad);
-    }
-    fxCtx.closePath();
-    fxCtx.fill();
-    fxCtx.restore();
-  }
   function fxLoop(){
     fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
     fxParticles.forEach(function(p){
@@ -1432,15 +1946,30 @@ if(fxType!=="none"){
       p.x+=Math.sin(p.sway)*0.6+p.drift*0.2;
       p.angle+=p.spin;
       if(p.y>fxCanvas.height+20 || p.x<-20 || p.x>fxCanvas.width+20){ Object.assign(p, fxSpawn(false)); }
-      if(fxType==="snow") fxDrawSnow(p);
-      else if(fxType==="stars") fxDrawStar(p);
+      if(type==="snow") fxDrawSnow(p);
+      else if(type==="stars") fxDrawStar(p);
       else fxDrawPetal(p);
     });
-    requestAnimationFrame(fxLoop);
+    fxAnimId=requestAnimationFrame(fxLoop);
   }
   fxLoop();
 }
+
+var fxButtons=document.querySelectorAll("#fxToggle button");
+Array.prototype.forEach.call(fxButtons, function(btn){
+  btn.classList.toggle("active", btn.getAttribute("data-fx")===fxType);
+  btn.addEventListener("click", function(){
+    var type=btn.getAttribute("data-fx");
+    fxStart(type);
+    try{ localStorage.setItem("wib-guest-fx", type); }catch(e){}
+    Array.prototype.forEach.call(fxButtons, function(b){ b.classList.toggle("active", b===btn); });
+  });
+});
+fxStart(fxType);
+${taJs.defs}
 ${mp.js}
+${taJs.init}
+${lbx.js}
 })();<\/script>
 </body></html>`;
 }
@@ -1457,83 +1986,94 @@ const DOWNLOAD_PRICE_USD = 20;
 
 const $ = id => document.getElementById(id);
 
-function buildThemePicker(){
-  const grid = $("themeGrid");
-  grid.innerHTML = Object.keys(THEMES).map(key => {
-    const t = THEMES[key];
-    return `<div class="theme-card${state.theme===key?" active":""}" data-theme="${key}" title="${escapeHtml(t.label)}">
-      <div class="theme-swatch" style="background:${t.swatch}"></div>
-    </div>`;
+// ---- Icon pickers: every style choice is shown as a tile (no drop-downs, no words) ----
+const PK = {
+  frame: '<rect x="5" y="4" width="30" height="48" rx="3" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".4"/>',
+  svg: (vb, inner) => `<svg viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`
+};
+const NONE_ICON = PK.svg("0 0 40 40", '<circle cx="20" cy="20" r="12" opacity=".6"/><path d="M11.5 28.5 28.5 11.5" opacity=".6"/>');
+const KBACH_ICONS = {
+  none: NONE_ICON,
+  diagbranch: PK.svg("0 0 40 56", PK.frame + '<path d="M8 8c7 0 10 4 11 11M8 8c0 7 4 10 11 11" /><circle cx="8" cy="8" r="1.4" fill="currentColor"/><path d="M32 48c-7 0-10-4-11-11M32 48c0-7-4-10-11-11"/><circle cx="32" cy="48" r="1.4" fill="currentColor"/>'),
+  fullwrap: PK.svg("0 0 40 56", PK.frame + '<rect x="9" y="8" width="22" height="40" rx="2" stroke-dasharray="0.1 3.4" stroke-width="2.6"/>'),
+  onecorner: PK.svg("0 0 40 56", PK.frame + '<path d="M32 48c-9 0-15-5-17-14M32 48c0-9-5-15-14-17M32 48l-9-9"/><circle cx="16" cy="33" r="1.5" fill="currentColor"/><circle cx="26" cy="36" r="1.5" fill="currentColor"/>'),
+  bottomgarland: PK.svg("0 0 40 56", PK.frame + '<path d="M7 44c4 6 8 6 12 0s8-6 12 0"/><circle cx="13" cy="49" r="1.4" fill="currentColor"/><circle cx="25" cy="49" r="1.4" fill="currentColor"/><circle cx="19" cy="42" r="1.4" fill="currentColor"/>'),
+  sidebranch: PK.svg("0 0 40 56", PK.frame + '<path d="M9 10v36M31 10v36" stroke-dasharray="0.1 3.6" stroke-width="2.6"/><path d="M9 20c3-1 4-3 4-5M9 34c3-1 4-3 4-5M31 20c-3-1-4-3-4-5M31 34c-3-1-4-3-4-5"/>'),
+  scatter: PK.svg("0 0 40 56", PK.frame + '<circle cx="12" cy="14" r="2" fill="currentColor"/><circle cx="29" cy="22" r="1.6" fill="currentColor"/><circle cx="14" cy="33" r="1.4" fill="currentColor"/><circle cx="27" cy="42" r="2.2" fill="currentColor"/><circle cx="20" cy="24" r="1" fill="currentColor"/><circle cx="11" cy="45" r="1.2" fill="currentColor"/>')
+};
+const GALLERY_ICONS = {
+  grid: PK.svg("0 0 40 40", '<rect x="4" y="5" width="32" height="10" rx="1.5"/><rect x="4" y="18" width="15" height="8" rx="1.5"/><rect x="21" y="18" width="15" height="8" rx="1.5"/><rect x="4" y="29" width="32" height="7" rx="1.5"/>'),
+  classic: PK.svg("0 0 40 40", '<rect x="4" y="5" width="15" height="13" rx="1.5"/><rect x="21" y="5" width="15" height="13" rx="1.5"/><rect x="4" y="22" width="15" height="13" rx="1.5"/><rect x="21" y="22" width="15" height="13" rx="1.5"/>'),
+  polaroid: PK.svg("0 0 40 40", '<g transform="rotate(-8 12 20)"><rect x="4" y="9" width="14" height="18" rx="1"/><path d="M6.5 11.5h9v9h-9z"/></g><g transform="rotate(7 28 20)"><rect x="21" y="11" width="14" height="18" rx="1"/><path d="M23.5 13.5h9v9h-9z"/></g>'),
+  square: PK.svg("0 0 40 40", [4,15,26].map(x=>[5,16,27].map(y=>`<rect x="${x}" y="${y}" width="10" height="9" rx=".8"/>`).join("")).join("")),
+  mosaic: PK.svg("0 0 40 40", '<rect x="4" y="4" width="15" height="20" rx="2"/><rect x="4" y="27" width="15" height="9" rx="2"/><rect x="21" y="4" width="15" height="10" rx="2"/><rect x="21" y="17" width="15" height="19" rx="2"/>')
+};
+const ANIM_ICONS = {
+  fadeup: PK.svg("0 0 40 40", '<path d="M20 6v14M14 12l6-6 6 6" /><path d="M8 26h24" opacity=".9"/><path d="M11 31h18" opacity=".55"/><path d="M14 36h12" opacity=".3"/>'),
+  words: PK.svg("0 0 40 40", '<rect x="4" y="10" width="9" height="5" rx="1.5"/><rect x="16" y="10" width="8" height="5" rx="1.5" opacity=".65"/><rect x="27" y="10" width="9" height="5" rx="1.5" opacity=".35"/><rect x="4" y="22" width="12" height="5" rx="1.5" opacity=".9"/><rect x="19" y="22" width="9" height="5" rx="1.5" opacity=".55"/><rect x="4" y="33" width="8" height="4" rx="1.5" opacity=".3"/>'),
+  blur: PK.svg("0 0 40 40", '<circle cx="20" cy="20" r="4" fill="currentColor" stroke="none"/><circle cx="20" cy="20" r="9" opacity=".55"/><circle cx="20" cy="20" r="14" opacity=".28" stroke-dasharray="2 3"/>'),
+  none: NONE_ICON
+};
+const LOTUS_ICON = PK.svg("0 0 40 40", '<path d="M20 30C14 27 12 19 20 8c8 11 6 19 0 22z"/><path d="M20 30c-6 1-12-3-13-11 6 0 11 3 13 11zM20 30c6 1 12-3 13-11-6 0-11 3-13 11z" opacity=".75"/><path d="M8 33h24" opacity=".5"/>');
+const COVER_ICONS = { door:"🚪", curtain:"🎭", lock:"🔒", rings:"💍", lotus:LOTUS_ICON, heart:"💗" };
+
+function renderPicker(id, items, current, onPick){
+  const el = $(id);
+  if(!el) return;
+  el.innerHTML = items.map(it => {
+    const t = escapeHtml(it.title || "");
+    return `<button type="button" class="pick-tile${it.key === current ? " active" : ""}" data-k="${it.key}" title="${t}" aria-label="${t}" aria-pressed="${it.key === current}">${it.inner}</button>`;
   }).join("");
-  grid.querySelectorAll(".theme-card").forEach(card => {
-    card.addEventListener("click", () => {
-      state.theme = card.dataset.theme;
-      buildThemePicker();
-      update();
-    });
-  });
+  el.querySelectorAll(".pick-tile").forEach(b => b.addEventListener("click", () => onPick(b.dataset.k)));
 }
 
-function buildEffectPicker(){
-  const grid = $("effectGrid");
-  grid.innerHTML = Object.keys(EFFECTS).map(key => {
-    const e = EFFECTS[key];
-    return `<div class="effect-card${state.effect===key?" active":""}" data-effect="${key}" title="${escapeHtml(e.label)}">
-      <div class="effect-icon">${e.icon}</div>
-    </div>`;
-  }).join("");
-  grid.querySelectorAll(".effect-card").forEach(card => {
-    card.addEventListener("click", () => {
-      state.effect = card.dataset.effect;
-      buildEffectPicker();
-      update();
-    });
-  });
+function buildThemeSelect(){
+  if(!hasOwn(THEMES, state.theme)) state.theme = "gold";
+  renderPicker("pickTheme", Object.keys(THEMES).map(k => ({ key:k, title:THEMES[k].label, inner:`<span class="pick-swatch" style="background:${THEMES[k].swatch}"></span>` })),
+    state.theme, k => { state.theme = k; buildThemeSelect(); update(); });
 }
-
-function buildKbachPicker(){
-  if(!hasOwn(KBACH_FRAME_STYLES, state.frameStyle)) state.frameStyle = "diagbranch";
-  const grid = $("kbachGrid");
-  grid.innerHTML = Object.keys(KBACH_FRAME_STYLES).map(key => {
-    const k = KBACH_FRAME_STYLES[key];
-    return `<div class="effect-card${state.frameStyle===key?" active":""}" data-kbach="${key}" title="${escapeHtml(k.label)}">
-      <div class="effect-icon">${k.icon}</div>
-    </div>`;
-  }).join("");
-  grid.querySelectorAll(".effect-card").forEach(card => {
-    card.addEventListener("click", () => {
-      state.frameStyle = card.dataset.kbach;
-      buildKbachPicker();
-      update();
-    });
-  });
+function buildFontSelects(){
+  if(!hasOwn(FONT_KM, state.fontKm)) state.fontKm = Object.keys(FONT_KM)[0];
+  if(!hasOwn(FONT_EN, state.fontEn)) state.fontEn = Object.keys(FONT_EN)[0];
+  renderPicker("pickFontKm", Object.keys(FONT_KM).map(k => ({ key:k, title:FONT_KM[k].name, inner:`<span class="pick-sample" style="font-family:${FONT_KM[k].display}">ក</span>` })),
+    state.fontKm, k => { state.fontKm = k; buildFontSelects(); update(); });
+  renderPicker("pickFontEn", Object.keys(FONT_EN).map(k => ({ key:k, title:FONT_EN[k].name, inner:`<span class="pick-sample" style="font-family:${FONT_EN[k].display}">Aa</span>` })),
+    state.fontEn, k => { state.fontEn = k; buildFontSelects(); update(); });
 }
-
-const LOTUS_ICON_SVG = '<svg viewBox="0 0 32 32" width="14" height="14" fill="currentColor" aria-hidden="true" style="display:block"><g><ellipse cx="16" cy="9" rx="4.2" ry="7.5"/><ellipse cx="16" cy="9" rx="4.2" ry="7.5" transform="rotate(72 16 16)"/><ellipse cx="16" cy="9" rx="4.2" ry="7.5" transform="rotate(144 16 16)"/><ellipse cx="16" cy="9" rx="4.2" ry="7.5" transform="rotate(216 16 16)"/><ellipse cx="16" cy="9" rx="4.2" ry="7.5" transform="rotate(288 16 16)"/></g><circle cx="16" cy="16" r="2.6" fill="#fff" opacity=".55"/></svg>';
-const COVER_ICONS = { door:"🚪", curtain:"🎭", lock:"🔒", envelope:"🎁", lotus:LOTUS_ICON_SVG, book:"📜" };
-
-function buildCoverGridPicker(){
-  if(!COVER_STYLE_KEYS.includes(state.openStyle)) state.openStyle = "door";
-  const grid = $("coverGridPicker");
-  grid.innerHTML = COVER_STYLE_KEYS.map(key => {
-    const c = COVER_STYLES[key];
-    return `<div class="effect-card${state.openStyle===key?" active":""}" data-cover="${key}" title="${escapeHtml(c.label)}">
-      <div class="effect-icon">${COVER_ICONS[key] || "•"}</div>
-    </div>`;
-  }).join("");
-  grid.querySelectorAll(".effect-card").forEach(card => {
-    card.addEventListener("click", () => {
-      state.openStyle = card.dataset.cover;
-      try{ sessionStorage.removeItem("wib-cover-seen"); }catch(e){}
-      buildCoverGridPicker();
+function buildGalleryStyleSelect(){
+  if(!hasOwn(GALLERY_STYLES, state.galleryStyle)) state.galleryStyle = "grid";
+  renderPicker("pickGallery", Object.keys(GALLERY_STYLES).map(k => ({ key:k, title:GALLERY_STYLES[k].label, inner:GALLERY_ICONS[k] })),
+    state.galleryStyle, k => { state.galleryStyle = k; buildGalleryStyleSelect(); update(); });
+}
+function buildKbachFrameSelect(){
+  if(!hasOwn(KBACH_FRAME_STYLES, state.kbachFrame)) state.kbachFrame = "none";
+  renderPicker("pickKbach", Object.keys(KBACH_FRAME_STYLES).map(k => ({ key:k, title:KBACH_FRAME_STYLES[k].label, inner:KBACH_ICONS[k] })),
+    state.kbachFrame, k => { state.kbachFrame = k; buildKbachFrameSelect(); update(); });
+}
+function buildTextAnimSelect(){
+  if(!hasOwn(TEXT_ANIM_STYLES, state.textAnim)) state.textAnim = "fadeup";
+  renderPicker("pickAnim", Object.keys(TEXT_ANIM_STYLES).map(k => ({ key:k, title:TEXT_ANIM_STYLES[k].label, inner:ANIM_ICONS[k] })),
+    state.textAnim, k => {
+      state.textAnim = k; buildTextAnimSelect();
+      try{ sessionStorage.removeItem("wib-anim-seen"); }catch(e){}   // replay the animation in the preview straight away
       update();
     });
-  });
+}
+function buildCoverStyleSelect(){
+  if(!hasOwn(COVER_STYLES, state.openStyle)) state.openStyle = "door";
+  renderPicker("pickCover", COVER_STYLE_KEYS.map(k => ({ key:k, title:COVER_STYLES[k].label, inner:COVER_ICONS[k] })),
+    state.openStyle, k => {
+      state.openStyle = k; buildCoverStyleSelect();
+      try{ sessionStorage.removeItem("wib-cover-seen"); }catch(e){}   // show the new style in the preview straight away
+      update();
+    });
   $("coverAlways").checked = !!state.coverAlways;
+  refreshMusicUI();
 }
 $("coverAlways").addEventListener("change", e => {
   state.coverAlways = e.target.checked;
   try{ sessionStorage.removeItem("wib-cover-seen"); }catch(err){}
+  refreshMusicUI();
   update();
 });
 
@@ -1541,15 +2081,16 @@ function buildTimeline(){
   const list = $("timelineList");
   list.innerHTML = state.timeline.map((item,i) => `
     <div class="item-card" data-i="${i}">
-      <div class="tl-row">
-        <input type="text" class="tl-time-in" value="${(item.time||"").replace(/"/g,"&quot;")}" placeholder="ម៉ោង">
-        <input type="text" class="tl-name-in" value="${(item.name||"").replace(/"/g,"&quot;")}" placeholder="ឈ្មោះកម្មវិធី (ខ្មែរ)">
-        <button class="icon-btn tl-remove" type="button" title="លុប">×</button>
-      </div>
-      <div class="lang-tag">English</div>
-      <div class="tl-row en-row">
-        <input type="text" class="tl-time-en-in" value="${(item.timeEn||"").replace(/"/g,"&quot;")}" placeholder="Time">
-        <input type="text" class="tl-name-en-in" value="${(item.nameEn||"").replace(/"/g,"&quot;")}" placeholder="Program Name (English)">
+      <div class="tl-head"><button class="icon-btn tl-remove" type="button" title="លុប">×</button></div>
+      <div class="row2">
+        <div class="tl-col">
+          <input type="text" class="tl-time-in" value="${(item.time||"").replace(/"/g,"&quot;")}" placeholder="ម៉ោង (ខ្មែរ)">
+          <input type="text" class="tl-name-in" value="${(item.name||"").replace(/"/g,"&quot;")}" placeholder="ឈ្មោះកម្មវិធី (ខ្មែរ)">
+        </div>
+        <div class="tl-col">
+          <input type="text" class="tl-time-en-in" value="${(item.timeEn||"").replace(/"/g,"&quot;")}" placeholder="Time (English)">
+          <input type="text" class="tl-name-en-in" value="${(item.nameEn||"").replace(/"/g,"&quot;")}" placeholder="Program Name (English)">
+        </div>
       </div>
     </div>`).join("");
   list.querySelectorAll(".item-card").forEach(row => {
@@ -1589,7 +2130,47 @@ function buildCoverPhoto(){
       }
     });
   }
+  buildCoverFocus();
 }
+
+function buildCoverFocus(){
+  const box = $("coverFocusBox");
+  if(!box) return;
+  const has = !!state.coverPhoto;
+  box.style.display = has ? "block" : "none";
+  if(!has) return;
+  if($("focusImg").getAttribute("src") !== state.coverPhoto) $("focusImg").src = state.coverPhoto;
+  $("focusDot").style.left = state.coverFocusX + "%";
+  $("focusDot").style.top = state.coverFocusY + "%";
+  $("coverBlur").value = state.coverBlur;   $("coverBlurVal").textContent = state.coverBlur ? state.coverBlur + " px" : "បិទ";
+  $("coverSharp").value = state.coverSharp; $("coverSharpVal").textContent = state.coverSharp + "%";
+}
+(function bindCoverFocus(){
+  const pick = $("focusPick");
+  if(!pick) return;
+  let dragging = false;
+  function setFromEvent(e){
+    const r = pick.getBoundingClientRect();
+    if(!r.width || !r.height) return;
+    state.coverFocusX = Math.max(0, Math.min(100, Math.round((e.clientX - r.left) / r.width * 100)));
+    state.coverFocusY = Math.max(0, Math.min(100, Math.round((e.clientY - r.top) / r.height * 100)));
+    $("focusDot").style.left = state.coverFocusX + "%";
+    $("focusDot").style.top = state.coverFocusY + "%";
+    scheduleUpdate();
+  }
+  pick.addEventListener("pointerdown", e => { dragging = true; try{ pick.setPointerCapture(e.pointerId); }catch(err){} setFromEvent(e); e.preventDefault(); });
+  pick.addEventListener("pointermove", e => { if(dragging) setFromEvent(e); });
+  const stop = () => { dragging = false; };
+  pick.addEventListener("pointerup", stop);
+  pick.addEventListener("pointercancel", stop);
+  $("coverBlur").addEventListener("input", e => { state.coverBlur = +e.target.value; $("coverBlurVal").textContent = state.coverBlur ? state.coverBlur + " px" : "បិទ"; scheduleUpdate(); });
+  $("coverSharp").addEventListener("input", e => { state.coverSharp = +e.target.value; $("coverSharpVal").textContent = state.coverSharp + "%"; scheduleUpdate(); });
+  $("coverFocusReset").addEventListener("click", () => {
+    state.coverBlur = defaultState.coverBlur; state.coverFocusX = defaultState.coverFocusX;
+    state.coverFocusY = defaultState.coverFocusY; state.coverSharp = defaultState.coverSharp;
+    buildCoverFocus(); update();
+  });
+})();
 
 function buildContacts(){
   const list = $("contactList");
@@ -2635,6 +3216,9 @@ function buildTemplateChips(){
         if(el) el.value = text;
         list.querySelectorAll(".template-chip-lg").forEach(c => c.classList.remove("chosen"));
         chip.classList.add("chosen");
+        list.style.display = "none";   // choice made: fold the list away again
+        toggleBtn.textContent = spec.toggleLabel + " (" + spec.items.length + ")";
+        toggleBtn.classList.remove("expanded");
         update();
       });
     });
@@ -2679,6 +3263,9 @@ function buildTimelineTemplates(){
       state.timeline = JSON.parse(JSON.stringify(preset.items));
       list.querySelectorAll(".template-chip-lg").forEach(c => c.classList.remove("chosen"));
       chip.classList.add("chosen");
+      list.style.display = "none";   // choice made: fold the list away again
+      toggleBtn.textContent = "ជ្រើសរើសគំរូកម្មវិធីពិធី (" + TIMELINE_PRESETS.length + ")";
+      toggleBtn.classList.remove("expanded");
       buildTimeline();
       update();
     });
@@ -2694,16 +3281,18 @@ function bindSimpleFields(){
     welcomeTextEn:"welcomeTextEn", host1En:"host1En", host2En:"host2En",
     venueName:"venueName", venueAddr:"venueAddr",
     venueNameEn:"venueNameEn", venueAddrEn:"venueAddrEn",
-    venueMapLink:"venueMapLink"
+    venueMapLink:"venueMapLink",
+    venueCoords:"venueCoords",
+    videoUrl:"videoUrl"
   };
   Object.entries(map).forEach(([id,key]) => {
     const el = $(id);
     el.value = state[key] || "";
-    el.addEventListener("input", () => {
+    el.oninput = () => {
       state[key] = el.value;
       if(id === "eventDate") updateEventDateReadback_();
       scheduleUpdate();
-    });
+    };
   });
   updateEventDateReadback_();
 }
@@ -2718,7 +3307,7 @@ function updateEventDateReadback_(){
 
 function update(){
   saveDraft();
-  $("frame").srcdoc = renderInvitation(state);
+  $("frame").srcdoc = renderInvitation(Object.assign({}, state, { __preview:true }));
 }
 
 let updateTimer = null;
@@ -2726,7 +3315,7 @@ function scheduleUpdate(){
   saveDraft();
   if(updateTimer) clearTimeout(updateTimer);
   updateTimer = setTimeout(() => {
-    $("frame").srcdoc = renderInvitation(state);
+    $("frame").srcdoc = renderInvitation(Object.assign({}, state, { __preview:true }));
   }, 450);
 }
 
@@ -2781,10 +3370,12 @@ window.addEventListener("touchmove", e => {
 }, {passive:true});
 window.addEventListener("touchend", () => { resizing = false; });
 
-buildThemePicker();
-buildEffectPicker();
-buildKbachPicker();
-buildCoverGridPicker();
+buildThemeSelect();
+buildFontSelects();
+buildCoverStyleSelect();
+buildGalleryStyleSelect();
+buildKbachFrameSelect();
+buildTextAnimSelect();
 buildTimeline();
 buildTimelineTemplates();
 buildContacts();
@@ -2795,6 +3386,55 @@ bindSimpleFields();
 restoreGuestFilesUI();
 update();
 refreshMusicUI();
+// ---------------------------------------------------------------------
+// Ready-made templates: apply a whole look in one click; only EMPTY text fields are filled with samples.
+// Photos, cover photo, song, map/video links, guest names and publish info are never touched.
+// ---------------------------------------------------------------------
+function refreshAllBuildersFromState_(){
+  buildThemeSelect(); buildFontSelects(); buildCoverStyleSelect(); buildGalleryStyleSelect();
+  buildKbachFrameSelect(); buildTextAnimSelect(); buildTimeline(); buildTimelineTemplates(); buildContacts();
+  buildPhotos(); buildCoverPhoto(); buildTemplateChips(); bindSimpleFields(); update();
+}
+function buildPresetCards(){
+  const box = $("presetList");
+  if(!box) return;
+  box.innerHTML = Object.keys(INVITATION_PRESETS).map(id => {
+    const p = INVITATION_PRESETS[id];
+    return `<button type="button" class="preset-card" data-id="${id}"><span class="preset-swatch" style="background:${p.swatch}"></span><span class="preset-txt"><b>${p.label}</b><small>${p.desc}</small></span></button>`;
+  }).join("");
+  box.querySelectorAll(".preset-card").forEach(b => b.addEventListener("click", () => applyPreset(b.dataset.id)));
+}
+function applyPreset(id){
+  const p = INVITATION_PRESETS[id];
+  if(!p) return;
+  Object.assign(state, p.design);
+  const fill = (k, v) => { if(!String(state[k] || "").trim()) state[k] = v; };
+  fill("groomName", SAMPLE_NAMES.km[0]); fill("brideName", SAMPLE_NAMES.km[1]);
+  fill("groomNameEn", SAMPLE_NAMES.en[0]); fill("brideNameEn", SAMPLE_NAMES.en[1]);
+  fill("eyebrow", TEMPLATES.eyebrow.km[p.tpl]); fill("eyebrowEn", TEMPLATES.eyebrow.en[p.tpl]);
+  fill("welcomeText", TEMPLATES.welcomeText.km[p.tpl]); fill("welcomeTextEn", TEMPLATES.welcomeText.en[p.tpl]);
+  fill("host1", "ឪពុកម្តាយកូនកម្លោះ"); fill("host2", "ឪពុកម្តាយកូនក្រមុំ");
+  fill("host1En", "Parents of the Groom"); fill("host2En", "Parents of the Bride");
+  fill("eventDate", "2026-12-12"); fill("startTime", p.startTime);
+  fill("venueName", "សាលមង្គលការ (ឈ្មោះគំរូ)"); fill("venueNameEn", "Sample Wedding Hall");
+  fill("venueAddr", "ភ្នំពេញ ព្រះរាជាណាចក្រកម្ពុជា"); fill("venueAddrEn", "Phnom Penh, Cambodia");
+  if(state.timeline.every(r => !r.time && !r.name && !r.timeEn && !r.nameEn)){
+    state.timeline = JSON.parse(JSON.stringify(TIMELINE_PRESETS[p.timeline].items));
+  }
+  if(state.contacts.every(c => !c.name && !c.phone && !c.nameEn)){
+    state.contacts = [
+      { name:"គ្រួសារកូនកម្លោះ", phone:"012 345 678", nameEn:"Groom's family" },
+      { name:"គ្រួសារកូនក្រមុំ", phone:"098 765 432", nameEn:"Bride's family" }
+    ];
+  }
+  state = migrateStyle_(state);
+  saveDraft();
+  refreshAllBuildersFromState_();
+  const st = $("presetStatus");
+  if(st) st.textContent = `✅ បានប្រើគំរូ «${p.label}» — ឥឡូវបញ្ចូលរូបភាព ចម្រៀង Link ផែនទី និង Link វិឌីអូ។ ត្រូវប្តូរឈ្មោះ ថ្ងៃ និងទីតាំងគំរូ មុនផ្ញើឲ្យភ្ញៀវ។`;
+}
+buildPresetCards();
+
 // ---------------------------------------------------------------------
 // Backup / restore the whole project as a .json file.
 //  - The song (kept in IndexedDB) is included only if the customer agrees when exporting.
@@ -2810,15 +3450,17 @@ function bkImg(v){ return (typeof v === "string" && BK_IMG_RE.test(v)) ? v : nul
 function normalizeImported(raw){
   const s = JSON.parse(JSON.stringify(defaultState));
   const r = (raw && typeof raw === "object" && !Array.isArray(raw)) ? raw : {};
+  legacyFill_(r);
   ["groomName","brideName","eyebrow","groomNameEn","brideNameEn","eyebrowEn","welcomeText","host1","host2",
    "welcomeTextEn","host1En","host2En","venueName","venueAddr","venueNameEn","venueAddrEn","coverPhotoName"
   ].forEach(k => { s[k] = bkStr(r[k], 20000); });
   s.venueMapLink = /^https?:\/\/\S+$/i.test(bkStr(r.venueMapLink, 2000).trim()) ? bkStr(r.venueMapLink, 2000).trim() : "";
   s.guestNamesFileRaw = bkStr(r.guestNamesFileRaw, 500000);
   s.theme = (typeof r.theme === "string" && hasOwn(THEMES, r.theme)) ? r.theme : defaultState.theme;
-  s.effect = (typeof r.effect === "string" && hasOwn(EFFECTS, r.effect)) ? r.effect : defaultState.effect;
-  s.frameStyle = (typeof r.frameStyle === "string" && hasOwn(KBACH_FRAME_STYLES, r.frameStyle)) ? r.frameStyle : defaultState.frameStyle;
-  s.openStyle = COVER_STYLE_KEYS.includes(r.openStyle) ? r.openStyle : "door";
+  ["kbachFrame","fontKm","fontEn","galleryStyle","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp"]
+    .forEach(k => { if(r[k] !== undefined) s[k] = r[k]; });
+  if(r.kbachFrame === undefined && typeof r.frameStyle === "string") s.kbachFrame = r.frameStyle;
+  s.openStyle = r.openStyle === "envelope" ? "rings" : (r.openStyle === "book" ? "heart" : r.openStyle);
   s.coverAlways = !!r.coverAlways;
   s.eventDate = /^\d{4}-\d{2}-\d{2}$/.test(r.eventDate || "") ? r.eventDate : "";
   s.startTime = /^\d{2}:\d{2}$/.test(r.startTime || "") ? r.startTime : "";
@@ -2837,7 +3479,7 @@ function normalizeImported(raw){
   s.siteSlug = /^[A-Za-z0-9_-]{1,120}$/.test(r.siteSlug || "") ? r.siteSlug : "";
   s.publishedUrl = /^https:\/\/[^\s"'<>]+$/.test(r.publishedUrl || "") ? r.publishedUrl : "";
   s.publishToken = "";   // never taken from a file
-  return s;
+  return migrateStyle_(s);
 }
 function exportProject(){
   const statusEl = $("backupStatus");
