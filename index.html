@@ -6,7 +6,7 @@
 <title>Wedding Invitation Builder (ខ្មែរ/English)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Bokor&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Koulen&family=Odor+Mean+Chey&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{
@@ -203,33 +203,58 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 .focus-pick img{display:block;max-width:100%;max-height:300px;width:auto;height:auto;pointer-events:none;-webkit-user-drag:none;}
 .focus-dot{position:absolute;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;border:2px solid #fff;background:rgba(255,255,255,.2);box-shadow:0 0 0 2px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.45);pointer-events:none;}
 .focus-dot::after{content:"";position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.5);}
-.preset-list{display:flex;flex-direction:column;gap:8px;}
-.preset-card{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:10px 12px;border:1px solid var(--b-line);border-radius:10px;background:var(--b-bg);color:var(--b-ink);cursor:pointer;font-family:inherit;}
-.preset-card:hover{border-color:var(--b-accent);}
+.preset-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.preset-card{display:flex;flex-direction:column;align-items:stretch;gap:8px;text-align:center;width:100%;min-width:0;padding:8px;border:1px solid var(--b-line);border-radius:10px;background:var(--b-bg);color:var(--b-ink);cursor:pointer;font-family:inherit;transition:border-color .15s ease,transform .1s ease,box-shadow .15s ease;}
+.preset-card:hover{border-color:var(--b-accent);transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.08);}
 .preset-card:focus-visible{outline:2px solid var(--b-accent);outline-offset:2px;}
-.preset-swatch{width:44px;height:44px;border-radius:8px;flex-shrink:0;}
-.preset-txt{display:flex;flex-direction:column;gap:2px;min-width:0;}
-.preset-txt b{font-size:14px;}
-.preset-txt small{font-size:12px;color:var(--b-sub);line-height:1.5;}
+.preset-swatch{width:100%;height:54px;border-radius:7px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.10);}
+.preset-txt{display:flex;flex-direction:column;gap:3px;min-width:0;align-items:center;}
+.preset-txt b{font-size:12.5px;line-height:1.4;}
+.preset-txt small{font-size:10.5px;color:var(--b-sub);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 .style-sel-row{display:flex;flex-direction:column;gap:12px;}
 .style-sel-row .field + .field{border-top:1px solid var(--b-line);padding-top:12px;}
 .style-sel-row select[hidden],.vp-lab{display:none;}
 .style-sel-row .field{margin-bottom:0;}
 .style-sel-row label{font-size:11.5px;margin-bottom:4px;}
 
+.export-reminder{margin-top:10px;padding:12px 14px;border:1px solid #F0C36D;border-left:4px solid #F0A500;border-radius:10px;background:#FFF8E6;color:#5A4300;font-size:13px;line-height:1.7;}
+.export-reminder b{color:#7A5200;}
+.export-reminder .er-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;align-items:center;}
+.export-reminder .er-btn{border:none;border-radius:8px;padding:8px 14px;background:linear-gradient(135deg,#F0A500,#F7C948);color:#4A3600;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;}
+.export-reminder .er-btn:hover{filter:brightness(1.05);}
+.export-reminder .er-dismiss{border:none;background:none;color:#7A5200;text-decoration:underline;cursor:pointer;font-size:12.5px;padding:4px;font-family:inherit;}
+.export-reminder.done{border-color:#9AD0A0;border-left-color:#2E7D32;background:#EEF8EF;color:#1F5A25;}
+@media(prefers-color-scheme:dark){.export-reminder{background:#3A2F14;color:#F5DFA8;border-color:#7A5F1E;}.export-reminder b{color:#FFE39A;}.export-reminder .er-dismiss{color:#F5DFA8;}.export-reminder.done{background:#183021;color:#BFE6C5;border-color:#2E6B3A;}}
 /* --- icon pickers (no text): colour, fonts, opening screen, gallery, frame, text animation --- */
-.pick-group{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-top:1px solid var(--b-line);}
+.pick-group{display:block;padding:12px 0;border-top:1px solid var(--b-line);}
 .pick-group:first-of-type{border-top:none;padding-top:0;}
-.pick-head{flex:0 0 28px;height:54px;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;opacity:.85;cursor:help;}
-.pick-head-t{font-size:19px;font-weight:700;color:var(--b-accent);}
-.pick-grid{flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px;min-width:0;}
-.pick-tile{width:100%;height:auto;aspect-ratio:1/1;min-height:54px;padding:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--b-line);border-radius:10px;background:var(--b-panel);color:var(--b-accent);cursor:pointer;font-family:inherit;font-size:26px;line-height:1;transition:border-color .15s ease,transform .1s ease,box-shadow .15s ease;}
+.pick-label{font-size:12.5px;font-weight:600;color:var(--b-sub, var(--b-ink));margin:0 0 8px 2px;letter-spacing:.01em;}
+.pick-grid{display:block;min-width:0;width:100%;}
+.pick-row{display:flex;gap:8px;margin-bottom:8px;}
+.pick-row:last-child{margin-bottom:0;}
+.pick-tile{flex:1 1 0;min-width:0;height:58px;padding:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--b-line);border-radius:10px;background:var(--b-panel);color:var(--b-accent);cursor:pointer;font-family:inherit;font-size:26px;line-height:1;transition:border-color .15s ease,transform .1s ease,box-shadow .15s ease;}
 .pick-tile:hover{border-color:color-mix(in srgb, var(--b-accent) 55%, var(--b-line));transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.08);}
 .pick-tile:focus-visible{outline:2px solid var(--b-accent);outline-offset:2px;}
 .pick-tile.active{border-color:var(--b-accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--b-accent) 18%, transparent);background:color-mix(in srgb, var(--b-accent) 8%, var(--b-panel));}
 .pick-tile svg{width:36px;height:36px;display:block;}
-.pick-tile .pick-swatch{width:34px;height:34px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);}
+.pick-tile:has(.pick-swatch){padding:3px;}
+.pick-tile .pick-swatch{display:block;width:100%;height:100%;border-radius:7px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.10);}
 .pick-tile .pick-sample{font-size:27px;color:var(--b-ink);}
+
+.cover-x{top:6px;right:6px;width:28px;height:28px;border-radius:50%;font-size:16px;line-height:1;cursor:pointer;touch-action:manipulation;}
+@media(max-width:640px){.cover-x{width:34px;height:34px;}}
+/* --- Pre-wedding photos: thumbnail grid, drag handle to reorder (same as the builder) --- */
+#photoGrid.photo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.photo-tile{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:var(--b-line);border:2px solid transparent;}
+.photo-tile img{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none;}
+.photo-tile.dragging{z-index:5;opacity:.9;box-shadow:0 8px 22px rgba(0,0,0,.35);}
+.photo-tile.drop-target{border-color:var(--b-accent);}
+.photo-drag{position:absolute;top:4px;left:4px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;padding:0;border:none;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;cursor:grab;touch-action:none;z-index:2;}
+.photo-drag:active{cursor:grabbing;}
+.photo-drag:focus-visible{outline:2px solid var(--b-accent);outline-offset:2px;}
+.photo-tile .photo-clear{width:26px;height:26px;border-radius:50%;font-size:14px;line-height:1;}
+#photoGrid .photo-add-row{aspect-ratio:4/3;flex-direction:column;text-align:center;padding:4px;font-size:12px;}
+@media(max-width:640px){.photo-drag,.photo-tile .photo-clear{width:32px;height:32px;}}
 </style>
 </head>
 <body>
@@ -270,13 +295,13 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 
     <fieldset>
       <legend><span class="lg-icon">🎨</span>ទម្រង់ (Style)</legend>
-      <div class="pick-group"><div class="pick-head" title="ពណ៌">🎨</div><div class="pick-grid" id="pickTheme"></div></div>
-      <div class="pick-group"><div class="pick-head pick-head-t" title="អក្សរខ្មែរ">ក</div><div class="pick-grid" id="pickFontKm"></div></div>
-      <div class="pick-group"><div class="pick-head pick-head-t" title="អក្សរ English">Aa</div><div class="pick-grid" id="pickFontEn"></div></div>
-      <div class="pick-group"><div class="pick-head" title="អេក្រង់បើកធៀប">💌</div><div class="pick-grid" id="pickCover"></div></div>
-      <div class="pick-group"><div class="pick-head" title="ទម្រង់រូបភាព">🖼️</div><div class="pick-grid" id="pickGallery"></div></div>
-      <div class="pick-group"><div class="pick-head" title="ស៊ុមតុបតែង">🌸</div><div class="pick-grid" id="pickKbach"></div></div>
-      <div class="pick-group"><div class="pick-head" title="ចលនាអត្ថបទពេល Scroll">✨</div><div class="pick-grid" id="pickAnim"></div></div>
+      <div class="pick-group"><div class="pick-label">ពណ៌</div><div class="pick-grid" id="pickTheme"></div></div>
+      <div class="pick-group"><div class="pick-label">អក្សរខ្មែរ</div><div class="pick-grid" id="pickFontKm"></div></div>
+      <div class="pick-group"><div class="pick-label">អក្សរ English</div><div class="pick-grid" id="pickFontEn"></div></div>
+      <div class="pick-group"><div class="pick-label">អេក្រង់បើកធៀប</div><div class="pick-grid" id="pickCover"></div></div>
+      <div class="pick-group"><div class="pick-label">ទម្រង់រូបភាព</div><div class="pick-grid" id="pickGallery"></div></div>
+      <div class="pick-group"><div class="pick-label">ស៊ុមតុបតែង</div><div class="pick-grid" id="pickKbach"></div></div>
+      <div class="pick-group"><div class="pick-label">ចលនាអត្ថបទពេល Scroll</div><div class="pick-grid" id="pickAnim"></div></div>
       <label class="chk-row"><input type="checkbox" id="coverAlways"><span>បង្ហាញអេក្រង់បើកធៀប ទោះមិនមានចម្រៀងក៏ដោយ (បើមានចម្រៀង អេក្រង់នេះបង្ហាញជានិច្ច)</span></label>
     </fieldset>
 
@@ -287,7 +312,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <p class="guest-empty-hint" id="coverStatus"></p>
       <div id="coverFocusBox" style="display:none;margin-top:12px;">
         <label>ទីតាំងចំណុចច្បាស់ (ចុច ឬអូសលើរូប ត្រង់មុខមនុស្ស)</label>
-        <div class="focus-pick" id="focusPick"><img id="focusImg" alt=""><span class="focus-dot" id="focusDot"></span></div>
+        <div class="focus-pick" id="focusPick"><img id="focusImg" alt=""><span class="focus-dot" id="focusDot"></span><button class="photo-clear cover-x" type="button" id="coverClear" title="លុបរូបភាពគម្រប" aria-label="លុបរូបភាពគម្រប">×</button></div>
         <label style="margin-top:12px;">កម្រិតព្រិលគែម <b id="coverBlurVal"></b></label>
         <input type="range" id="coverBlur" min="0" max="40" step="1" style="width:100%;">
         <label style="margin-top:10px;">ទំហំតំបន់ច្បាស់ <b id="coverSharpVal"></b></label>
@@ -323,7 +348,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <legend><span class="lg-icon">📅</span>ថ្ងៃ និង ម៉ោង (ប្រើរួមទាំងពីរភាសា)</legend>
       <div class="row2">
         <div class="field"><label>កាលបរិច្ឆេទ</label><input type="date" id="eventDate"><div id="eventDateReadback" style="margin-top:4px;font-size:12.5px;color:var(--muted,#8a7a6a);"></div></div>
-        <div class="field"><label>ម៉ោងចាប់ផ្តើម (សម្រាប់ការរាប់ថយក្រោយ)</label><input type="time" id="startTime"></div>
+        <div class="field"><label>ម៉ោងចាប់ផ្តើម (ពិសាអាហារ)</label><input type="time" id="startTime"></div>
       </div>
     </fieldset>
 
@@ -385,14 +410,14 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 
     <fieldset>
       <legend><span class="lg-icon">🖼️</span>រូបភាព (Pre-wedding) — រួម</legend>
-      <p class="photo-hint">បញ្ចូលបានតិច-ច្រើនតាមចិត្ត (រហូតដល់ ១០ សន្លឹក) ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា (រូបភាពត្រូវបានបង្រួមទំហំដោយស្វ័យប្រវត្តិ)</p>
+      <p class="photo-hint">បញ្ចូលបានតិច-ច្រើនតាមចិត្ត (រហូតដល់ ១០ សន្លឹក) ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា (រូបភាពត្រូវបានបង្រួមទំហំដោយស្វ័យប្រវត្តិ)។ អូសចំណុច ⋮⋮ លើរូប ដើម្បីប្តូរលំដាប់ (ឬចុចលើចំណុចនោះ រួចប្រើព្រួញលើក្តារចុច)។</p>
       <div class="photo-grid" id="photoGrid"></div>
       <p class="guest-empty-hint" id="photoStatus"></p>
     </fieldset>
 
     <fieldset>
       <legend><span class="lg-icon">🎬</span>វិឌីអូ (Video) — រួម</legend>
-      <p class="photo-hint">ដាក់ Link វិឌីអូ៖ YouTube (រួមទាំង Shorts), Facebook, TikTok, Vimeo ឬឯកសារ .mp4 ផ្ទាល់។ ទុកទទេ បើមិនចង់បង្ហាញ។</p>
+      <p class="photo-hint">ដាក់ Link វិឌីអូ៖ YouTube (រួមទាំង Shorts), Facebook, TikTok, Vimeo ឬឯកសារ .mp4 ផ្ទាល់។ ទុកទទេ បើមិនមានវិឌីអូ ឬមិនចង់បង្ហាញ។</p>
       <div class="field"><label for="videoUrl">Link វិឌីអូ</label>
         <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=..."></div>
     </fieldset>
@@ -407,9 +432,6 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
           <option value="30">30 វិនាទី</option>
           <option value="45">45 វិនាទី</option>
           <option value="60" selected>60 វិនាទី</option>
-          <option value="90">90 វិនាទី</option>
-          <option value="120">120 វិនាទី</option>
-          <option value="0">មិនកំណត់ (កាត់តែពេលធំលើស 2 MB)</option>
         </select>
       </div>
       <input type="file" id="musicFile" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" style="display:none;">
@@ -433,7 +455,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
     </fieldset>
 
     <fieldset>
-      <legend><span class="lg-icon">🎁</span>ធៀបអញ្ជើញផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវ (Guest Copies)</legend>
+      <legend><span class="lg-icon">🎁</span>ធៀបអញ្ជើញតាមឈ្មោះភ្ញៀវ (Guest Copies)</legend>
       <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;">ចុចប៊ូតុងខាងក្រោមម្តងដើម្បី Publish គេហទំព័រ រួចវានឹងបង្កើត <b>Link ផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវម្នាក់ៗ</b> ភ្លាមៗ (គ្មានកំណត់ចំនួន)។ ការទូទាត់មានសុពលភាព ៣០ ថ្ងៃ ដរាបណាមិនប្តូរឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធី។</p>
       <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;color:#C0392B;font-weight:600;">⚠️ សំខាន់៖ បន្ទាប់ពីទូទាត់រួច <u>កុំកែឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធីម្តងទៀត</u> — ព្រោះការទូទាត់ភ្ជាប់ទៅនឹងឈ្មោះ/ថ្ងៃពិតប្រាកដ។ បើកែ ប្រព័ន្ធនឹងសុំទូទាត់ថ្មី ទោះជាអ្នកមានលេខកូដក៏ដោយ (លេខកូដនឹងប្រើមិនកើតរហូតដល់អ្នកបំពេញឈ្មោះ/ថ្ងៃឲ្យដូចដើមវិញ)។</p>
       <div class="field"><label>បញ្ជីឈ្មោះភ្ញៀវ (មួយបន្ទាត់ម្នាក់)</label>
@@ -443,6 +465,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <p class="guest-empty-hint" id="guestCount" style="padding:0 0 10px;text-align:right;"></p>
       <button class="add-btn" id="uploadFilesBtn" type="button" style="margin-top:2px;border:none;background:linear-gradient(135deg,#2E7D32,#66BB6A);color:#fff;font-weight:700;box-shadow:0 3px 10px rgba(46,125,50,.25);">🚀 បង្កើត Link ស្វ័យប្រវត្តិសម្រាប់ភ្ញៀវម្នាក់ៗ</button>
       <div id="publishedUrlBox"></div>
+      <div id="exportReminder"></div>
       <p class="guest-empty-hint" id="genFilesStatus"></p>
       <div id="guestLinksResult"></div>
     </fieldset>
@@ -560,8 +583,8 @@ const EFFECTS = {
 const FONT_KM = {
   moul:{ name:"Moul", display:"'Moul',serif", body:"'Kantumruy Pro',sans-serif" },
   suwannaphum:{ name:"Suwannaphum", display:"'Suwannaphum',serif", body:"'Battambang',sans-serif" },
-  battambang:{ name:"Battambang", display:"'Battambang',serif", body:"'Kantumruy Pro',sans-serif" },
-  bokor:{ name:"Bokor", display:"'Bokor',serif", body:"'Kantumruy Pro',sans-serif" },
+  koulen:{ name:"Koulen", display:"'Koulen','Battambang',serif", body:"'Kantumruy Pro',sans-serif" },
+  odormeanchey:{ name:"Odor Mean Chey", display:"'Odor Mean Chey','Battambang',serif", body:"'Kantumruy Pro',sans-serif" },
   angkor:{ name:"Angkor", display:"'Angkor',serif", body:"'Battambang',sans-serif" },
   moulpali:{ name:"Moulpali", display:"'Moulpali',serif", body:"'Kantumruy Pro',sans-serif" }
 };
@@ -575,8 +598,8 @@ const FONT_EN = {
 };
 // What each theme used to force. Only used to keep old drafts / saved projects looking exactly as before.
 const THEME_FONT_DEFAULTS = {
-  gold:["moul","greatVibes"], rose:["suwannaphum","parisienne"], minimal:["battambang","playfair"],
-  royal:["bokor","ebGaramond"], emerald:["angkor","tangerine"], blush:["moulpali","marckScript"]
+  gold:["moul","greatVibes"], rose:["suwannaphum","parisienne"], minimal:["koulen","playfair"],
+  royal:["odormeanchey","ebGaramond"], emerald:["angkor","tangerine"], blush:["moulpali","marckScript"]
 };
 // ---- Photo gallery layout: chosen separately from colour/font/theme ----
 const GALLERY_STYLES = {
@@ -780,7 +803,7 @@ const TEMPLATES = {
   eyebrow:{
     km:[
       "សូមគោរពអញ្ជើញអ្នកមកចូលរួមព្រឹត្តិការណ៍ដ៏មានតម្លៃមួយនេះ",
-      "ក្នុងជីវិតមានតែថ្ងៃមួយប៉ុណ្ណោះ ដែលយើងចង់ឲ្យអ្នកនៅជាមួយ",
+      "ក្នុងជីវិតមានតែមួយថ្ងៃប៉ុណ្ណោះ ដែលយើងចង់ឲ្យអ្នកនៅជាមួយ",
       "អញ្ជើញអ្នកមកចែករំលែកភាពរីករាយក្នុងថ្ងៃសំខាន់របស់យើង"
     ],
     en:[
@@ -874,7 +897,7 @@ const INVITATION_PRESETS = {
     design:{ theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"polaroid", kbachFrame:"bottomgarland", textAnim:"blur", openStyle:"heart" } },
   elegant:{ label:"ទំនើបថ្លៃថ្នូរ (ខៀវ-មាស)", desc:"វាំងនន · មែកសងខាង · រូបក្រឡាការ៉េ · អក្សរស្រាយម្តងមួយពាក្យ",
     swatch:THEMES.royal.swatch, tpl:2, timeline:2, startTime:"06:30",
-    design:{ theme:"royal", fontKm:"battambang", fontEn:"playfair", galleryStyle:"square", kbachFrame:"sidebranch", textAnim:"words", openStyle:"curtain" } }
+    design:{ theme:"royal", fontKm:"koulen", fontEn:"playfair", galleryStyle:"square", kbachFrame:"sidebranch", textAnim:"words", openStyle:"curtain" } }
 };
 
 const defaultState = {
@@ -948,6 +971,8 @@ function migrateStyle_(s){
   if(!s || typeof s !== "object") return s;
   delete s.effect;   // the falling effect is now chosen by each guest, not by staff
   if(typeof s.frameStyle === "string" && s.kbachFrame === undefined) s.kbachFrame = s.frameStyle;
+  if(s.fontKm === "battambang") s.fontKm = "koulen";          // removed (too thin) -> bold display font
+  else if(s.fontKm === "bokor") s.fontKm = "odormeanchey";    // removed (too thin) -> ornamental display font
   delete s.frameStyle;
   if(s.openStyle === "envelope") s.openStyle = "rings";
   if(s.openStyle === "book") s.openStyle = "heart";
@@ -1655,7 +1680,7 @@ function renderInvitation(s){
 <title>${escapeHtml(s.groomName)} & ${escapeHtml(s.brideName)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Bokor&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Koulen&family=Odor+Mean+Chey&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
 <style>
 :root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--card:${t.card};--border:${t.border};--radius:${t.radius};--display-font:${fk.display};--body-font:${fk.body};--display-font-en:${fe.display};--body-font-en:${fe.body};}
 *{box-sizing:border-box}
@@ -2017,14 +2042,46 @@ const ANIM_ICONS = {
 const LOTUS_ICON = PK.svg("0 0 40 40", '<path d="M20 30C14 27 12 19 20 8c8 11 6 19 0 22z"/><path d="M20 30c-6 1-12-3-13-11 6 0 11 3 13 11zM20 30c6 1 12-3 13-11-6 0-11 3-13 11z" opacity=".75"/><path d="M8 33h24" opacity=".5"/>');
 const COVER_ICONS = { door:"🚪", curtain:"🎭", lock:"🔒", rings:"💍", lotus:LOTUS_ICON, heart:"💗" };
 
+// Each picker is laid out in full-width rows: tiles in a row share the width equally, and the tiles are split
+// as evenly as possible over the rows (e.g. 7 -> 4 + 3), so every group spans the same width and lines up.
+const PICK_MIN_TILE = 48, PICK_GAP = 8;
+function pickerRowSizes(n, width){
+  const perRow = Math.max(3, Math.floor((width + PICK_GAP) / (PICK_MIN_TILE + PICK_GAP)));
+  const rows = Math.max(1, Math.ceil(n / perRow));
+  const base = Math.floor(n / rows), extra = n % rows;
+  return Array.from({ length: rows }, (_, i) => base + (i < extra ? 1 : 0));   // bigger rows first
+}
+let pickerRO = null;
 function renderPicker(id, items, current, onPick){
   const el = $(id);
   if(!el) return;
-  el.innerHTML = items.map(it => {
-    const t = escapeHtml(it.title || "");
-    return `<button type="button" class="pick-tile${it.key === current ? " active" : ""}" data-k="${it.key}" title="${t}" aria-label="${t}" aria-pressed="${it.key === current}">${it.inner}</button>`;
-  }).join("");
-  el.querySelectorAll(".pick-tile").forEach(b => b.addEventListener("click", () => onPick(b.dataset.k)));
+  el._pk = { items, current, onPick };
+  const draw = () => {
+    const p = el._pk;
+    const w = el.clientWidth || 288;
+    const sizes = pickerRowSizes(p.items.length, w);
+    const sig = sizes.join("-") + "|" + p.current + "|" + p.items.length;
+    if(el._pkSig === sig) return;
+    el._pkSig = sig;
+    let idx = 0;
+    el.innerHTML = sizes.map(cnt => {
+      const row = p.items.slice(idx, idx + cnt).map(it => {
+        const t = escapeHtml(it.title || "");
+        const on = it.key === p.current;
+        return `<button type="button" class="pick-tile${on ? " active" : ""}" data-k="${it.key}" title="${t}" aria-label="${t}" aria-pressed="${on}">${it.inner}</button>`;
+      }).join("");
+      idx += cnt;
+      return `<div class="pick-row">${row}</div>`;
+    }).join("");
+    el.querySelectorAll(".pick-tile").forEach(btn => btn.addEventListener("click", () => p.onPick(btn.dataset.k)));
+  };
+  el._pkDraw = draw;
+  el._pkSig = "";
+  draw();
+  if(typeof ResizeObserver !== "undefined"){
+    if(!pickerRO) pickerRO = new ResizeObserver(entries => entries.forEach(en => { if(en.target._pkDraw) en.target._pkDraw(); }));
+    if(!el._pkObserved){ pickerRO.observe(el); el._pkObserved = true; }
+  }
 }
 
 function buildThemeSelect(){
@@ -2035,7 +2092,7 @@ function buildThemeSelect(){
 function buildFontSelects(){
   if(!hasOwn(FONT_KM, state.fontKm)) state.fontKm = Object.keys(FONT_KM)[0];
   if(!hasOwn(FONT_EN, state.fontEn)) state.fontEn = Object.keys(FONT_EN)[0];
-  renderPicker("pickFontKm", Object.keys(FONT_KM).map(k => ({ key:k, title:FONT_KM[k].name, inner:`<span class="pick-sample" style="font-family:${FONT_KM[k].display}">ក</span>` })),
+  renderPicker("pickFontKm", Object.keys(FONT_KM).map(k => ({ key:k, title:FONT_KM[k].name, inner:`<span class="pick-sample" style="font-family:${FONT_KM[k].display}">កខ</span>` })),
     state.fontKm, k => { state.fontKm = k; buildFontSelects(); update(); });
   renderPicker("pickFontEn", Object.keys(FONT_EN).map(k => ({ key:k, title:FONT_EN[k].name, inner:`<span class="pick-sample" style="font-family:${FONT_EN[k].display}">Aa</span>` })),
     state.fontEn, k => { state.fontEn = k; buildFontSelects(); update(); });
@@ -2106,12 +2163,9 @@ function buildTimeline(){
 function buildCoverPhoto(){
   const grid = $("coverGrid");
   if(state.coverPhoto){
-    grid.innerHTML = `<div class="photo-file-row">
-      <span class="filename-text" title="${(state.coverPhotoName||"").replace(/"/g,"&quot;")}">${(state.coverPhotoName||"រូបភាពគម្រប").replace(/</g,"&lt;")}</span>
-      <button class="photo-clear" type="button" id="coverClear">×</button>
-    </div>`;
-    $("coverClear").addEventListener("click", () => { state.coverPhoto = null; state.coverPhotoName = ""; setImgStatus("coverStatus", ""); buildCoverPhoto(); update(); });
+    grid.innerHTML = ""; grid.style.display = "none";      // the picture itself is shown below (with its × button)
   } else {
+    grid.style.display = "";
     grid.innerHTML = `<div class="photo-add-row">
       <span>+ បញ្ចូលរូបភាពគម្រប</span>
       <input type="file" accept="image/*" id="coverInput">
@@ -2132,6 +2186,16 @@ function buildCoverPhoto(){
   }
   buildCoverFocus();
 }
+(function bindCoverClear(){
+  const x = $("coverClear");
+  if(!x) return;
+  x.addEventListener("pointerdown", e => e.stopPropagation());     // do not move the focus point when tapping ×
+  x.addEventListener("click", e => {
+    e.stopPropagation();
+    state.coverPhoto = null; state.coverPhotoName = "";
+    setImgStatus("coverStatus", ""); buildCoverPhoto(); update();
+  });
+})();
 
 function buildCoverFocus(){
   const box = $("coverFocusBox");
@@ -2199,15 +2263,16 @@ function buildPhotos(){
   if(state.photos.length !== state.photoNames.length){
     state.photoNames = state.photos.map((_,i) => state.photoNames[i] || `រូបភាព ${i+1}`);
   }
-  const zipped = state.photos.map((src,i) => ({src, name: state.photoNames[i]})).filter(p => p.src);
-  state.photos = zipped.map(p => p.src);
-  state.photoNames = zipped.map(p => p.name);
+  const paired = state.photos.map((src,i) => ({src, name: state.photoNames[i]})).filter(p => p.src);
+  state.photos = paired.map(p => p.src);
+  state.photoNames = paired.map(p => p.name);
   const grid = $("photoGrid");
-  const existing = zipped.map((p,i) => `
-    <div class="photo-file-row" data-i="${i}">
-      <span class="filename-text" title="${(p.name||"").replace(/"/g,"&quot;")}">${(p.name||"").replace(/</g,"&lt;")}</span>
-      <button class="photo-clear" type="button" data-i="${i}">×</button>
-    </div>`).join("");
+  const existing = paired.length ? paired.map((p,i) => `
+    <div class="photo-tile" data-i="${i}">
+      <img src="${p.src}" alt="" draggable="false">
+      <button class="photo-drag" type="button" title="អូសដើម្បីប្តូរលំដាប់" aria-label="អូសដើម្បីប្តូរលំដាប់ (ឬប្រើព្រួញ)"><svg viewBox="0 0 10 14" width="10" height="14" aria-hidden="true" fill="currentColor"><circle cx="2.5" cy="2.5" r="1.4"/><circle cx="7.5" cy="2.5" r="1.4"/><circle cx="2.5" cy="7" r="1.4"/><circle cx="7.5" cy="7" r="1.4"/><circle cx="2.5" cy="11.5" r="1.4"/><circle cx="7.5" cy="11.5" r="1.4"/></svg></button>
+      <button class="photo-clear" type="button" data-i="${i}" aria-label="លុបរូបភាព">×</button>
+    </div>`).join("") : "";
   const addTile = state.photos.length < MAX_PHOTOS
     ? `<div class="photo-add-row">
         <span>+ បញ្ចូលរូបភាព (${state.photos.length}/${MAX_PHOTOS})</span>
@@ -2247,6 +2312,59 @@ function buildPhotos(){
       state.photos.splice(i,1);
       state.photoNames.splice(i,1);
       buildPhotos(); update();
+    });
+  });
+  // Reorder: drag the handle (mouse or touch) onto another photo, or focus the handle and press an arrow key.
+  const movePhoto = (from, to) => {
+    if(to < 0 || to >= state.photos.length || to === from) return;
+    const [ph] = state.photos.splice(from, 1); state.photos.splice(to, 0, ph);
+    const [nm] = state.photoNames.splice(from, 1); state.photoNames.splice(to, 0, nm);
+    buildPhotos(); update();
+    const again = grid.querySelector(`.photo-tile[data-i="${to}"] .photo-drag`);
+    if(again && document.activeElement === document.body) again.focus();
+  };
+  grid.querySelectorAll(".photo-drag").forEach(h => {
+    const tile = h.closest(".photo-tile");
+    const from = +tile.dataset.i;
+    h.addEventListener("keydown", e => {
+      const d = (e.key === "ArrowLeft" || e.key === "ArrowUp") ? -1 : (e.key === "ArrowRight" || e.key === "ArrowDown") ? 1 : 0;
+      if(!d) return;
+      e.preventDefault();
+      movePhoto(from, from + d);
+      const again = grid.querySelector(`.photo-tile[data-i="${from + d}"] .photo-drag`);
+      if(again) again.focus();
+    });
+    h.addEventListener("pointerdown", e => {
+      if(e.button !== undefined && e.button !== 0) return;
+      e.preventDefault();
+      const sx = e.clientX, sy = e.clientY;
+      let over = -1;
+      try{ h.setPointerCapture(e.pointerId); }catch(err){}
+      tile.classList.add("dragging");
+      const tiles = Array.from(grid.querySelectorAll(".photo-tile"));
+      const onMove = ev => {
+        tile.style.transform = `translate(${ev.clientX - sx}px, ${ev.clientY - sy}px) scale(1.04)`;
+        over = -1;
+        tiles.forEach((t, k) => {
+          t.classList.remove("drop-target");
+          if(k === from) return;
+          const r = t.getBoundingClientRect();
+          if(ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom){ over = k; t.classList.add("drop-target"); }
+        });
+      };
+      const end = ev => {
+        h.removeEventListener("pointermove", onMove);
+        h.removeEventListener("pointerup", end);
+        h.removeEventListener("pointercancel", end);
+        if(ev.type === "pointerup" && over >= 0){ movePhoto(from, over); }
+        else{
+          tile.classList.remove("dragging"); tile.style.transform = "";
+          tiles.forEach(t => t.classList.remove("drop-target"));
+        }
+      };
+      h.addEventListener("pointermove", onMove);
+      h.addEventListener("pointerup", end);
+      h.addEventListener("pointercancel", end);
     });
   });
 }
@@ -2807,6 +2925,7 @@ async function publishWebsite(){
     statusEl.textContent = "✅ បោះពុម្ពជោគជ័យ! Link គោល: " + data.url;
     renderPublishedUrl();
     generateGuestLinks();
+    try{ showExportReminder_(); }catch(remErr){}   // ask the client to back up the project (does not affect publishing)
   }catch(e){
     console.error("Publish failed:", e);
     if(/fingerprint_mismatch/i.test(String(e && e.message || e))){
@@ -3400,7 +3519,7 @@ function buildPresetCards(){
   if(!box) return;
   box.innerHTML = Object.keys(INVITATION_PRESETS).map(id => {
     const p = INVITATION_PRESETS[id];
-    return `<button type="button" class="preset-card" data-id="${id}"><span class="preset-swatch" style="background:${p.swatch}"></span><span class="preset-txt"><b>${p.label}</b><small>${p.desc}</small></span></button>`;
+    return `<button type="button" class="preset-card" data-id="${id}" title="${p.desc}"><span class="preset-swatch" style="background:${p.swatch}"></span><span class="preset-txt"><b>${p.label}</b><small>${p.desc}</small></span></button>`;
   }).join("");
   box.querySelectorAll(".preset-card").forEach(b => b.addEventListener("click", () => applyPreset(b.dataset.id)));
 }
@@ -3542,6 +3661,39 @@ function importProject(file){
   reader.readAsText(file);
 }
 $("backupExportBtn").addEventListener("click", exportProject);
+
+// ---------------------------------------------------------------------
+// After a successful Publish: remind the client to back up the project (.json).
+// The backup keeps the Link គោល (siteSlug/publishedUrl) and every name/date exactly as paid for, so on a new
+// device or browser they can Import it and re-enter the unlock code. Shown after every successful publish
+// (the content may have changed); it disappears once they export or dismiss it.
+// ---------------------------------------------------------------------
+function hideExportReminder_(){
+  const el = $("exportReminder");
+  if(el) el.innerHTML = "";
+}
+function showExportReminder_(){
+  const el = $("exportReminder");
+  if(!el) return;
+  el.innerHTML = `<div class="export-reminder" role="status">
+    <div>💾 <b>កុំភ្លេច Export ទុក!</b> ឯកសារ .json រក្សា <b>Link គោល</b> ឈ្មោះ និងថ្ងៃពិធីដូចដែលបានទូទាត់។
+    ពេលប្តូរ device ឬ browser គ្រាន់តែ Import ឯកសារនេះ រួចវាយលេខកូដ (Unlock code) ម្តងទៀត។ សូមរក្សាទុកក្នុងទីកន្លែងសុវត្ថិភាព ជាមួយលេខកូដ។</div>
+    <div class="er-actions">
+      <button type="button" class="er-btn" id="erExportBtn">⬇ Export (.json) ឥឡូវនេះ</button>
+      <button type="button" class="er-dismiss" id="erDismissBtn">ទុកសិន</button>
+    </div>
+  </div>`;
+  $("erExportBtn").addEventListener("click", () => { exportProject(); markExported_(); });
+  $("erDismissBtn").addEventListener("click", hideExportReminder_);
+}
+function markExported_(){
+  const el = $("exportReminder");
+  if(!el || !el.firstElementChild) return;
+  el.innerHTML = `<div class="export-reminder done" role="status">✅ បាន Export រួចហើយ — សូមរក្សាឯកសារ .json នោះទុកជាមួយលេខកូដ។</div>`;
+  setTimeout(hideExportReminder_, 8000);
+}
+// exporting from the normal backup button also counts (only if the reminder is currently showing)
+$("backupExportBtn").addEventListener("click", () => { if($("exportReminder") && $("exportReminder").querySelector(".er-btn")) markExported_(); });
 $("backupImportBtn").addEventListener("click", () => $("backupImportFile").click());
 $("backupImportFile").addEventListener("change", e => {
   const file = e.target.files && e.target.files[0];
