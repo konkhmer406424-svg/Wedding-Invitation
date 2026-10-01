@@ -348,7 +348,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <legend><span class="lg-icon">📅</span>ថ្ងៃ និង ម៉ោង (ប្រើរួមទាំងពីរភាសា)</legend>
       <div class="row2">
         <div class="field"><label>កាលបរិច្ឆេទ</label><input type="date" id="eventDate"><div id="eventDateReadback" style="margin-top:4px;font-size:12.5px;color:var(--muted,#8a7a6a);"></div></div>
-        <div class="field"><label>ម៉ោងចាប់ផ្តើម (ពិសាអាហារ)</label><input type="time" id="startTime"></div>
+        <div class="field"><label>ម៉ោងចាប់ផ្តើម (សម្រាប់ការរាប់ថយក្រោយ)</label><input type="time" id="startTime"></div>
       </div>
     </fieldset>
 
@@ -417,7 +417,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 
     <fieldset>
       <legend><span class="lg-icon">🎬</span>វិឌីអូ (Video) — រួម</legend>
-      <p class="photo-hint">ដាក់ Link វិឌីអូ៖ YouTube (រួមទាំង Shorts), Facebook, TikTok, Vimeo ឬឯកសារ .mp4 ផ្ទាល់។ ទុកទទេ បើមិនមានវិឌីអូ ឬមិនចង់បង្ហាញ។</p>
+      <p class="photo-hint">ដាក់ Link វិឌីអូ៖ YouTube (រួមទាំង Shorts), Facebook, TikTok, Vimeo ឬឯកសារ .mp4 ផ្ទាល់។ ទុកទទេ បើមិនចង់បង្ហាញ។ សម្គាល់៖ Facebook/TikTok/Vimeo បង្ហាញក្នុងទំព័របានតែវិឌីអូ «សាធារណៈ» ដែលអនុញ្ញាតឲ្យ embed ប៉ុណ្ណោះ។ Link ខ្លី (fb.watch, facebook.com/share/…, vm.tiktok.com) នឹងបង្ហាញជាប៊ូតុង «មើលវិឌីអូ» ដែលបើក Link នោះ។ YouTube ស្ថិរភាពបំផុត។</p>
       <div class="field"><label for="videoUrl">Link វិឌីអូ</label>
         <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=..."></div>
     </fieldset>
@@ -455,7 +455,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
     </fieldset>
 
     <fieldset>
-      <legend><span class="lg-icon">🎁</span>ធៀបអញ្ជើញតាមឈ្មោះភ្ញៀវ (Guest Copies)</legend>
+      <legend><span class="lg-icon">🎁</span>ធៀបអញ្ជើញផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវ (Guest Copies)</legend>
       <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;">ចុចប៊ូតុងខាងក្រោមម្តងដើម្បី Publish គេហទំព័រ រួចវានឹងបង្កើត <b>Link ផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវម្នាក់ៗ</b> ភ្លាមៗ (គ្មានកំណត់ចំនួន)។ ការទូទាត់មានសុពលភាព ៣០ ថ្ងៃ ដរាបណាមិនប្តូរឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធី។</p>
       <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;color:#C0392B;font-weight:600;">⚠️ សំខាន់៖ បន្ទាប់ពីទូទាត់រួច <u>កុំកែឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធីម្តងទៀត</u> — ព្រោះការទូទាត់ភ្ជាប់ទៅនឹងឈ្មោះ/ថ្ងៃពិតប្រាកដ។ បើកែ ប្រព័ន្ធនឹងសុំទូទាត់ថ្មី ទោះជាអ្នកមានលេខកូដក៏ដោយ (លេខកូដនឹងប្រើមិនកើតរហូតដល់អ្នកបំពេញឈ្មោះ/ថ្ងៃឲ្យដូចដើមវិញ)។</p>
       <div class="field"><label>បញ្ជីឈ្មោះភ្ញៀវ (មួយបន្ទាត់ម្នាក់)</label>
@@ -803,7 +803,7 @@ const TEMPLATES = {
   eyebrow:{
     km:[
       "សូមគោរពអញ្ជើញអ្នកមកចូលរួមព្រឹត្តិការណ៍ដ៏មានតម្លៃមួយនេះ",
-      "ក្នុងជីវិតមានតែមួយថ្ងៃប៉ុណ្ណោះ ដែលយើងចង់ឲ្យអ្នកនៅជាមួយ",
+      "ក្នុងជីវិតមានតែថ្ងៃមួយប៉ុណ្ណោះ ដែលយើងចង់ឲ្យអ្នកនៅជាមួយ",
       "អញ្ជើញអ្នកមកចែករំលែកភាពរីករាយក្នុងថ្ងៃសំខាន់របស់យើង"
     ],
     en:[
@@ -1143,22 +1143,31 @@ function parseVideo(raw){
     if(host === "youtu.be") id = path.split("/")[1];
     else if((m = path.match(/^\/(shorts|embed|live|v)\/([\w-]+)/))){ id = m[2]; vertical = m[1] === "shorts"; }
     else id = u.searchParams.get("v");
-    if(okId(id)) return { kind:"iframe", src:"https://www.youtube-nocookie.com/embed/" + id + "?rel=0&playsinline=1", ratio: vertical ? "9/16" : "16/9", vertical, url:u0 };
+    if(okId(id)) return { kind:"iframe", provider:"youtube", src:"https://www.youtube-nocookie.com/embed/" + id + "?rel=0&playsinline=1", ratio: vertical ? "9/16" : "16/9", vertical, url:u0 };
   }
   if(host === "vimeo.com" || host === "player.vimeo.com"){
     const m = path.match(/(\d{6,12})/);
-    if(m) return { kind:"iframe", src:"https://player.vimeo.com/video/" + m[1], ratio:"16/9", vertical:false, url:u0 };
+    if(m){
+      // unlisted / private Vimeo videos need their hash (vimeo.com/ID/HASH or ?h=HASH), otherwise the player stays black
+      const hm = path.match(/\/\d{6,12}\/([0-9a-f]{8,16})/i);
+      const h = u.searchParams.get("h") || (hm ? hm[1] : "");
+      return { kind:"iframe", provider:"vimeo", src:"https://player.vimeo.com/video/" + m[1] + (/^[\w]{6,20}$/.test(h) ? "?h=" + h : ""), ratio:"16/9", vertical:false, url:u0 };
+    }
   }
   if(host === "tiktok.com"){
     const m = path.match(/\/video\/(\d{8,25})/);
-    if(m) return { kind:"iframe", src:"https://www.tiktok.com/embed/v2/" + m[1], ratio:"9/16", vertical:true, url:u0 };
+    if(m) return { kind:"iframe", provider:"tiktok", src:"https://www.tiktok.com/embed/v2/" + m[1], ratio:"9/16", vertical:true, url:u0 };
+    // short links (vm.tiktok.com, tiktok.com/t/…) hide the video id and cannot be resolved in the browser -> button to open it
   }
-  if(host === "facebook.com" || host === "fb.watch" || host === "fb.com"){
-    const vertical = /\/reel\//.test(path);
-    return { kind:"iframe", src:"https://www.facebook.com/plugins/video.php?href=" + encodeURIComponent(u0) + "&show_text=false", ratio: vertical ? "9/16" : "16/9", vertical, url:u0 };
+  if(host === "facebook.com" || host === "fb.com"){
+    // Facebook's video player only embeds PUBLIC videos given by their full address; "share" links redirect and show a black box
+    if(!/^\/share\//.test(path) && /\/(videos?|watch|reel|reels)\b|[?&]v=/.test(path + u.search)){
+      const vertical = /\/reels?\//.test(path);
+      return { kind:"iframe", provider:"facebook", src:"https://www.facebook.com/plugins/video.php?href=" + encodeURIComponent(u0) + "&show_text=false&width=" + (vertical ? 340 : 560), ratio: vertical ? "9/16" : "16/9", vertical, url:u0 };
+    }
   }
-  if(/\.(mp4|webm|mov|m4v)$/i.test(path)) return { kind:"video", src:u0, ratio:"16/9", vertical:false, url:u0 };
-  return { kind:"link", src:u0, url:u0 };
+  if(/\.(mp4|webm|mov|m4v)$/i.test(path)) return { kind:"video", provider:"file", src:u0, ratio:"16/9", vertical:false, url:u0 };
+  return { kind:"link", provider:"link", src:u0, url:u0 };
 }
 // A small map preview for the venue card. Uses the coordinates inside the pasted Google Maps link when there are any,
 // otherwise searches by venue name + address. No API key needed. The embed itself is not touchable (so it never
@@ -1188,10 +1197,18 @@ function buildVideoHtml(v, lang){
     return `<a class="video-card" href="${escapeHtml(v.src)}" target="_blank" rel="noopener"><span class="vc-play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span><span class="vc-host">${escapeHtml(host)}</span><span class="vc-cta">${t}</span></a>`;
   }
   const style = `--vr:${v.ratio};${v.vertical ? "max-width:340px;" : ""}`;
-  const inner = v.kind === "video"
-    ? `<video src="${escapeHtml(v.src)}" controls playsinline preload="metadata"></video>`
-    : `<iframe src="${escapeHtml(v.src)}" loading="lazy" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Video"></iframe>`;
-  return `<div class="video-wrap" style="${style}">${inner}</div>`;
+  if(v.kind === "video"){
+    // If the file cannot be played (blocked, wrong format, not a direct link) swap the black box for a "watch video" button.
+    const card = buildVideoHtml({ kind:"link", src:v.url, url:v.url }, lang).replace('class="video-card"', 'class="video-card vid-hide"');
+    const src = escapeHtml(v.src) + (v.src.indexOf("#") < 0 ? "#t=0.1" : "");   // #t=0.1 makes iOS show the first frame instead of black
+    return `<div class="video-wrap" style="${style}"><video src="${src}" controls playsinline preload="metadata" onerror="var w=this.parentNode;w.classList.add('vid-hide');var c=w.nextElementSibling;if(c)c.classList.remove('vid-hide');"></video></div>${card}`;
+  }
+  const iframe = `<div class="video-wrap" style="${style}"><iframe src="${escapeHtml(v.src)}" loading="lazy" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Video"></iframe></div>`;
+  if(v.provider === "youtube") return iframe;
+  // Facebook / TikTok / Vimeo only play if the video is public and embedding is allowed (and not in every in-app browser).
+  // The page cannot detect a failed embed, so always offer a plain link underneath.
+  const cap = lang === "km" ? "បើមិនឃើញវិឌីអូ សូមចុចទីនេះដើម្បីមើល" : "Video not showing? Tap here to watch";
+  return iframe + `<a class="video-open" href="${escapeHtml(v.url)}" target="_blank" rel="noopener">▶ ${cap}</a>`;
 }
 
 function buildSection(s, t, lang){
@@ -1786,6 +1803,9 @@ section{padding:30px 0;}
 @media(prefers-reduced-motion:reduce){.map-pin-ring{animation:none;opacity:.4;}}
 .map-embed-hit{position:absolute;inset:0;z-index:2;display:block;}
 .map-embed-tag{position:absolute;z-index:3;left:10px;bottom:10px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.94);color:#222;font-size:12.5px;font-style:normal;box-shadow:0 2px 8px rgba(0,0,0,.25);pointer-events:none;}
+.vid-hide{display:none!important;}
+.video-open{display:block;text-align:center;margin:10px auto 0;font-size:12.5px;color:var(--accent-1);text-decoration:underline;text-underline-offset:3px;opacity:.9;}
+.video-open:hover{opacity:1;}
 .video-wrap{position:relative;width:100%;margin:0 auto;aspect-ratio:var(--vr,16/9);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:#000;box-shadow:0 8px 20px rgba(0,0,0,.12);}\n.video-wrap iframe,.video-wrap video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000;}\n.venue-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px;text-align:center;}
 .venue-name{font-size:25px;margin:0 0 8px;}
 .venue-addr{color:var(--ink);opacity:.75;font-size:16px;margin:0 0 16px;}
