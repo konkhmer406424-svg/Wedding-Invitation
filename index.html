@@ -238,7 +238,12 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
 .pick-tile.active{border-color:var(--b-accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--b-accent) 18%, transparent);background:color-mix(in srgb, var(--b-accent) 8%, var(--b-panel));}
 .pick-tile svg{width:36px;height:36px;display:block;}
 .pick-tile:has(.pick-swatch){padding:3px;}
+.pick-tile:has(.kbach-thumb){height:92px;padding:3px;}
+.pick-tile .kbach-thumb{display:block;width:100%;height:100%;object-fit:contain;border-radius:6px;background:#fffaf0;}
 .pick-tile .pick-swatch{display:block;width:100%;height:100%;border-radius:7px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.10);}
+.frame-custom-box{margin:-2px 0 16px;padding:12px;border:1px dashed var(--b-line);border-radius:10px;}
+.frame-prev{position:relative;margin-top:2px;border-radius:8px;overflow:hidden;border:1px solid var(--b-line);background:repeating-conic-gradient(#d9d5cd 0% 25%, #f4f2ef 0% 50%) 50% / 16px 16px;}
+.frame-prev img{display:block;width:100%;max-height:220px;object-fit:contain;}
 .pick-tile .pick-sample{font-size:27px;color:var(--b-ink);}
 
 .cover-x{top:6px;right:6px;width:28px;height:28px;border-radius:50%;font-size:16px;line-height:1;cursor:pointer;touch-action:manipulation;}
@@ -300,7 +305,10 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <div class="pick-group"><div class="pick-label">អក្សរ English</div><div class="pick-grid" id="pickFontEn"></div></div>
       <div class="pick-group"><div class="pick-label">អេក្រង់បើកធៀប</div><div class="pick-grid" id="pickCover"></div></div>
       <div class="pick-group"><div class="pick-label">ទម្រង់រូបភាព</div><div class="pick-grid" id="pickGallery"></div></div>
-      <div class="pick-group"><div class="pick-label">ស៊ុមតុបតែង</div><div class="pick-grid" id="pickKbach"></div></div>
+      <div class="pick-group"><div class="pick-label">ស៊ុម (នៅពីលើ ជាប់អេក្រង់)</div><div class="pick-grid" id="pickKbach"></div></div>
+      <div id="frameCustomBox"></div>
+      <div class="pick-group"><div class="pick-label">ផ្ទៃខាងក្រោយ (នៅពីក្រោយ ជាប់អេក្រង់)</div><div class="pick-grid" id="pickKbachBg"></div></div>
+      <div id="bgCustomBox"></div>
       <div class="pick-group"><div class="pick-label">ចលនាអត្ថបទពេល Scroll</div><div class="pick-grid" id="pickAnim"></div></div>
       <label class="chk-row"><input type="checkbox" id="coverAlways"><span>បង្ហាញអេក្រង់បើកធៀប ទោះមិនមានចម្រៀងក៏ដោយ (បើមានចម្រៀង អេក្រង់នេះបង្ហាញជានិច្ច)</span></label>
     </fieldset>
@@ -348,7 +356,7 @@ iframe{width:100%;max-width:820px;height:100%;border:1px solid var(--b-line);bor
       <legend><span class="lg-icon">📅</span>ថ្ងៃ និង ម៉ោង (ប្រើរួមទាំងពីរភាសា)</legend>
       <div class="row2">
         <div class="field"><label>កាលបរិច្ឆេទ</label><input type="date" id="eventDate"><div id="eventDateReadback" style="margin-top:4px;font-size:12.5px;color:var(--muted,#8a7a6a);"></div></div>
-        <div class="field"><label>ម៉ោងចាប់ផ្តើម (ពិសារអាហារ)</label><input type="time" id="startTime"></div>
+        <div class="field"><label>ម៉ោងចាប់ផ្តើម (សម្រាប់ការរាប់ថយក្រោយ)</label><input type="time" id="startTime"></div>
       </div>
     </fieldset>
 
@@ -623,15 +631,47 @@ const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square",
 // Fixed decorative Kbach Khmer border: stays anchored to the screen edges while the invitation content
 // scrolls underneath it. Colours are drawn from the active theme (--accent-1 / --accent-2 / --bg), so no
 // separate colour picker is needed here.
-const KBACH_FRAME_STYLES = {
+// ===== រូបស៊ុម / ផ្ទៃខាងក្រោយ ជាឯកសាររូបភាព (PNG) នៅលើ GitHub =====
+// ដាក់ឯកសារនៅ folder តែមួយជាមួយ index.html (root)៖  frame1.png … frame5.png  និង  bg1.png … bg5.png
+// ស៊ុមនីមួយៗជារូប PNG ថ្លា "ការ៉េ" ១ ឯកសារ (ទំហំណាក៏បាន ឧ. 1080×1080) ហើយកូដកាត់ជា ៩ ចំណែក (9-slice)៖
+//   ជ្រុងទាំង ៤ = ផ្នែកក្បាច់ធំ  |  គែមទាំង ៤ = ផ្នែកក្បាច់ដដែលៗ  → ដូច្នេះស៊ុមមិនលាតខុសរូបលើអេក្រង់ណាក៏ដោយ។
+// ទំហំជ្រុងក្នុងរូប = 3/8 នៃទំហំរូប (រូប 1080 → ជ្រុង 405px)។ តម្លៃ 405 នេះនៅក្នុង CSS ឈ្មោះ .kb-frame (border-image-slice)។
+// ចង់ប្តូររូប គ្រាន់តែ upload រូបថ្មីដាក់ឈ្មោះដូចគ្នា (ជំនួសរូបចាស់) ដោយមិនចាំបាច់កែកូដ។
+// ASSET_BASE_OVERRIDE៖ ទុកទទេ = ប្រើ folder តែមួយជាមួយ index.html របស់ Builder នេះ។
+// បើរូបនៅកន្លែងផ្សេង ដាក់ URL ពេញ ឧ. "https://USERNAME.github.io/REPO/assets/"  (ត្រូវបញ្ចប់ដោយ /)
+const ASSET_BASE_OVERRIDE = "";
+const ASSET_VERSION = "2";   // ប្តូរលេខនេះ (2, 3 …) ពេលជំនួសរូបថ្មី ដើម្បីបំបាត់ cache
+function assetBase(){
+  if(ASSET_BASE_OVERRIDE) return ASSET_BASE_OVERRIDE;
+  try{ return new URL("./", location.href).href; }catch(e){ return "./"; }
+}
+const KBACH_FRAME_STYLES = {   // FRAME: នៅពីលើខ្លឹមសារ ជាប់គែមអេក្រង់
   none:{ label:"គ្មាន" },
-  diagbranch:{ label:"មែកទ្រេត" },
-  fullwrap:{ label:"ព័ទ្ធពេញ" },
-  onecorner:{ label:"ជ្រុងតែមួយ" },
-  bottomgarland:{ label:"កម្រងក្រោម" },
-  sidebranch:{ label:"សងខាង" },
-  scatter:{ label:"ទីតាំងសេរី" }
+  frame1:{ label:"ស៊ុម ១ — ផ្កាមាសជ្រុង", file:"frame1.png" },
+  frame2:{ label:"ស៊ុម ២ — ស្លឹកឈើសងខាង", file:"frame2.png" },
+  frame3:{ label:"ស៊ុម ៣ — ស៊ុមមាសពីរជាន់", file:"frame3.png" },
+  frame4:{ label:"ស៊ុម ៤ — ផ្កាព្យួរពីលើ", file:"frame4.png" },
+  frame5:{ label:"ស៊ុម ៥ — ក្បាច់ខៀវ-មាស", file:"frame5.png" },
+  custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
 };
+const KBACH_BG_STYLES = {      // BACKGROUND: នៅពីក្រោយខ្លឹមសារ ជាប់អេក្រង់
+  none:{ label:"គ្មាន" },
+  bg1:{ label:"ផ្ទៃ ១ — មែកផ្កាទ្រេត", file:"bg1.png" },
+  bg2:{ label:"ផ្ទៃ ២ — ព័ទ្ធជុំវិញ", file:"bg2.png" },
+  bg3:{ label:"ផ្ទៃ ៣ — ជ្រុងតែមួយ", file:"bg3.png" },
+  bg4:{ label:"ផ្ទៃ ៤ — កម្រងផ្កាក្រោម", file:"bg4.png" },
+  bg5:{ label:"ផ្ទៃ ៥ — មែកសងខាង", file:"bg5.png" },
+  custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
+};
+function kbachPresetUrl(layer, key){
+  const m = (layer === "bg") ? KBACH_BG_STYLES : KBACH_FRAME_STYLES;
+  if(!Object.prototype.hasOwnProperty.call(m, key) || !m[key].file) return "";
+  return assetBase() + m[key].file + "?v=" + ASSET_VERSION;
+}
+// ឈ្មោះចាស់ (កូដគូរ) → រូបថ្មី  ដើម្បីឱ្យ draft / backup ចាស់នៅតែដំណើរការ
+const KBACH_OLD_FRAME_MAP = { floralcorners:"frame1", leafborder:"frame2", goldline:"frame3", hangflowers:"frame4" };
+const KBACH_OLD_BG_MAP = { diagbranch:"bg1", fullwrap:"bg2", onecorner:"bg3", bottomgarland:"bg4", sidebranch:"bg5", scatter:"bg1" };
+const KBACH_WM_KEYS = ["diagbranch","fullwrap","onecorner","bottomgarland","sidebranch","scatter"];   // old frame values that are really backgrounds
 
 // ---- Ready-made invitation templates: one click sets colour, fonts, cover animation, frame, gallery layout and
 // text animation, and fills EMPTY text fields with sample content. Staff then only add photos, song, map and video. ----
@@ -891,13 +931,13 @@ const TIMELINE_PRESETS = [
 const INVITATION_PRESETS = {
   classic:{ label:"ប្រពៃណីខ្មែរ (មាស)", desc:"ផ្កាឈូកបើក · ក្របខណ្ឌព័ទ្ធពេញ · រូបធំ-តូចឆ្លាស់ · អក្សរលេចឡើង",
     swatch:THEMES.gold.swatch, tpl:0, timeline:0, startTime:"16:00",
-    design:{ theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"grid", kbachFrame:"fullwrap", textAnim:"fadeup", openStyle:"lotus" } },
+    design:{ theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"grid", kbachFrame:"none", kbachBg:"bg2", textAnim:"fadeup", openStyle:"lotus" } },
   romantic:{ label:"ស្នេហ៍ទន់ភ្លន់ (ផ្កាឈូក)", desc:"បេះដូងបែក · កម្រងផ្កាក្រោម · រូបប៉ូឡារ៉ូអ៊ីត · អក្សរព្រិលទៅច្បាស់",
     swatch:THEMES.blush.swatch, tpl:1, timeline:1, startTime:"06:30",
-    design:{ theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"polaroid", kbachFrame:"bottomgarland", textAnim:"blur", openStyle:"heart" } },
+    design:{ theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"polaroid", kbachFrame:"none", kbachBg:"bg4", textAnim:"blur", openStyle:"heart" } },
   elegant:{ label:"ទំនើបថ្លៃថ្នូរ (ខៀវ-មាស)", desc:"វាំងនន · មែកសងខាង · រូបក្រឡាការ៉េ · អក្សរស្រាយម្តងមួយពាក្យ",
     swatch:THEMES.royal.swatch, tpl:2, timeline:2, startTime:"06:30",
-    design:{ theme:"royal", fontKm:"koulen", fontEn:"playfair", galleryStyle:"square", kbachFrame:"sidebranch", textAnim:"words", openStyle:"curtain" } }
+    design:{ theme:"royal", fontKm:"koulen", fontEn:"playfair", galleryStyle:"square", kbachFrame:"none", kbachBg:"bg5", textAnim:"words", openStyle:"curtain" } }
 };
 
 const defaultState = {
@@ -905,7 +945,9 @@ const defaultState = {
   fontKm:"moul",
   fontEn:"greatVibes",
   galleryStyle:"grid",
-  kbachFrame:"diagbranch",
+  kbachFrame:"none", kbachBg:"bg1",
+  frameFit:"stretch", frameOpacity:100,
+  bgFit:"cover", bgOpacity:100,
   textAnim:"fadeup",
   openStyle:"door",
   coverAlways:false,
@@ -951,6 +993,10 @@ const COVER_STYLE_KEYS = ["door","curtain","lock","rings","lotus","heart"];   //
 // Background song (one per project, this device). Kept out of `state` — far too big for
 // localStorage — and stored in IndexedDB instead (see the Music block below).
 let musicAsset = null;   // { name, size, dataUrl, seconds, origSeconds, startSeconds } or null
+// Custom decorative frame image (JPG / PNG / GIF), one per project on this device. Stored in IndexedDB (same
+// database as the song, key "frame") because it is too big for localStorage. See the Frame image block below.
+let frameAsset = null;   // { name, size, type, dataUrl } or null
+let bgAsset = null;      // same shape — custom background image (behind the content)
 let musicSource = null;  // the file as picked (kept in memory only), so length/start can change without re-picking
 
 
@@ -964,6 +1010,11 @@ function legacyFill_(r){
     if(r.fontEn === undefined) r.fontEn = fd[1];
     if(r.galleryStyle === undefined) r.galleryStyle = THEME_GALLERY_DEFAULTS[r.theme] || "grid";
     if(r.kbachFrame === undefined && typeof r.frameStyle === "string") r.kbachFrame = r.frameStyle;
+    // The decorative frame used to be one list; the faint patterns are now the BACKGROUND and the frame is separate.
+    if(r.kbachBg === undefined && r.kbachFrame !== undefined){
+      if(KBACH_WM_KEYS.indexOf(r.kbachFrame) >= 0){ r.kbachBg = r.kbachFrame; r.kbachFrame = "none"; }
+      else r.kbachBg = "none";
+    }
   }
   return r;
 }
@@ -981,9 +1032,17 @@ function migrateStyle_(s){
   if(!_ho(FONT_EN, s.fontEn)) s.fontEn = fd[1];
   if(!_ho(GALLERY_STYLES, s.galleryStyle)) s.galleryStyle = THEME_GALLERY_DEFAULTS[s.theme] || "grid";
   if(!_ho(TEXT_ANIM_STYLES, s.textAnim)) s.textAnim = "fadeup";
+  if(KBACH_WM_KEYS.indexOf(s.kbachFrame) >= 0){ s.kbachBg = s.kbachFrame; s.kbachFrame = "none"; }
+  if(KBACH_OLD_FRAME_MAP[s.kbachFrame]) s.kbachFrame = KBACH_OLD_FRAME_MAP[s.kbachFrame];
+  if(KBACH_OLD_BG_MAP[s.kbachBg]) s.kbachBg = KBACH_OLD_BG_MAP[s.kbachBg];
   if(!_ho(KBACH_FRAME_STYLES, s.kbachFrame)) s.kbachFrame = defaultState.kbachFrame;
+  if(!_ho(KBACH_BG_STYLES, s.kbachBg)) s.kbachBg = "none";
+  if(s.bgFit !== "cover" && s.bgFit !== "stretch") s.bgFit = "cover";
   if(!COVER_STYLE_KEYS.includes(s.openStyle)) s.openStyle = "door";
+  if(s.frameFit !== "stretch" && s.frameFit !== "cover") s.frameFit = "stretch";
   const num = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
+  s.frameOpacity = num(s.frameOpacity, 10, 100, 100);
+  s.bgOpacity = num(s.bgOpacity, 10, 100, 100);
   s.coverBlur = num(s.coverBlur, 0, 40, 22); s.coverFocusX = num(s.coverFocusX, 0, 100, 50);
   s.coverFocusY = num(s.coverFocusY, 0, 100, 35); s.coverSharp = num(s.coverSharp, 30, 95, 60);
   s.venueCoords = (typeof s.venueCoords === "string") ? s.venueCoords.slice(0, 80) : "";
@@ -1378,69 +1437,123 @@ function kfWatermarkTileUri(inner, w, h){
   return "data:image/svg+xml," + encodeURIComponent(svg);
 }
 
+// ---------- Ready-made decorative frames: flowers / leaves / gold ornaments, animated, drawn in the theme colours ----------
+const DECO_FRAMES = ["floralcorners", "leafborder", "goldline", "hangflowers"];
+const DECO_LEAF = "M0,0C5,-7 17,-7 26,0C17,7 5,7 0,0Z";
+function decoBez_(c, tt){   // point + tangent angle on a cubic bezier [x0,y0,x1,y1,x2,y2,x3,y3]
+  const u = 1 - tt;
+  const x = u*u*u*c[0] + 3*u*u*tt*c[2] + 3*u*tt*tt*c[4] + tt*tt*tt*c[6];
+  const y = u*u*u*c[1] + 3*u*u*tt*c[3] + 3*u*tt*tt*c[5] + tt*tt*tt*c[7];
+  const dx = 3*u*u*(c[2]-c[0]) + 6*u*tt*(c[4]-c[2]) + 3*tt*tt*(c[6]-c[4]);
+  const dy = 3*u*u*(c[3]-c[1]) + 6*u*tt*(c[5]-c[3]) + 3*tt*tt*(c[7]-c[5]);
+  return { x, y, a: Math.atan2(dy, dx) * 180 / Math.PI };
+}
+function decoPath_(c){ return `M${c[0]},${c[1]}C${c[2]},${c[3]} ${c[4]},${c[5]} ${c[6]},${c[7]}`; }
+function decoLeaves_(curves, ts, fill, op, scale){
+  let out = "", k = 0;
+  curves.forEach(c => ts.forEach(tt => {
+    const q = decoBez_(c, tt), side = (k++ % 2) ? 1 : -1;
+    out += `<path d="${DECO_LEAF}" fill="${fill}" opacity="${op}" transform="translate(${q.x.toFixed(1)},${q.y.toFixed(1)}) rotate(${(q.a + side*52).toFixed(0)}) scale(${scale})"/>`;
+  }));
+  return out;
+}
+function decoCornerInner_(a1, a2, bg){   // one top-left corner on a 200x200 canvas
+  const c1 = [-6,172, 12,122, 16,76, 50,50], c2 = [50,50, 76,16, 122,12, 172,-6];
+  const c3 = [-6,100, 14,92, 22,70, 40,58], c4 = [58,40, 70,22, 92,14, 100,-6];
+  return `<path d="${decoPath_(c1)}" fill="none" stroke="${a1}" stroke-width="2.4" stroke-linecap="round"/>`
+    + `<path d="${decoPath_(c2)}" fill="none" stroke="${a1}" stroke-width="2.4" stroke-linecap="round"/>`
+    + `<path d="${decoPath_(c3)}" fill="none" stroke="${a1}" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>`
+    + `<path d="${decoPath_(c4)}" fill="none" stroke="${a1}" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>`
+    + decoLeaves_([c1, c2], [0.14, 0.3, 0.46, 0.62, 0.78, 0.92], a1, .78, .8)
+    + decoLeaves_([c3, c4], [0.35, 0.7], a2, .6, .55)
+    + `<g transform="translate(52,52) scale(2.5)">${kfFlower(2, a1, a2, bg)}</g>`
+    + `<g transform="translate(14,120) scale(1.3)">${kfFlower(2, a1, a2, bg)}</g>`
+    + `<g transform="translate(120,14) scale(1.3)">${kfFlower(2, a1, a2, bg)}</g>`
+    + `<circle cx="-2" cy="170" r="3" fill="${a2}"/><circle cx="170" cy="-2" r="3" fill="${a2}"/>`;
+}
+function decoGoldCornerInner_(a1, a2){   // small ornament for a gold-line corner, 56x56
+  return `<path d="M3,52C3,22 22,3 52,3" fill="none" stroke="${a1}" stroke-width="2.2" stroke-linecap="round"/>`
+    + `<path d="M11,46C11,26 26,11 46,11" fill="none" stroke="${a2}" stroke-width="1.3" stroke-linecap="round"/>`
+    + `<path d="M3,3 L15,3 L3,15Z" fill="${a1}" opacity=".85"/>`
+    + `<path d="M17,17 L24,10 L31,17 L24,24Z" fill="${a2}"/><circle cx="24" cy="17" r="1.6" fill="${a1}"/>`
+    + `<circle cx="52" cy="3" r="2.6" fill="${a1}"/><circle cx="3" cy="52" r="2.6" fill="${a1}"/>`;
+}
+function decoSideTileUri_(a1, a2, bg){   // seamless vertical vine, 56 x 160
+  const c1 = [28,0, 6,40, 50,40, 28,80], c2 = [28,80, 6,120, 50,120, 28,160];
+  const inner = `<path d="${decoPath_(c1)}" fill="none" stroke="${a1}" stroke-width="2" stroke-linecap="round"/>`
+    + `<path d="${decoPath_(c2)}" fill="none" stroke="${a1}" stroke-width="2" stroke-linecap="round"/>`
+    + decoLeaves_([c1, c2], [0.2, 0.42, 0.62, 0.82], a1, .8, .85)
+    + `<g transform="translate(28,80) scale(1.25)">${kfFlower(2, a1, a2, bg)}</g>`
+    + `<circle cx="28" cy="0" r="3" fill="${a2}"/><circle cx="28" cy="160" r="3" fill="${a2}"/>`;
+  return kfWatermarkTileUri(inner, 56, 160);
+}
+function decoHangTileUri_(a1, a2, bg){   // seamless horizontal strip of hanging flowers, 120 x 160
+  const strings = [[20, 58, 2, 1.2], [60, 96, 0, 1.0], [100, 44, 2, 1.1]];
+  let inner = `<path d="M0,5Q60,19 120,5" fill="none" stroke="${a1}" stroke-width="1.6" opacity=".7"/>`;
+  strings.forEach(([x, len, seed, sc]) => {
+    const y0 = 8 + (x === 60 ? 6 : 0) - (x === 60 ? 0 : 0);
+    inner += `<path d="M${x},${y0}L${x},${len}" stroke="${a1}" stroke-width="1.3" opacity=".8"/>`;
+    for(let k = 1; k <= 3; k++){
+      const yy = y0 + (len - y0) * k / 4, side = k % 2 ? 1 : -1;
+      inner += `<path d="${DECO_LEAF}" fill="${a1}" opacity=".75" transform="translate(${x},${yy.toFixed(0)}) rotate(${side > 0 ? 38 : 142}) scale(.6)"/>`;
+    }
+    inner += `<g transform="translate(${x},${len + 8}) scale(${sc})">${kfFlower(seed, a1, a2, bg)}</g>`;
+  });
+  return kfWatermarkTileUri(inner, 120, 160);
+}
+function buildDecoFrame(styleId, t){
+  const a1 = t.accent1, a2 = t.accent2, bg = t.bg;
+  const corners = (id, extra) => ["tl", "tr", "bl", "br"].map((pos, i) =>
+    `<div class="deco-corner deco-${pos}${extra || ""}" aria-hidden="true"><svg viewBox="0 0 200 200" style="animation-delay:${-i*1.7}s"><use href="#${id}"/></svg></div>`).join("");
+  if(styleId === "floralcorners"){
+    return `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><g id="wibdc">${decoCornerInner_(a1, a2, bg)}</g></defs></svg>` + corners("wibdc");
+  }
+  if(styleId === "leafborder"){
+    const uri = decoSideTileUri_(a1, a2, bg);
+    const st = `background-image:url('${uri}');`;
+    return `<div class="deco-side deco-side-l" style="${st}" aria-hidden="true"></div><div class="deco-side deco-side-r" style="${st}" aria-hidden="true"></div>`;
+  }
+  if(styleId === "goldline"){
+    return `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><g id="wibgc">${decoGoldCornerInner_(a1, a2)}</g></defs></svg>`
+      + `<div class="deco-gold" style="--g1:${a1};--g2:${a2};" aria-hidden="true"><i class="dg-o"></i><i class="dg-i"></i>`
+      + ["tl", "tr", "bl", "br"].map(pos => `<svg class="dg-c dg-${pos}" viewBox="0 0 56 56"><use href="#wibgc"/></svg>`).join("") + `</div>`;
+  }
+  if(styleId === "hangflowers"){
+    const uri = decoHangTileUri_(a1, a2, bg);
+    return `<div class="deco-hang" style="background-image:url('${uri}');" aria-hidden="true"></div>`;
+  }
+  return "";
+}
+
 // Each style = one seamlessly-tiling pattern + a slow drift (dx/dy exactly one tile length, so the loop never jumps)
 // mode "full" tiles the whole page; "bottom"/"side" confine the tile to a strip so it doesn't read as covering the page
-function buildKbachFrameOverlay(styleId, t){
-  if(!styleId || styleId === "none" || !hasOwn(KBACH_FRAME_STYLES, styleId)) return "";
-  const a1 = t.accent1, a2 = t.accent2, bg = t.bg;
-  let w = 140, h = 140, dx = 140, dy = 140, dur = 55, inner = "", mode = "full";
-
-  if(styleId === "diagbranch"){
-    w = h = 150; dx = 150; dy = 150; dur = 60;
-    mode = "diagonal";
-    inner = `<g transform="translate(30,30) rotate(-15) scale(.7)">${kfSprig(a1,a2,bg,0)}</g>
-<g transform="translate(105,95) rotate(20) scale(.55)">${kfSprig(a1,a2,bg,3)}</g>`;
-  } else if(styleId === "fullwrap"){
-    w = h = 110; dx = 110; dy = 110; dur = 50;
-    mode = "ring";   // border band only, centre stays empty
-    inner = `<g transform="translate(20,20) scale(.6)">${kfSprig(a1,a2,bg,1)}</g>
-<g transform="translate(75,35) rotate(40) scale(.45)">${kfSprig(a1,a2,bg,3)}</g>
-<g transform="translate(45,80) rotate(-25) scale(.5)">${kfSprig(a1,a2,bg,4)}</g>`;
-  } else if(styleId === "onecorner"){
-    w = h = 220; dx = 220; dy = 220; dur = 75;
-    mode = "corner";
-    inner = `<g transform="translate(40,50) rotate(10) scale(.6)">${kfSprig(a1,a2,bg,2)}</g>`;
-  } else if(styleId === "bottomgarland"){
-    w = 130; h = 60; dx = 130; dy = 0; dur = 40;
-    mode = "bottom";
-    inner = `<path d="M0,30 Q32,46 65,30 T130,30" fill="none" stroke="${a1}" stroke-width="1" opacity=".5"/>
-<g transform="translate(20,30) scale(.5)">${kfSprig(a1,a2,bg,2)}</g>
-<g transform="translate(95,30) scale(.45) rotate(20)">${kfSprig(a1,a2,bg,4)}</g>`;
-  } else if(styleId === "sidebranch"){
-    w = 60; h = 130; dx = 0; dy = 130; dur = 40;
-    mode = "side";
-    inner = `<path d="M30,0 Q46,32 30,65 T30,130" fill="none" stroke="${a1}" stroke-width="1" opacity=".5"/>
-<g transform="translate(30,20) scale(.5)">${kfSprig(a1,a2,bg,1)}</g>
-<g transform="translate(30,95) scale(.45) rotate(-20)">${kfSprig(a1,a2,bg,3)}</g>`;
-  } else if(styleId === "scatter"){
-    w = h = 180; dx = 180; dy = 180; dur = 70;
-    inner = [0,1,2].map(i => {
-      const x = 20 + i*55, y = 30 + (i%2)*90;
-      return `<g transform="translate(${x},${y}) rotate(${i*33}) scale(${(0.3+i*0.08).toFixed(2)})">${kfSprig(a1,a2,bg,i)}</g>`;
-    }).join("");
+function buildKbachFrameOverlay(styleId, t, s, layer){
+  layer = (layer === "bg") ? "bg" : "frame";
+  if(!styleId || styleId === "none") return "";
+  if(!hasOwn(layer === "bg" ? KBACH_BG_STYLES : KBACH_FRAME_STYLES, styleId)) return "";
+  const cl = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
+  if(styleId === "custom"){
+    // Staff-uploaded image (JPG / PNG / GIF). FRAME = on top (PNG/GIF with a transparent centre works best);
+    // BACKGROUND = behind the content.
+    const asset = (layer === "bg") ? bgAsset : frameAsset;
+    if(!asset || typeof asset.dataUrl !== "string" || !BK_IMG_RE.test(asset.dataUrl)) return "";
+    if(layer === "bg"){
+      const fitB = (s && s.bgFit === "stretch") ? "100% 100%" : "cover";
+      const opB = cl(s && s.bgOpacity, 10, 100, 100) / 100;
+      // The hero block paints its own solid colour; keep its soft glow but let the background image show through.
+      return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg" style="background-image:url('${asset.dataUrl}');background-size:${fitB};opacity:${opB};" aria-hidden="true"></div>`;
+    }
+    const fit = (s && s.frameFit === "cover") ? "cover" : "100% 100%";
+    const op = cl(s && s.frameOpacity, 10, 100, 100) / 100;
+    return `<div class="kbach-custom-frame" style="background-image:url('${asset.dataUrl}');background-size:${fit};opacity:${op};" aria-hidden="true"></div>`;
   }
-
-  const uri = kfWatermarkTileUri(inner, w, h);
-  const bgStyle = `background-image:url('${uri}');background-size:${w}px ${h}px;--kf-dx:${dx}px;--kf-dy:${dy}px;--kf-dur:${dur}s;`;
-
-  if(mode === "bottom"){
-    return `<div class="kbach-watermark kbach-watermark-bottom" style="${bgStyle}height:190px;" aria-hidden="true"></div>`;
+  // រូបភាពរៀបចំស្រាប់ពី GitHub (assets/frames/… និង assets/backgrounds/…)
+  const pu = kbachPresetUrl(layer, styleId);
+  if(!pu) return "";
+  if(layer === "bg"){
+    return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg kb-bg-anim" style="background-image:url('${pu}');background-size:cover;" aria-hidden="true"></div>`;
   }
-  if(mode === "side"){
-    return `<div class="kbach-watermark kbach-watermark-side-l" style="${bgStyle}width:140px;" aria-hidden="true"></div>`
-      + `<div class="kbach-watermark kbach-watermark-side-r" style="${bgStyle}width:140px;" aria-hidden="true"></div>`;
-  }
-  if(mode === "corner"){
-    return `<div class="kbach-watermark kbach-watermark-corner-br" style="${bgStyle}width:280px;height:280px;" aria-hidden="true"></div>`;
-  }
-  if(mode === "diagonal"){
-    return `<div class="kbach-watermark kbach-watermark-corner-tl" style="${bgStyle}width:320px;height:320px;" aria-hidden="true"></div>`
-      + `<div class="kbach-watermark kbach-watermark-corner-br" style="${bgStyle}width:320px;height:320px;" aria-hidden="true"></div>`;
-  }
-  if(mode === "ring"){
-    return `<div class="kbach-watermark kbach-watermark-ring" style="${bgStyle}" aria-hidden="true"></div>`;
-  }
-  return `<div class="kbach-watermark kbach-watermark-full" style="${bgStyle}" aria-hidden="true"></div>`;
+  return `<div class="kb-frame" style="--kb-img:url('${pu}');" aria-hidden="true"><div class="kb-shine"></div></div>`;
 }
 // ---------- Text animation on scroll (guest invitation) ----------
 // Text/blocks start hidden and reveal once when they scroll into view. Everything is added by script and scoped
@@ -1703,6 +1816,38 @@ function renderInvitation(s){
 *{box-sizing:border-box}
 html{background:var(--bg);}
 body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
+.deco-corner{position:fixed;width:clamp(96px,30vw,176px);aspect-ratio:1/1;z-index:60;pointer-events:none;opacity:.94;}
+.deco-corner svg{width:100%;height:100%;display:block;overflow:visible;transform-origin:0 0;animation:deco-sway 7s ease-in-out infinite alternate;}
+.deco-tl{top:0;left:0;}
+.deco-tr{top:0;right:0;transform:scaleX(-1);}
+.deco-bl{bottom:0;left:0;transform:scaleY(-1);}
+.deco-br{bottom:0;right:0;transform:scale(-1,-1);}
+@keyframes deco-sway{from{transform:rotate(-1.8deg) scale(1);}to{transform:rotate(2deg) scale(1.035);}}
+.deco-side{position:fixed;top:0;bottom:0;width:clamp(30px,9vw,54px);z-index:60;pointer-events:none;background-repeat:repeat-y;background-size:100% auto;opacity:.92;animation:deco-shimmer 4.5s ease-in-out infinite alternate;}
+.deco-side-l{left:0;}
+.deco-side-r{right:0;transform:scaleX(-1);animation-delay:-2s;}
+@keyframes deco-shimmer{from{opacity:.62;}to{opacity:1;}}
+.deco-gold{position:fixed;inset:0;z-index:60;pointer-events:none;}
+.deco-gold .dg-o{position:absolute;inset:9px;border:2px solid var(--g1);border-radius:6px;animation:deco-glow 3.8s ease-in-out infinite alternate;}
+.deco-gold .dg-i{position:absolute;inset:16px;border:1px solid var(--g2);border-radius:3px;opacity:.85;}
+.deco-gold .dg-c{position:absolute;width:clamp(38px,11vw,56px);height:auto;aspect-ratio:1/1;overflow:visible;}
+.dg-tl{top:5px;left:5px;}
+.dg-tr{top:5px;right:5px;transform:scaleX(-1);}
+.dg-bl{bottom:5px;left:5px;transform:scaleY(-1);}
+.dg-br{bottom:5px;right:5px;transform:scale(-1,-1);}
+@keyframes deco-glow{from{box-shadow:0 0 0 transparent,inset 0 0 0 transparent;}to{box-shadow:0 0 14px color-mix(in srgb,var(--g1) 55%,transparent),inset 0 0 12px color-mix(in srgb,var(--g1) 30%,transparent);}}
+.deco-hang{position:fixed;top:0;left:-4%;width:108%;height:clamp(104px,32vw,150px);z-index:60;pointer-events:none;background-repeat:repeat-x;background-size:auto 100%;background-position:center top;transform-origin:50% 0;animation:deco-hang 6s ease-in-out infinite alternate;}
+@keyframes deco-hang{from{transform:rotate(-1.1deg);}to{transform:rotate(1.1deg);}}
+@media(prefers-reduced-motion:reduce){.deco-corner svg,.deco-side,.deco-gold .dg-o,.deco-hang{animation:none !important;}}
+.kb-frame{position:fixed;inset:0;z-index:60;pointer-events:none;box-sizing:border-box;--kb-w:clamp(120px,27vw,190px);border:var(--kb-w) solid transparent;border-image-source:var(--kb-img);border-image-slice:405;border-image-width:var(--kb-w);border-image-repeat:round;animation:kb-glow 6s ease-in-out infinite;}
+.kb-shine{position:absolute;inset:calc(-1 * var(--kb-w));pointer-events:none;-webkit-mask-box-image:var(--kb-img) 405 / var(--kb-w) round;mask-border:var(--kb-img) 405 / var(--kb-w) round;background:linear-gradient(115deg,transparent 38%,rgba(255,246,205,.95) 50%,transparent 62%) 0 0/300% 300%;animation:kb-shine 5.5s ease-in-out infinite;}
+.kb-bg-anim{transform-origin:50% 60%;animation:kb-bgmove 28s ease-in-out infinite alternate;}
+@keyframes kb-glow{0%,100%{filter:drop-shadow(0 0 2px rgba(255,205,100,.18));}50%{filter:drop-shadow(0 0 9px rgba(255,205,100,.75));}}
+@keyframes kb-shine{0%{background-position:100% 100%;}60%,100%{background-position:0% 0%;}}
+@keyframes kb-bgmove{0%{transform:scale(1) translate3d(0,0,0);opacity:.85;}100%{transform:scale(1.09) translate3d(-1.2%,-1.5%,0);opacity:1;}}
+@media(prefers-reduced-motion:reduce){.kb-frame,.kb-shine,.kb-bg-anim{animation:none !important;}}
+.kbach-custom-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background-repeat:no-repeat;background-position:center;}
+.kbach-custom-frame{position:fixed;inset:0;z-index:60;pointer-events:none;background-repeat:no-repeat;background-position:center;}
 .kbach-watermark{position:fixed;pointer-events:none;opacity:.12;background-repeat:repeat;animation:kf-drift var(--kf-dur,55s) linear infinite;}
 .kbach-watermark-full{inset:0;}
 .kbach-watermark-ring{inset:0;opacity:.2;-webkit-mask-image:linear-gradient(to right,#000 0,#000 40%,transparent 100%),linear-gradient(to left,#000 0,#000 40%,transparent 100%),linear-gradient(to bottom,#000 0,#000 40%,transparent 100%),linear-gradient(to top,#000 0,#000 40%,transparent 100%);-webkit-mask-size:min(92px,20vw) 100%,min(92px,20vw) 100%,100% min(92px,20vw),100% min(92px,20vw);-webkit-mask-position:left top,right top,left top,left bottom;-webkit-mask-repeat:no-repeat;mask-image:linear-gradient(to right,#000 0,#000 40%,transparent 100%),linear-gradient(to left,#000 0,#000 40%,transparent 100%),linear-gradient(to bottom,#000 0,#000 40%,transparent 100%),linear-gradient(to top,#000 0,#000 40%,transparent 100%);mask-size:min(92px,20vw) 100%,min(92px,20vw) 100%,100% min(92px,20vw),100% min(92px,20vw);mask-position:left top,right top,left top,left bottom;mask-repeat:no-repeat;}
@@ -1829,7 +1974,7 @@ body.guest-mode .lang-toggle{top:62px;}
 body.guest-mode .fx-toggle{top:62px;}
 @media(max-width:480px){.hero{padding:40px 18px 30px;}.welcome{padding:22px 20px;}.lang-toggle{top:10px;right:10px;}.lang-toggle button{padding:7px 12px;font-size:12px;}body.guest-mode .lang-toggle{top:56px;}.fx-toggle{top:10px;left:10px;}.fx-toggle button{width:28px;height:28px;font-size:13px;}body.guest-mode .fx-toggle{top:56px;}}
 ${mp.css}${buildTextAnimCss(ta)}${lbx.css}</style></head><body${bodyClass}>
-${buildKbachFrameOverlay(s.kbachFrame, t)}
+${buildKbachFrameOverlay(s.kbachBg, t, s, "bg")}${buildKbachFrameOverlay(s.kbachFrame, t, s, "frame")}
 <div class="lang-toggle">
   <button id="btn-km" class="active" type="button">${LKM.toggleKm}</button>
   <button id="btn-en" type="button">${LEN.toggleEn}</button>
@@ -2038,6 +2183,11 @@ const PK = {
 };
 const NONE_ICON = PK.svg("0 0 40 40", '<circle cx="20" cy="20" r="12" opacity=".6"/><path d="M11.5 28.5 28.5 11.5" opacity=".6"/>');
 const KBACH_ICONS = {
+  floralcorners: PK.svg("0 0 40 56", PK.frame + '<path d="M8 22c0-9 5-14 14-14M8 22c2-5 5-8 10-9"/><circle cx="11" cy="11" r="3.2"/><path d="M32 34c0 9-5 14-14 14M32 34c-2 5-5 8-10 9"/><circle cx="29" cy="45" r="3.2"/>'),
+  leafborder: PK.svg("0 0 40 56", PK.frame + '<path d="M9 8c-4 10 4 12 0 20s4 12 0 20"/><path d="M9 18l5-3M9 30l5-3M9 42l5-3"/><path d="M31 8c4 10-4 12 0 20s-4 12 0 20"/><path d="M31 18l-5-3M31 30l-5-3M31 42l-5-3"/>'),
+  goldline: PK.svg("0 0 40 56", PK.frame + '<rect x="9" y="9" width="22" height="38" rx="1.5"/><rect x="12" y="12" width="16" height="32" rx="1" opacity=".6"/><circle cx="9" cy="9" r="1.8" fill="currentColor"/><circle cx="31" cy="9" r="1.8" fill="currentColor"/><circle cx="9" cy="47" r="1.8" fill="currentColor"/><circle cx="31" cy="47" r="1.8" fill="currentColor"/>'),
+  hangflowers: PK.svg("0 0 40 56", PK.frame + '<path d="M7 9q13 6 26 0"/><path d="M12 11v12M20 13v20M28 11v9"/><circle cx="12" cy="26" r="3"/><circle cx="20" cy="36" r="3.4"/><circle cx="28" cy="23" r="2.8"/>'),
+  custom: PK.svg("0 0 40 56", PK.frame + '<rect x="11" y="18" width="18" height="14" rx="2"/><circle cx="16" cy="23" r="1.6" fill="currentColor"/><path d="M11 29l5-4 4 3 4-4 5 5"/><path d="M20 38v8M16 42h8"/>'),
   none: NONE_ICON,
   diagbranch: PK.svg("0 0 40 56", PK.frame + '<path d="M8 8c7 0 10 4 11 11M8 8c0 7 4 10 11 11" /><circle cx="8" cy="8" r="1.4" fill="currentColor"/><path d="M32 48c-7 0-10-4-11-11M32 48c0-7-4-10-11-11"/><circle cx="32" cy="48" r="1.4" fill="currentColor"/>'),
   fullwrap: PK.svg("0 0 40 56", PK.frame + '<rect x="9" y="8" width="22" height="40" rx="2" stroke-dasharray="0.1 3.4" stroke-width="2.6"/>'),
@@ -2122,10 +2272,23 @@ function buildGalleryStyleSelect(){
   renderPicker("pickGallery", Object.keys(GALLERY_STYLES).map(k => ({ key:k, title:GALLERY_STYLES[k].label, inner:GALLERY_ICONS[k] })),
     state.galleryStyle, k => { state.galleryStyle = k; buildGalleryStyleSelect(); update(); });
 }
+function kbachThumb(layer, k){
+  if(k === "custom") return KBACH_ICONS.custom;
+  const u = kbachPresetUrl(layer, k);
+  if(!u) return NONE_ICON;
+  return `<img class="kbach-thumb" src="${u}" alt="" loading="lazy" onerror="this.style.opacity=.25">`;
+}
 function buildKbachFrameSelect(){
   if(!hasOwn(KBACH_FRAME_STYLES, state.kbachFrame)) state.kbachFrame = "none";
-  renderPicker("pickKbach", Object.keys(KBACH_FRAME_STYLES).map(k => ({ key:k, title:KBACH_FRAME_STYLES[k].label, inner:KBACH_ICONS[k] })),
+  renderPicker("pickKbach", Object.keys(KBACH_FRAME_STYLES).map(k => ({ key:k, title:KBACH_FRAME_STYLES[k].label, inner:kbachThumb("frame", k) })),
     state.kbachFrame, k => { state.kbachFrame = k; buildKbachFrameSelect(); update(); });
+  buildKbachBgSelect();
+  if(typeof refreshFrameUI === "function") refreshFrameUI();
+}
+function buildKbachBgSelect(){
+  if(!hasOwn(KBACH_BG_STYLES, state.kbachBg)) state.kbachBg = "none";
+  renderPicker("pickKbachBg", Object.keys(KBACH_BG_STYLES).map(k => ({ key:k, title:KBACH_BG_STYLES[k].label, inner:kbachThumb("bg", k) })),
+    state.kbachBg, k => { state.kbachBg = k; buildKbachBgSelect(); if(typeof refreshFrameUI === "function") refreshFrameUI(); update(); });
 }
 function buildTextAnimSelect(){
   if(!hasOwn(TEXT_ANIM_STYLES, state.textAnim)) state.textAnim = "fadeup";
@@ -2575,6 +2738,182 @@ async function persistMusic(){
     if(st && musicAsset) st.textContent += " (មិនអាចរក្សាទុកចម្រៀងក្នុង browser នេះបានទេ — ត្រូវជ្រើសរើសម្តងទៀតពេលបើកថ្មី)";
   }
 }
+// ---------- Custom frame image (JPG / PNG / GIF): processing + IndexedDB storage + Builder UI ----------
+const FRAME_KEY = "frame";
+const MAX_FRAME_INPUT_BYTES = 15 * 1024 * 1024;   // biggest file staff may pick (JPG/PNG get shrunk)
+const MAX_FRAME_OUT_BYTES = 1.5 * 1024 * 1024;     // cap of a JPG/PNG after shrinking, embedded in every guest file
+const MAX_FRAME_GIF_BYTES = 3 * 1024 * 1024;       // GIFs are not re-encoded (would stop the animation), so just capped
+function frameFileKind(file){
+  const ext = ((file.name || "").split(".").pop() || "").toLowerCase();
+  if(file.type === "image/gif" || ext === "gif") return "gif";
+  if(file.type === "image/png" || ext === "png") return "png";
+  if(file.type === "image/jpeg" || file.type === "image/jpg" || ext === "jpg" || ext === "jpeg") return "jpg";
+  return "";
+}
+function readAsDataUrl_(file){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = ev => resolve(ev.target.result);
+    r.onerror = () => reject(new Error("read_failed"));
+    r.readAsDataURL(file);
+  });
+}
+function loadImgEl_(file){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("decode_failed")); };
+    img.src = url;
+  });
+}
+// PNG keeps its transparency: shrink to a smaller PNG until it fits the size cap.
+async function shrinkPng_(file){
+  const img = await loadImgEl_(file);
+  const longest = Math.max(img.naturalWidth, img.naturalHeight);
+  for(const maxDim of [1600, 1200, 900, 700]){
+    const scale = Math.min(1, maxDim / longest);
+    const w = Math.max(1, Math.round(img.naturalWidth * scale)), h = Math.max(1, Math.round(img.naturalHeight * scale));
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    c.getContext("2d").drawImage(img, 0, 0, w, h);
+    const out = c.toDataURL("image/png");
+    if(dataUrlBytes(out) <= MAX_FRAME_OUT_BYTES) return out;
+  }
+  return null;
+}
+async function buildFrameAsset(file){
+  const kind = frameFileKind(file);
+  if(!kind) throw new Error("type");
+  if(file.size > MAX_FRAME_INPUT_BYTES) throw new Error("input_big");
+  let dataUrl;
+  if(kind === "gif"){
+    if(file.size > MAX_FRAME_GIF_BYTES) throw new Error("gif_big");
+    dataUrl = await readAsDataUrl_(file);
+    if(!/^data:image\/gif;base64,/i.test(dataUrl)) dataUrl = dataUrl.replace(/^data:[^;,]*/i, "data:image/gif");
+  }else if(kind === "png"){
+    if(file.size <= MAX_FRAME_OUT_BYTES){
+      dataUrl = await readAsDataUrl_(file);                     // already small: keep the original untouched
+      const img = await loadImgEl_(file);
+      if(Math.max(img.naturalWidth, img.naturalHeight) > 2400) dataUrl = await shrinkPng_(file);
+    }else{
+      dataUrl = await shrinkPng_(file);
+    }
+    if(!dataUrl) throw new Error("png_big");
+    if(!/^data:image\/png;base64,/i.test(dataUrl)) dataUrl = dataUrl.replace(/^data:[^;,]*/i, "data:image/png");
+  }else{
+    dataUrl = await compressImage(new File([file], file.name, { type: "image/jpeg" }), { maxDim: 1600, quality: 0.85 });
+    if(dataUrlBytes(dataUrl) > MAX_FRAME_OUT_BYTES) dataUrl = await compressImage(new File([file], file.name, { type: "image/jpeg" }), { maxDim: 1100, quality: 0.78 });
+  }
+  if(!BK_IMG_RE.test(dataUrl)) throw new Error("bad_data");
+  return { name: String(file.name || "frame").slice(0, 200), size: dataUrlBytes(dataUrl), type: dataUrl.slice(5, dataUrl.indexOf(";")), dataUrl };
+}
+const BG_KEY = "bg";
+function sanitizeFrameAsset_(rec){
+  if(!rec || typeof rec !== "object" || typeof rec.dataUrl !== "string" || !BK_IMG_RE.test(rec.dataUrl)) return null;
+  return { name: String(rec.name || "image").slice(0, 200), size: (typeof rec.size === "number" && isFinite(rec.size)) ? rec.size : dataUrlBytes(rec.dataUrl),
+           type: rec.dataUrl.slice(5, rec.dataUrl.indexOf(";")), dataUrl: rec.dataUrl };
+}
+// One upload box per slot: the FRAME image (on top) and the BACKGROUND image (behind). Same behaviour, own storage key.
+const IMG_SLOTS = [];
+function makeImageSlot(c){
+  const S = { c };
+  IMG_SLOTS.push(S);
+  const id = n => c.prefix + n, el = n => $(id(n));
+  const box = $(c.prefix + "CustomBox");
+  if(!box) return S;
+  box.className = "frame-custom-box"; box.style.display = "none";
+  box.innerHTML = `<p class="photo-hint" style="margin:0 0 10px;">${c.hint}</p>
+<input type="file" id="${id("File")}" accept="image/png,image/jpeg,image/gif,.png,.jpg,.jpeg,.gif" style="display:none;">
+<button class="add-btn" id="${id("AddBtn")}" type="button"></button>
+<div class="frame-prev" id="${id("Prev")}" style="display:none;"><img id="${id("PrevImg")}" alt=""><button class="photo-clear cover-x" type="button" id="${id("Clear")}" title="លុបរូបភាព" aria-label="លុបរូបភាព">×</button></div>
+<p class="guest-empty-hint" id="${id("Status")}" style="padding-top:8px;white-space:pre-line;"></p>
+<div id="${id("Opts")}" style="display:none;">
+${c.fits.map(f => `<label class="chk-row"><input type="radio" name="${c.prefix}Fit" value="${f[0]}"><span>${f[1]}</span></label>`).join("")}
+<label style="margin-top:10px;">ភាពច្បាស់ <b id="${id("OpacityVal")}"></b></label>
+<input type="range" id="${id("Opacity")}" min="10" max="100" step="1" style="width:100%;">
+</div>`;
+  S.refresh = () => {
+    const on = state[c.styleKey] === "custom";
+    box.style.display = on ? "" : "none";
+    if(!on) return;
+    const a = c.get(), has = !!(a && a.dataUrl);
+    el("Prev").style.display = has ? "" : "none";
+    el("Opts").style.display = has ? "" : "none";
+    el("AddBtn").textContent = has ? c.changeText : c.addText;
+    if(has){
+      el("PrevImg").src = a.dataUrl;
+      const kind = (a.type || "").replace("image/", "").toUpperCase();
+      el("Status").textContent = `${a.name} — ${kind} · ${fmtSize(a.size)}\nឯកសារភ្ញៀវនីមួយៗនឹងធំបន្ថែមប្រហែល ${fmtSize(a.dataUrl.length)}`;
+    }else{
+      el("Status").textContent = "មិនទាន់មានរូបភាពទេ";
+    }
+    box.querySelectorAll('input[type=radio]').forEach(r => { r.checked = (r.value === state[c.fitKey]); });
+    el("Opacity").value = String(state[c.opKey]);
+    el("OpacityVal").textContent = state[c.opKey] + "%";
+  };
+  S.persist = async () => {
+    try{
+      const a = c.get();
+      if(a) await musicStoreOp("readwrite", st => st.put(a, c.key));
+      else await musicStoreOp("readwrite", st => st.delete(c.key));
+      return true;
+    }catch(e){ return false; }
+  };
+  S.picked = async (file) => {
+    if(!file) return;
+    el("Status").textContent = "កំពុងរៀបចំរូបភាព...";
+    try{
+      c.set(await buildFrameAsset(file));
+      state[c.styleKey] = "custom";
+      const saved = await S.persist();
+      S.refresh();
+      if(!saved) el("Status").textContent += "\n(មិនអាចរក្សាទុកក្នុង browser នេះបានទេ — ត្រូវជ្រើសរើសម្តងទៀតពេលបើកថ្មី)";
+      update();
+    }catch(e){
+      const msg = ({
+        type: "សូមជ្រើសរើសឯកសារ JPG, PNG ឬ GIF ប៉ុណ្ណោះ",
+        input_big: `ឯកសារធំពេក (${fmtSize(file.size)}) — សូមជ្រើសរើសឯកសារតូចជាង ${fmtSize(MAX_FRAME_INPUT_BYTES)}`,
+        gif_big: `GIF ធំពេក (${fmtSize(file.size)}) — សូមប្រើ GIF តូចជាង ${fmtSize(MAX_FRAME_GIF_BYTES)} (បង្រួមវាតាម ezgif.com ជាដើម)`,
+        png_big: "PNG នេះធំពេក សូមប្រើរូបភាពតូចជាងនេះ"
+      })[e && e.message] || "មិនអាចអានរូបភាពនេះបានទេ";
+      S.refresh();
+      el("Status").textContent = msg;
+    }
+  };
+  el("AddBtn").addEventListener("click", () => el("File").click());
+  el("File").addEventListener("change", ev => { const f = ev.target.files && ev.target.files[0]; ev.target.value = ""; S.picked(f); });
+  el("Clear").addEventListener("click", async () => { c.set(null); await S.persist(); S.refresh(); update(); });
+  box.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener("change", () => {
+    if(!r.checked) return;
+    state[c.fitKey] = r.value; scheduleUpdate();
+  }));
+  el("Opacity").addEventListener("input", ev => {
+    state[c.opKey] = Number(ev.target.value) || 100;
+    el("OpacityVal").textContent = state[c.opKey] + "%";
+    scheduleUpdate();
+  });
+  return S;
+}
+makeImageSlot({ prefix:"frame", key:FRAME_KEY, styleKey:"kbachFrame", fitKey:"frameFit", opKey:"frameOpacity",
+  get:() => frameAsset, set:v => { frameAsset = v; },
+  hint:"ស៊ុមនៅ <b>ពីលើ</b> ខ្លឹមសារ។ ល្អបំផុតគឺ <b>PNG ឬ GIF</b> ដែលចំកណ្ដាលថ្លា (transparent)។ GIF នឹងមានចលនា។ ទំហំណែនាំ ៩០០ × ១៦០០ px (បញ្ឈរ)។",
+  addText:"＋ បញ្ចូលរូបភាពស៊ុម (JPG / PNG / GIF)", changeText:"🔄 ប្តូររូបភាពស៊ុម",
+  fits:[["stretch","ទាញពេញអេក្រង់ (ស័ក្តិសមស៊ុម PNG/GIF)"],["cover","រក្សាសមាមាត្រ (អាចកាត់គែមខ្លះ)"]] });
+makeImageSlot({ prefix:"bg", key:BG_KEY, styleKey:"kbachBg", fitKey:"bgFit", opKey:"bgOpacity",
+  get:() => bgAsset, set:v => { bgAsset = v; },
+  hint:"ផ្ទៃខាងក្រោយនៅ <b>ពីក្រោយ</b> ខ្លឹមសារ ហើយនៅជាប់អេក្រង់ខណៈ scroll។ ប្រើ JPG, PNG ឬ GIF ក៏បាន។ ទំហំណែនាំ ៩០០ × ១៦០០ px។ បើអក្សរពិបាកអាន សូមបន្ថយ «ភាពច្បាស់»។",
+  addText:"＋ បញ្ចូលរូបភាពផ្ទៃខាងក្រោយ (JPG / PNG / GIF)", changeText:"🔄 ប្តូររូបភាពផ្ទៃខាងក្រោយ",
+  fits:[["cover","រក្សាសមាមាត្រ (ពេញអេក្រង់ កាត់គែមបន្តិច)"],["stretch","ទាញពេញអេក្រង់"]] });
+function refreshFrameUI(){ IMG_SLOTS.forEach(S => { if(S.refresh) S.refresh(); }); }
+async function loadFrameOnStartup(){
+  for(const S of IMG_SLOTS){
+    try{ S.c.set(sanitizeFrameAsset_(await musicStoreOp("readonly", st => st.get(S.c.key)))); }
+    catch(e){ S.c.set(null); }
+  }
+  refreshFrameUI();
+  if(state.kbachFrame === "custom" || state.kbachBg === "custom") update();
+}
+
 async function loadMusicOnStartup(){
   try{
     const rec = await musicStoreOp("readonly", st => st.get(MUSIC_KEY));
@@ -3596,7 +3935,7 @@ function normalizeImported(raw){
   s.venueMapLink = /^https?:\/\/\S+$/i.test(bkStr(r.venueMapLink, 2000).trim()) ? bkStr(r.venueMapLink, 2000).trim() : "";
   s.guestNamesFileRaw = bkStr(r.guestNamesFileRaw, 500000);
   s.theme = (typeof r.theme === "string" && hasOwn(THEMES, r.theme)) ? r.theme : defaultState.theme;
-  ["kbachFrame","fontKm","fontEn","galleryStyle","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp"]
+  ["kbachFrame","kbachBg","frameFit","frameOpacity","bgFit","bgOpacity","fontKm","fontEn","galleryStyle","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp"]
     .forEach(k => { if(r[k] !== undefined) s[k] = r[k]; });
   if(r.kbachFrame === undefined && typeof r.frameStyle === "string") s.kbachFrame = r.frameStyle;
   s.openStyle = r.openStyle === "envelope" ? "rings" : (r.openStyle === "book" ? "heart" : r.openStyle);
@@ -3632,6 +3971,8 @@ function exportProject(){
   delete copy.publishTokenKey;
   const payload = { app: BACKUP_APP_ID, version: 1, name, exportedAt: Date.now(), state: copy };
   if(includeMusic) payload.music = JSON.parse(JSON.stringify(musicAsset));
+  if(frameAsset && state.kbachFrame === "custom") payload.frame = JSON.parse(JSON.stringify(frameAsset));
+  if(bgAsset && state.kbachBg === "custom") payload.bg = JSON.parse(JSON.stringify(bgAsset));
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -3670,6 +4011,12 @@ function importProject(file){
         }else{
           musicNote = " · ចម្រៀងក្នុងឯកសារមិនត្រឹមត្រូវ (មិនបាននាំចូល)";
         }
+      }
+      for(const [pk, dbKey, lbl] of [["frame", FRAME_KEY, "ស៊ុមរូបភាព"], ["bg", BG_KEY, "ផ្ទៃខាងក្រោយ"]]){
+        const im = sanitizeFrameAsset_(payload[pk]);
+        if(!im) continue;
+        try{ await musicStoreOp("readwrite", st => st.put(im, dbKey)); musicNote += " · រួមទាំង" + lbl; }
+        catch(e){ musicNote += " · មិនអាចរក្សាទុក" + lbl + "បានទេ"; }
       }
       state = next;                      // so nothing in memory can overwrite the imported draft
       statusEl.textContent = "បាននាំចូលជោគជ័យ" + musicNote + " — កំពុងផ្ទុកទំព័រឡើងវិញ...";
@@ -3722,6 +4069,7 @@ $("backupImportFile").addEventListener("change", e => {
 });
 
 loadMusicOnStartup();
+loadFrameOnStartup();
 </script>
 </body>
 </html>
