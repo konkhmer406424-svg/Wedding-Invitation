@@ -910,8 +910,8 @@ body.oc-noscroll{overflow:hidden;}
 `;
 
 const MUSIC_BTN_CSS = `
-.music-btn{position:fixed;right:16px;bottom:18px;z-index:100;width:44px;height:44px;padding:0;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--accent-1);box-shadow:0 4px 14px rgba(0,0,0,.14);display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.music-btn svg{width:20px;height:20px;}
+.music-btn{position:fixed;right:16px;bottom:18px;z-index:100;width:44px;height:44px;padding:0;border-radius:50%;border:1px solid color-mix(in srgb, var(--border) 55%, transparent);background:var(--ctl-bg, var(--card));color:var(--accent-1);box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.music-btn svg{width:20px;height:20px;filter:drop-shadow(0 0 3px var(--card));}
 .music-btn .ico-off{display:none;}
 .music-btn:not(.on) .ico-on{display:none;}
 .music-btn.on{background:var(--accent-1);color:#fff;}
@@ -1902,7 +1902,7 @@ function renderInvitation(s){
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Koulen&family=Odor+Mean+Chey&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
 <style>
-:root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--card:${t.card};--border:${t.border};--radius:${t.radius};--display-font:${fk.display};--body-font:${fk.body};--display-font-en:${fe.display};--body-font-en:${fe.body};}
+:root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--card:${t.card};--ctl-bg:color-mix(in srgb, ${t.card} 26%, transparent);--border:${t.border};--radius:${t.radius};--display-font:${fk.display};--body-font:${fk.body};--display-font-en:${fe.display};--body-font-en:${fe.body};}
 *{box-sizing:border-box}
 html{background:var(--bg);}
 body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
@@ -2060,13 +2060,13 @@ section{padding:30px 0;}
 .contact-phone{display:inline-block;color:var(--accent-1);font-weight:600;text-decoration:none;font-size:16.5px;font-style:normal;}
 footer{text-align:center;padding:30px 24px 36px;color:var(--ink);opacity:.75;font-size:15px;}
 footer .thanks{font-size:22px;color:var(--accent-1);opacity:1;margin-bottom:6px;}
-.lang-toggle{position:fixed;top:16px;right:16px;z-index:100;display:flex;background:color-mix(in srgb, var(--card) 15%, transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.14);}
-.lang-toggle button{border:none;background:none;padding:8px 16px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--ink);font-family:'Kantumruy Pro',sans-serif;font-style:normal;}
-.lang-toggle button.active{background:color-mix(in srgb, var(--accent-1) 25%, transparent);color:#fff;}
+.lang-toggle{position:fixed;top:16px;right:16px;z-index:100;display:flex;background:var(--ctl-bg);border:1px solid color-mix(in srgb, var(--border) 55%, transparent);border-radius:999px;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.lang-toggle button{border:none;background:none;padding:8px 16px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--ink);font-family:'Kantumruy Pro',sans-serif;font-style:normal;font-weight:600;text-shadow:0 0 3px var(--card),0 0 8px var(--card);}
+.lang-toggle button.active{background:var(--accent-1);color:#fff;text-shadow:none;box-shadow:0 1px 4px rgba(0,0,0,.25);}
 body.guest-mode .lang-toggle{top:62px;}
-.fx-toggle{position:fixed;top:16px;left:16px;z-index:100;display:flex;gap:2px;background:color-mix(in srgb, var(--card) 15%, transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.14);}
+.fx-toggle{position:fixed;top:16px;left:16px;z-index:100;display:flex;gap:2px;background:var(--ctl-bg);border:1px solid color-mix(in srgb, var(--border) 55%, transparent);border-radius:999px;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
 .fx-toggle button{border:none;background:none;width:32px;height:32px;border-radius:50%;font-size:15px;line-height:1;cursor:pointer;color:var(--ink);display:flex;align-items:center;justify-content:center;font-style:normal;}
-.fx-toggle button.active{background:color-mix(in srgb, var(--accent-1) 25%, transparent);color:#fff;}
+.fx-toggle button.active{background:var(--accent-1);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);}
 body.guest-mode .fx-toggle{top:62px;}
 @media(max-width:480px){.hero{padding:40px 18px 30px;}.welcome{padding:22px 20px;}.lang-toggle{top:10px;right:10px;}.lang-toggle button{padding:7px 12px;font-size:12px;}body.guest-mode .lang-toggle{top:56px;}.fx-toggle{top:10px;left:10px;}.fx-toggle button{width:28px;height:28px;font-size:13px;}body.guest-mode .fx-toggle{top:56px;}}
 ${mp.css}${buildTextAnimCss(ta)}${lbx.css}</style></head><body${bodyClass}>
