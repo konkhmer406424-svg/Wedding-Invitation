@@ -96,7 +96,7 @@ const GALLERY_STYLES = {
 // ---- រូបតំណាង (Stand-in pictures) — បង្ហាញពេលគ្មានរូប Cover ឬគ្មានរូប Pre-wedding ----
 // ដាក់ឯកសាររូបទុកក្នុង GitHub តាម folder ដូចខាងក្រោម (ក្នុង images/) ហើយប្រើ ASSET_VERSION ដូចគ្នា។
 //   images/covers/   → cover1.webp … cover5.webp      (បង្ហាញជារូបគម្រប ពេញក្រោមឈ្មោះ — ណែនាំរូបបញ្ឈរ ឧ. 1080×1920 ឬ 1080×1620)
-//   images/gallery/  → gallery1.png … gallery5.png  (បង្ហាញក្នុងផ្នែក "រូបភាពនៃពួកយើង" — ណែនាំ 1200×1200 ឬ 1200×900)
+//   images/gallery/  → gallery1.webp … gallery5.webp  (បង្ហាញក្នុងផ្នែក "រូបភាពនៃពួកយើង" — ណែនាំ 1200×1200 ឬ 1200×900)
 // ចង់ប្តូរឈ្មោះក្នុងបញ្ជី (label), ប្តូរប្រភេទឯកសារ (jpg / webp) ឬបន្ថែមជម្រើសថ្មី គ្រាន់តែកែ/ថែមបន្ទាត់ខាងក្រោម។
 // ជម្រើសបណ្ដុំរូបភាពអាចមានរូបច្រើនសន្លឹក ដោយសរសេរ files:["a.png","b.png","c.png"] (បង្ហាញតាមទម្រង់ gallery ដែលបានជ្រើស)។
 const COVER_ART = {
@@ -109,11 +109,11 @@ const COVER_ART = {
 };
 const GALLERY_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  gallery1:{ label:"បណ្ដុំរូបភាព ១", files:["gallery1.png"] },
-  gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.png"] },
-  gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.png"] },
-  gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.png"] },
-  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.png"] }
+  gallery1:{ label:"បណ្ដុំរូបភាព ១", files:["gallery1.webp"] },
+  gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.webp"] },
+  gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.webp"] },
+  gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.webp"] },
+  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.webp"] }
 };
 function artUrl(file, kind){ return assetBase() + ASSET_DIRS[kind || "gallery"] + file + "?v=" + ASSET_VERSION; }   // kind: "cover" | "gallery"
 function coverArtUrl(s){
