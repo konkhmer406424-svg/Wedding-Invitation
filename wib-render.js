@@ -236,11 +236,12 @@ function buildSection(s, t, lang){
   // Cover photo: sharp in the middle, softly blurred toward the edges and tinted with the theme colour, so the
   // couple stands out. The photo is passed once as a CSS variable and painted by three stacked layers.
   const cnum = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
-  const cBlur = cnum(s.coverBlur, 0, 40, 22), cFx = cnum(s.coverFocusX, 0, 100, 50), cFy = cnum(s.coverFocusY, 0, 100, 35), cSharp = cnum(s.coverSharp, 30, 95, 60);
+  const cBlur = cnum(s.coverBlur, 0, 40, 22), cFx = cnum(s.coverFocusX, 0, 100, 50), cFy = cnum(s.coverFocusY, 0, 100, 35), cSharp = cnum(s.coverSharp, 30, 95, 60), cVeil = cnum(s.coverVeil, 0, 100, 35);
   const coverSrc = s.coverPhoto || coverArtUrl(s);   // uploaded cover photo, otherwise the chosen stand-in picture from GitHub
-  const heroStyle = coverSrc ? ` style="--cover:url('${coverSrc}');--fx:${cFx}%;--fy:${cFy}%;--blur:${cBlur}px;--rx:${cSharp}%;--ry:${Math.round(cSharp * 0.93)}%;"` : "";
+  const heroStyle = coverSrc ? ` style="--cover:url('${coverSrc}');--fx:${cFx}%;--fy:${cFy}%;--blur:${cBlur}px;--rx:${cSharp}%;--ry:${Math.round(cSharp * 0.93)}%;--veil:${(cVeil / 100).toFixed(2)};"` : "";
   const heroLayers = coverSrc ? `<span class="hb hb-blur"></span><span class="hb hb-sharp"></span><span class="hb hb-tint"></span>` : "";
-  const heroClass = coverSrc ? "hero has-cover" : "hero";
+  // stand-in picture (from GitHub) = shown clean: no blur, no colour veil. Uploaded photo: blur 0 = no blur at all.
+  const heroClass = coverSrc ? ("hero has-cover" + (!s.coverPhoto ? " cover-art" : "") + (cBlur === 0 ? " no-blur" : "")) : "hero";
   const suf = "-" + lang;
 
   const guestLineText = s.__guestName ? (isKm ? `ជូនចំពោះ ${s.__guestName}` : `Dear ${s.__guestName},`) : "";
@@ -639,6 +640,9 @@ body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-web
 .hb-blur{inset:calc(var(--blur,22px) * -2);z-index:-3;filter:blur(var(--blur,22px)) saturate(1.08);}
 .hb-sharp{inset:0;z-index:-2;-webkit-mask-image:radial-gradient(ellipse var(--rx,60%) var(--ry,56%) at var(--fx,50%) var(--fy,35%),#000 42%,rgba(0,0,0,.55) 68%,transparent 100%);mask-image:radial-gradient(ellipse var(--rx,60%) var(--ry,56%) at var(--fx,50%) var(--fy,35%),#000 42%,rgba(0,0,0,.55) 68%,transparent 100%);}
 .hb-tint{inset:0;z-index:-1;background:linear-gradient(180deg,transparent 80%,var(--bg) 100%),radial-gradient(ellipse 88% 82% at var(--fx,50%) var(--fy,35%),transparent 38%,color-mix(in srgb,var(--accent-1) 48%,transparent) 76%,color-mix(in srgb,var(--accent-1) 78%,#000) 100%),linear-gradient(180deg,rgba(0,0,0,.30) 0%,rgba(0,0,0,.36) 45%,rgba(0,0,0,.58) 100%);}
+.hb-tint{opacity:var(--veil,.35);}
+.hero.no-blur .hb-blur,.hero.cover-art .hb-blur,.hero.cover-art .hb-tint{display:none;}
+.hero.no-blur .hb-sharp,.hero.cover-art .hb-sharp{-webkit-mask-image:none;mask-image:none;}
 .hero.has-cover .eyebrow{color:#fff;opacity:.92;text-shadow:0 2px 10px rgba(0,0,0,.55);}
 .hero.has-cover .names{color:#fff;text-shadow:0 4px 18px rgba(0,0,0,.55), 0 1px 4px rgba(0,0,0,.85);}
 .hero.has-cover .names .amp{color:var(--accent-2);}

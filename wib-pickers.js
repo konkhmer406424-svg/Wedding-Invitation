@@ -249,6 +249,7 @@ function buildCoverFocus(){
   $("focusDot").style.top = state.coverFocusY + "%";
   $("coverBlur").value = state.coverBlur;   $("coverBlurVal").textContent = state.coverBlur ? state.coverBlur + " px" : "បិទ";
   $("coverSharp").value = state.coverSharp; $("coverSharpVal").textContent = state.coverSharp + "%";
+  $("coverVeil").value = state.coverVeil;   $("coverVeilVal").textContent = state.coverVeil ? state.coverVeil + "%" : "បិទ";
 }
 (function bindCoverFocus(){
   const pick = $("focusPick");
@@ -270,9 +271,10 @@ function buildCoverFocus(){
   pick.addEventListener("pointercancel", stop);
   $("coverBlur").addEventListener("input", e => { state.coverBlur = +e.target.value; $("coverBlurVal").textContent = state.coverBlur ? state.coverBlur + " px" : "បិទ"; scheduleUpdate(); });
   $("coverSharp").addEventListener("input", e => { state.coverSharp = +e.target.value; $("coverSharpVal").textContent = state.coverSharp + "%"; scheduleUpdate(); });
+  $("coverVeil").addEventListener("input", e => { state.coverVeil = +e.target.value; $("coverVeilVal").textContent = state.coverVeil ? state.coverVeil + "%" : "បិទ"; scheduleUpdate(); });
   $("coverFocusReset").addEventListener("click", () => {
     state.coverBlur = defaultState.coverBlur; state.coverFocusX = defaultState.coverFocusX;
-    state.coverFocusY = defaultState.coverFocusY; state.coverSharp = defaultState.coverSharp;
+    state.coverFocusY = defaultState.coverFocusY; state.coverSharp = defaultState.coverSharp; state.coverVeil = defaultState.coverVeil;
     buildCoverFocus(); update();
   });
 })();

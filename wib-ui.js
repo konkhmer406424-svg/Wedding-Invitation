@@ -1388,7 +1388,7 @@ function normalizeImported(raw){
   s.venueMapLink = /^https?:\/\/\S+$/i.test(bkStr(r.venueMapLink, 2000).trim()) ? bkStr(r.venueMapLink, 2000).trim() : "";
   s.guestNamesFileRaw = bkStr(r.guestNamesFileRaw, 500000);
   s.theme = (typeof r.theme === "string" && hasOwn(THEMES, r.theme)) ? r.theme : defaultState.theme;
-  ["kbachFrame","kbachBg","frameFit","frameOpacity","bgFit","bgOpacity","fontKm","fontEn","galleryStyle","galleryArt","coverArt","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp"]
+  ["kbachFrame","kbachBg","frameFit","frameOpacity","bgFit","bgOpacity","fontKm","fontEn","galleryStyle","galleryArt","coverArt","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil"]
     .forEach(k => { if(r[k] !== undefined) s[k] = r[k]; });
   if(!hasOwn(GALLERY_ART, s.galleryArt)) s.galleryArt = "none";
   if(!hasOwn(COVER_ART, s.coverArt)) s.coverArt = "none";

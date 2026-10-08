@@ -480,7 +480,7 @@ const defaultState = {
   venueNameEn:"",
   venueAddrEn:"",
   venueMapLink:"",
-  coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60,
+  coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60, coverVeil:35,
   venueCoords:"",
   videoUrl:"",
   contacts:[
@@ -554,6 +554,7 @@ function migrateStyle_(s){
   s.bgOpacity = num(s.bgOpacity, 10, 100, 100);
   s.coverBlur = num(s.coverBlur, 0, 40, 22); s.coverFocusX = num(s.coverFocusX, 0, 100, 50);
   s.coverFocusY = num(s.coverFocusY, 0, 100, 35); s.coverSharp = num(s.coverSharp, 30, 95, 60);
+  s.coverVeil = num(s.coverVeil, 0, 100, 35);
   s.venueCoords = (typeof s.venueCoords === "string") ? s.venueCoords.slice(0, 80) : "";
   s.videoUrl = (typeof s.videoUrl === "string" && /^https?:\/\//i.test(s.videoUrl.trim())) ? s.videoUrl.trim().slice(0, 500) : "";
   return s;
@@ -584,3 +585,4 @@ function escapeHtml(s){
   return (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 const hasOwn = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+
