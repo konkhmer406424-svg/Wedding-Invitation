@@ -318,6 +318,40 @@ ${bodySections}
 </section>`;
 }
 
+// Transition of the full-screen overlay frames while scrolling down: progress p (0 at the top -> 1 after ~60% of a screen) drives the effect,
+// so the frame disappears little by little and comes back when you scroll up. Effects: fade / slide / zoom / blur / drift.
+function buildFrameFxJs(s){
+  const id = s && s.kbachFrame;
+  if(!id || id === "none" || id === "custom" || !hasOwn(KBACH_FRAME_STYLES, id) || KBACH_FRAME_STYLES[id].mode === "slice") return "";
+  const fx = hasOwn(FRAME_FX, s.frameFx) ? s.frameFx : "fade";
+  if(fx === "none") return "";
+  return `
+(function(){
+  var els=[].slice.call(document.querySelectorAll('.kb-ov'));
+  if(!els.length) return;
+  var fx=${JSON.stringify(fx)}, ticking=false;
+  try{ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) fx='fade'; }catch(e){}
+  els.forEach(function(el){ el.style.transformOrigin=el.classList.contains('kb-ov-top')?'50% 0':'50% 100%'; });
+  function ease(p){ return p*p*(3-2*p); }
+  function apply(){
+    ticking=false;
+    var y=window.pageYOffset||document.documentElement.scrollTop||0;
+    var p=ease(Math.min(1,Math.max(0,y/Math.max(180,window.innerHeight*0.6))));
+    els.forEach(function(el){
+      var d=el.classList.contains('kb-ov-top')?-1:1, tr='translateX(-50%)', fl='', op=1-p;
+      if(fx==='slide'){ tr+=' translateY('+(d*p*105)+'%)'; op=1-p*p; }
+      else if(fx==='zoom'){ tr+=' scale('+(1+p*0.45)+')'; }
+      else if(fx==='blur'){ fl='blur('+(p*14)+'px)'; }
+      else if(fx==='drift'){ tr+=' translate('+(d*p*16)+'%,'+(d*p*45)+'%) rotate('+(d*p*7)+'deg)'; }
+      el.style.transform=tr; el.style.filter=fl; el.style.opacity=op;
+      el.style.visibility=(p>=0.999)?'hidden':'visible';
+    });
+  }
+  window.addEventListener('scroll',function(){ if(!ticking){ ticking=true; (window.requestAnimationFrame||setTimeout)(apply); } },{passive:true});
+  window.addEventListener('resize',apply);
+  apply();
+})();`;
+}
 // Does this frame leave only a border free (9-slice / uploaded), so the background must be inset? Full-screen overlay frames: no.
 function kbachFrameNeedsInset(id){
   if(!id || id === "none") return false;
@@ -353,14 +387,13 @@ function buildKbachFrameOverlay(styleId, t, s, layer){
     return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg kb-bg-anim${kbachFrameNeedsInset(s && s.kbachFrame) ? " kb-bg-framed" : ""}" style="background-image:url('${pu}');background-size:contain;" aria-hidden="true"></div>`;
   }
   // "slice" = old 9-slice border frame (square picture, corners 3/8). Default = full-screen overlay picture (portrait 1024x1280):
-  // the top half sits at the very top of the page and the bottom half at the very end of the page (they scroll with the content),
+  // the top half sticks to the top edge of the screen and the bottom half to the bottom edge (see buildFrameFxJs: they fade away as you scroll),
   // the middle stays transparent, so the flowers keep
   // their real proportions on any phone and are never stretched or cut in the corners.
   if(KBACH_FRAME_STYLES[styleId].mode === "slice"){
     return `<div class="kb-frame" style="--kb-img:url('${pu}');" aria-hidden="true"><div class="kb-shine"></div></div>`;
   }
-  const fx = (s && s.frameScroll === "fixed") ? " kb-ov-fixed" : "";   // fixed = stays on the screen, otherwise it scrolls with the page
-  return `<div class="kb-ov kb-ov-top${fx}" style="--kb-img:url('${pu}');" aria-hidden="true"></div><div class="kb-ov kb-ov-bot${fx}" style="--kb-img:url('${pu}');" aria-hidden="true"></div>`;
+  return `<div class="kb-ov kb-ov-top" style="--kb-img:url('${pu}');" aria-hidden="true"></div><div class="kb-ov kb-ov-bot" style="--kb-img:url('${pu}');" aria-hidden="true"></div>`;
 }
 // ---------- Text animation on scroll (guest invitation) ----------
 // Text/blocks start hidden and reveal once when they scroll into view. Everything is added by script and scoped
@@ -609,6 +642,7 @@ function renderInvitation(s){
   const mp = buildMusicParts(s);
   const ta = hasOwn(TEXT_ANIM_STYLES, s.textAnim) ? s.textAnim : "fadeup";
   const taJs = buildTextAnimJs(ta, !!s.__preview);
+  const frameFxJs = buildFrameFxJs(s);
   const lbx = buildLightbox();
   const calJs = (targetIso && !isNaN(Date.parse(targetIso))) ? `try{(${wibCalendarRuntime.toString()})(${JSON.stringify(buildCalendarCfg(s, targetIso)).replace(/</g, "\\u003c")});}catch(e){}` : "";
 
@@ -622,10 +656,9 @@ function renderInvitation(s){
 :root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--card:${t.card};--ctl-bg:color-mix(in srgb, ${t.card} 26%, transparent);--border:${t.border};--radius:${t.radius};--display-font:${fk.display};--body-font:${fk.body};--display-font-en:${fe.display};--body-font-en:${fe.body};}
 *{box-sizing:border-box}
 html{background:var(--bg);}
-body{position:relative;min-height:100vh;min-height:100dvh;margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
+body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
 .kb-frame{position:fixed;inset:0;z-index:60;pointer-events:none;box-sizing:border-box;border:var(--kb-w) solid transparent;border-image-source:var(--kb-img);border-image-slice:405;border-image-width:var(--kb-w);border-image-repeat:round;animation:kb-glow 6s ease-in-out infinite;}
-.kb-ov{position:absolute;left:50%;width:min(100%,680px);transform:translateX(-50%);aspect-ratio:1024/640;z-index:60;pointer-events:none;background:var(--kb-img) no-repeat;background-size:100% 200%;}
-.kb-ov-fixed{position:fixed;}
+.kb-ov{position:fixed;left:50%;will-change:transform,opacity;width:min(100%,680px);transform:translateX(-50%);aspect-ratio:1024/640;z-index:60;pointer-events:none;background:var(--kb-img) no-repeat;background-size:100% 200%;}
 .kb-ov-top{top:0;background-position:center top;}
 .kb-ov-bot{bottom:0;background-position:center bottom;}
 .kb-shine{position:absolute;inset:calc(-1 * var(--kb-w));pointer-events:none;-webkit-mask-box-image:var(--kb-img) 405 / var(--kb-w) round;mask-border:var(--kb-img) 405 / var(--kb-w) round;background:linear-gradient(115deg,transparent 38%,rgba(255,246,205,.95) 50%,transparent 62%) 0 0/300% 300%;animation:kb-shine 5.5s ease-in-out infinite;}
@@ -948,6 +981,7 @@ fxStart(fxType);
 ${taJs.defs}
 ${mp.js}
 ${taJs.init}
+${frameFxJs}
 ${lbx.js}
 })();<\/script>
 </body></html>`;

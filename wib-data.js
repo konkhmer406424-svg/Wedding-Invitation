@@ -160,6 +160,15 @@ const KBACH_FRAME_STYLES = {   // FRAME: នៅពីលើខ្លឹមសា
   frame5:{ label:"គុម្ពឈើផ្កាលឿង — ជ្រុងក្រោម", file:"frame5.png" },
   custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
 };
+// ចលនារបស់ស៊ុម (frame1–5) ពេលអូសចុះក្រោម៖ ស៊ុមបាត់បន្តិចម្ដងៗតាមចម្ងាយដែលអូស (ត្រឡប់មកវិញពេលអូសឡើងលើ)។
+const FRAME_FX = {
+  none:{ label:"ជាប់ជានិច្ច (គ្មានចលនា)" },
+  fade:{ label:"រលាយបាត់" },
+  slide:{ label:"រុញចេញ (លើឡើងលើ ក្រោមចុះក្រោម)" },
+  zoom:{ label:"ពង្រីករួចបាត់" },
+  blur:{ label:"ព្រិលរួចបាត់" },
+  drift:{ label:"បក់ផ្លុំចេញ" }
+};
 const KBACH_BG_STYLES = {      // BACKGROUND: នៅពីក្រោយខ្លឹមសារ ជាប់អេក្រង់
   none:{ label:"គ្មាន" },
   bg1:{ label:"ផ្ទៃ ១ — មែកផ្កាទ្រេត", file:"bg1.png" },
@@ -454,7 +463,7 @@ const defaultState = {
   galleryArt:"none",
   coverArt:"none",
   kbachFrame:"none", kbachBg:"bg1",
-  frameFit:"stretch", frameOpacity:100, frameScroll:"scroll",
+  frameFit:"stretch", frameOpacity:100, frameFx:"fade",
   bgFit:"cover", bgOpacity:100,
   textAnim:"fadeup",
   openStyle:"door",
@@ -550,7 +559,7 @@ function migrateStyle_(s){
   if(s.bgFit !== "cover" && s.bgFit !== "stretch") s.bgFit = "cover";
   if(!COVER_STYLE_KEYS.includes(s.openStyle)) s.openStyle = "door";
   if(s.frameFit !== "stretch" && s.frameFit !== "cover") s.frameFit = "stretch";
-  if(s.frameScroll !== "fixed") s.frameScroll = "scroll";   // "scroll" = frame moves with the page, "fixed" = stays on the screen
+  if(!_ho(FRAME_FX, s.frameFx)) s.frameFx = "fade";
   const num = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
   s.frameOpacity = num(s.frameOpacity, 10, 100, 100);
   s.bgOpacity = num(s.bgOpacity, 10, 100, 100);

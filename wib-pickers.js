@@ -140,27 +140,28 @@ function buildKbachFrameSelect(){
   renderPicker("pickKbach", Object.keys(KBACH_FRAME_STYLES).map(k => ({ key:k, title:KBACH_FRAME_STYLES[k].label, inner:kbachThumb("frame", k) })),
     state.kbachFrame, k => { state.kbachFrame = k; buildKbachFrameSelect(); update(); });
   buildKbachBgSelect();
-  buildFrameScrollSelect();
+  buildFrameFxSelect();
   if(typeof refreshFrameUI === "function") refreshFrameUI();
 }
-// Frame display mode (only for preset overlay frames): scroll with the page, or stay fixed on the screen.
-function buildFrameScrollSelect(){
-  const g = $("frameScrollGroup"); if(!g) return;
+// Frame transition while scrolling (only for the full-screen overlay frames frame1–5).
+const FRAME_FX_ICONS = {
+  none: NONE_ICON,
+  fade: PK.svg("0 0 40 40", '<rect x="7" y="9" width="26" height="5" rx="2" fill="currentColor" stroke="none"/><rect x="7" y="18" width="26" height="5" rx="2" fill="currentColor" stroke="none" opacity=".55"/><rect x="7" y="27" width="26" height="5" rx="2" fill="currentColor" stroke="none" opacity=".22"/>'),
+  slide: PK.svg("0 0 40 40", '<path d="M20 15V5M15 10l5-5 5 5"/><path d="M20 25v10M15 30l5 5 5-5"/><path d="M8 20h24" opacity=".4" stroke-dasharray="2 3"/>'),
+  zoom: PK.svg("0 0 40 40", '<rect x="14" y="14" width="12" height="12" rx="1.5" fill="currentColor" stroke="none"/><rect x="8" y="8" width="24" height="24" rx="2" opacity=".5"/><rect x="3.5" y="3.5" width="33" height="33" rx="3" opacity=".25" stroke-dasharray="3 3"/>'),
+  blur: PK.svg("0 0 40 40", '<circle cx="20" cy="20" r="4.5" fill="currentColor" stroke="none"/><circle cx="20" cy="20" r="9.5" opacity=".55"/><circle cx="20" cy="20" r="15" opacity=".28" stroke-dasharray="2 3"/>'),
+  drift: PK.svg("0 0 40 40", '<path d="M14 15L6 7M6 14V7h7"/><path d="M26 25l8 8M34 26v7h-7"/><path d="M20 20h.1" stroke-width="3" opacity=".6"/>')
+};
+function buildFrameFxSelect(){
+  if(!hasOwn(FRAME_FX, state.frameFx)) state.frameFx = "fade";
+  const g = $("frameFxGroup"); if(!g) return;
   const id = state.kbachFrame, st = hasOwn(KBACH_FRAME_STYLES, id) ? KBACH_FRAME_STYLES[id] : null;
   g.style.display = (id && id !== "none" && id !== "custom" && st && st.mode !== "slice") ? "" : "none";
-  g.querySelectorAll("button[data-v]").forEach(b => b.classList.toggle("active", b.dataset.v === state.frameScroll));
-  const h = $("frameScrollHint");
-  if(h) h.textContent = state.frameScroll === "fixed"
-    ? "ស៊ុមនៅជាប់គែមអេក្រង់ជានិច្ច ពេលរមូរ (អាចបាំងអក្សរ)។"
-    : "ផ្នែកលើនៅដើមទំព័រ ហើយផ្នែកក្រោមនៅចុងទំព័រ ពេលរមូរទើបឃើញ។";
+  renderPicker("pickFrameFx", Object.keys(FRAME_FX).map(k => ({ key:k, title:FRAME_FX[k].label, inner:FRAME_FX_ICONS[k] })),
+    state.frameFx, k => { state.frameFx = k; buildFrameFxSelect(); update(); });
+  const h = $("frameFxHint");
+  if(h) h.textContent = "«" + FRAME_FX[state.frameFx].label + "» — " + (state.frameFx === "none" ? "ស៊ុមនៅជាប់អេក្រង់ជានិច្ច ពេលរមូរ។" : "រមូរចុះក្រោមក្នុងផ្ទាំង Preview ដើម្បីមើលចលនា។");
 }
-(function bindFrameScroll(){
-  const g = $("frameScrollGroup"); if(!g) return;
-  g.querySelectorAll("button[data-v]").forEach(b => b.addEventListener("click", () => {
-    state.frameScroll = (b.dataset.v === "fixed") ? "fixed" : "scroll";
-    buildFrameScrollSelect(); update();
-  }));
-})();
 function buildKbachBgSelect(){
   if(!hasOwn(KBACH_BG_STYLES, state.kbachBg)) state.kbachBg = "none";
   renderPicker("pickKbachBg", Object.keys(KBACH_BG_STYLES).map(k => ({ key:k, title:KBACH_BG_STYLES[k].label, inner:kbachThumb("bg", k) })),
