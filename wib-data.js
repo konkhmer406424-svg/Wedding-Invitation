@@ -95,17 +95,17 @@ const GALLERY_STYLES = {
 // ---- Text animation when the guest scrolls (chosen separately from colour/font/theme) ----
 // ---- រូបតំណាង (Stand-in pictures) — បង្ហាញពេលគ្មានរូប Cover ឬគ្មានរូប Pre-wedding ----
 // ដាក់ឯកសាររូបទុកក្នុង GitHub តាម folder ដូចខាងក្រោម (ក្នុង images/) ហើយប្រើ ASSET_VERSION ដូចគ្នា។
-//   images/covers/   → cover1.png … cover5.png      (បង្ហាញជារូបគម្រប ពេញក្រោមឈ្មោះ — ណែនាំរូបបញ្ឈរ ឧ. 1080×1920 ឬ 1080×1620)
+//   images/covers/   → cover1.webp … cover5.webp      (បង្ហាញជារូបគម្រប ពេញក្រោមឈ្មោះ — ណែនាំរូបបញ្ឈរ ឧ. 1080×1920 ឬ 1080×1620)
 //   images/gallery/  → gallery1.png … gallery5.png  (បង្ហាញក្នុងផ្នែក "រូបភាពនៃពួកយើង" — ណែនាំ 1200×1200 ឬ 1200×900)
 // ចង់ប្តូរឈ្មោះក្នុងបញ្ជី (label), ប្តូរប្រភេទឯកសារ (jpg / webp) ឬបន្ថែមជម្រើសថ្មី គ្រាន់តែកែ/ថែមបន្ទាត់ខាងក្រោម។
 // ជម្រើសបណ្ដុំរូបភាពអាចមានរូបច្រើនសន្លឹក ដោយសរសេរ files:["a.png","b.png","c.png"] (បង្ហាញតាមទម្រង់ gallery ដែលបានជ្រើស)។
 const COVER_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  cover1:{ label:"រូបគម្រប ១", file:"cover1.png" },
-  cover2:{ label:"រូបគម្រប ២", file:"cover2.png" },
-  cover3:{ label:"រូបគម្រប ៣", file:"cover3.png" },
-  cover4:{ label:"រូបគម្រប ៤", file:"cover4.png" },
-  cover5:{ label:"រូបគម្រប ៥", file:"cover5.png" }
+  cover1:{ label:"រូបគម្រប ១", file:"cover1.webp" },
+  cover2:{ label:"រូបគម្រប ២", file:"cover2.webp" },
+  cover3:{ label:"រូបគម្រប ៣", file:"cover3.webp" },
+  cover4:{ label:"រូបគម្រប ៤", file:"cover4.webp" },
+  cover5:{ label:"រូបគម្រប ៥", file:"cover5.webp" }
 };
 const GALLERY_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
@@ -584,4 +584,3 @@ function escapeHtml(s){
   return (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 const hasOwn = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
-
