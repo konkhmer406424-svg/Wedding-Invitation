@@ -318,6 +318,12 @@ ${bodySections}
 </section>`;
 }
 
+// Does this frame leave only a border free (9-slice / uploaded), so the background must be inset? Full-screen overlay frames: no.
+function kbachFrameNeedsInset(id){
+  if(!id || id === "none") return false;
+  if(id === "custom" || !hasOwn(KBACH_FRAME_STYLES, id)) return true;
+  return KBACH_FRAME_STYLES[id].mode === "slice";
+}
 // Frame (on top) / background (behind) overlay. Preset styles are PNG files from GitHub (see KBACH_FRAME_STYLES / KBACH_BG_STYLES);
 // "custom" is an image uploaded by staff, embedded in the invitation.
 function buildKbachFrameOverlay(styleId, t, s, layer){
@@ -344,9 +350,17 @@ function buildKbachFrameOverlay(styleId, t, s, layer){
   const pu = kbachPresetUrl(layer, styleId);
   if(!pu) return "";
   if(layer === "bg"){
-    return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg kb-bg-anim${(s && s.kbachFrame && s.kbachFrame !== "none") ? " kb-bg-framed" : ""}" style="background-image:url('${pu}');background-size:contain;" aria-hidden="true"></div>`;
+    return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg kb-bg-anim${kbachFrameNeedsInset(s && s.kbachFrame) ? " kb-bg-framed" : ""}" style="background-image:url('${pu}');background-size:contain;" aria-hidden="true"></div>`;
   }
-  return `<div class="kb-frame" style="--kb-img:url('${pu}');" aria-hidden="true"><div class="kb-shine"></div></div>`;
+  // "slice" = old 9-slice border frame (square picture, corners 3/8). Default = full-screen overlay picture (portrait 1024x1280):
+  // the top half sits at the very top of the page and the bottom half at the very end of the page (they scroll with the content),
+  // the middle stays transparent, so the flowers keep
+  // their real proportions on any phone and are never stretched or cut in the corners.
+  if(KBACH_FRAME_STYLES[styleId].mode === "slice"){
+    return `<div class="kb-frame" style="--kb-img:url('${pu}');" aria-hidden="true"><div class="kb-shine"></div></div>`;
+  }
+  const fx = (s && s.frameScroll === "fixed") ? " kb-ov-fixed" : "";   // fixed = stays on the screen, otherwise it scrolls with the page
+  return `<div class="kb-ov kb-ov-top${fx}" style="--kb-img:url('${pu}');" aria-hidden="true"></div><div class="kb-ov kb-ov-bot${fx}" style="--kb-img:url('${pu}');" aria-hidden="true"></div>`;
 }
 // ---------- Text animation on scroll (guest invitation) ----------
 // Text/blocks start hidden and reveal once when they scroll into view. Everything is added by script and scoped
@@ -608,8 +622,12 @@ function renderInvitation(s){
 :root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--card:${t.card};--ctl-bg:color-mix(in srgb, ${t.card} 26%, transparent);--border:${t.border};--radius:${t.radius};--display-font:${fk.display};--body-font:${fk.body};--display-font-en:${fe.display};--body-font-en:${fe.body};}
 *{box-sizing:border-box}
 html{background:var(--bg);}
-body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
+body{position:relative;min-height:100vh;min-height:100dvh;margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
 .kb-frame{position:fixed;inset:0;z-index:60;pointer-events:none;box-sizing:border-box;border:var(--kb-w) solid transparent;border-image-source:var(--kb-img);border-image-slice:405;border-image-width:var(--kb-w);border-image-repeat:round;animation:kb-glow 6s ease-in-out infinite;}
+.kb-ov{position:absolute;left:50%;width:min(100%,680px);transform:translateX(-50%);aspect-ratio:1024/640;z-index:60;pointer-events:none;background:var(--kb-img) no-repeat;background-size:100% 200%;}
+.kb-ov-fixed{position:fixed;}
+.kb-ov-top{top:0;background-position:center top;}
+.kb-ov-bot{bottom:0;background-position:center bottom;}
 .kb-shine{position:absolute;inset:calc(-1 * var(--kb-w));pointer-events:none;-webkit-mask-box-image:var(--kb-img) 405 / var(--kb-w) round;mask-border:var(--kb-img) 405 / var(--kb-w) round;background:linear-gradient(115deg,transparent 38%,rgba(255,246,205,.95) 50%,transparent 62%) 0 0/300% 300%;animation:kb-shine 5.5s ease-in-out infinite;}
 .kb-shine{display:none;}   /* shine is a gradient clipped by a border-image mask: browsers without mask-border / -webkit-mask-box-image (e.g. Firefox) would paint it over the whole screen, so keep it hidden there */
 @supports ((-webkit-mask-box-image:none) or (mask-border:none)){.kb-shine{display:block;}}

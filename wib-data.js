@@ -136,9 +136,10 @@ const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square",
 
 // ===== រូបស៊ុម / ផ្ទៃខាងក្រោយ ជាឯកសាររូបភាព (PNG) នៅលើ GitHub =====
 // ដាក់ឯកសារក្នុង  images/frames/  (frame1.png … frame5.png)  និង  images/backgrounds/  (bg1.png … bg5.png)
-// ស៊ុមនីមួយៗជារូប PNG ថ្លា "ការ៉េ" ១ ឯកសារ (ទំហំណាក៏បាន ឧ. 1080×1080) ហើយកូដកាត់ជា ៩ ចំណែក (9-slice)៖
-//   ជ្រុងទាំង ៤ = ផ្នែកក្បាច់ធំ  |  គែមទាំង ៤ = ផ្នែកក្បាច់ដដែលៗ  → ដូច្នេះស៊ុមមិនលាតខុសរូបលើអេក្រង់ណាក៏ដោយ។
-// ទំហំជ្រុងក្នុងរូប = 3/8 នៃទំហំរូប (រូប 1080 → ជ្រុង 405px)។ តម្លៃ 405 នេះនៅក្នុង CSS ឈ្មោះ .kb-frame (border-image-slice)។
+// FRAME (ត្រួតពីលើខ្លឹមសារ)៖ រូប PNG ថ្លា បញ្ឈរ ទំហំ 1024×1280 (4:5) ដែលកណ្ដាលទុកថ្លា។
+//   កន្លះលើនៃរូប (បន្ទាត់ 0–640) នៅដើមទំព័រ និងកន្លះក្រោម (640–1280) នៅចុងទំព័រ → រមូរចុះក្រោមទើបឃើញផ្កាខាងក្រោម ហើយមិនលាតខុសសមាមាត្រលើទូរស័ព្ទ។
+//   ដូច្នេះរូបតុបតែងត្រូវនៅក្នុងកន្លះលើ ឬកន្លះក្រោម កុំឱ្យឆ្លងកណ្ដាល។ លើកុំព្យូទ័រ ទទឹងអតិបរមាស្មើ 680px (ស្មើទទឹងធៀប)។
+//   ចង់ប្រើរូបស៊ុមបួនជ្រុងបែបចាស់ (9-slice 1080×1080) សូមបន្ថែម mode:"slice" ក្នុងបន្ទាត់នោះ។
 // ចង់ប្តូររូប គ្រាន់តែ upload រូបថ្មីដាក់ឈ្មោះដូចគ្នា (ជំនួសរូបចាស់) ដោយមិនចាំបាច់កែកូដ។
 // ASSET_BASE_OVERRIDE៖ ទុកទទេ = ប្រើ folder តែមួយជាមួយ index.html របស់ Builder នេះ (folder images/ ស្ថិតក្នុងនោះ)។
 // បើរូបនៅកន្លែងផ្សេង ដាក់ URL ពេញ ឧ. "https://USERNAME.github.io/REPO/"  (ត្រូវបញ្ចប់ដោយ /)
@@ -152,11 +153,11 @@ function assetBase(){
 }
 const KBACH_FRAME_STYLES = {   // FRAME: នៅពីលើខ្លឹមសារ ជាប់គែមអេក្រង់
   none:{ label:"គ្មាន" },
-  frame1:{ label:"ស៊ុម ១ — ផ្កាមាសជ្រុង", file:"frame1.png" },
-  frame2:{ label:"ស៊ុម ២ — ស្លឹកឈើសងខាង", file:"frame2.png" },
-  frame3:{ label:"ស៊ុម ៣ — ស៊ុមមាសពីរជាន់", file:"frame3.png" },
-  frame4:{ label:"ស៊ុម ៤ — ផ្កាព្យួរពីលើ", file:"frame4.png" },
-  frame5:{ label:"ស៊ុម ៥ — ក្បាច់ខៀវ-មាស", file:"frame5.png" },
+  frame1:{ label:"ផ្កាកុលាប — ជ្រុងស្តាំក្រោម", file:"frame1.png" },
+  frame2:{ label:"ផ្កាកុលាប — ខាងក្រោម", file:"frame2.png" },
+  frame3:{ label:"អប្សរាចាក់ផ្កា — ពីរជ្រុងខាងលើ", file:"frame3.png" },
+  frame4:{ label:"ស្លឹកព្យួរខាងលើ + គុម្ពឈើ", file:"frame4.png" },
+  frame5:{ label:"គុម្ពឈើផ្កាលឿង — ជ្រុងក្រោម", file:"frame5.png" },
   custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
 };
 const KBACH_BG_STYLES = {      // BACKGROUND: នៅពីក្រោយខ្លឹមសារ ជាប់អេក្រង់
@@ -453,7 +454,7 @@ const defaultState = {
   galleryArt:"none",
   coverArt:"none",
   kbachFrame:"none", kbachBg:"bg1",
-  frameFit:"stretch", frameOpacity:100,
+  frameFit:"stretch", frameOpacity:100, frameScroll:"scroll",
   bgFit:"cover", bgOpacity:100,
   textAnim:"fadeup",
   openStyle:"door",
@@ -549,6 +550,7 @@ function migrateStyle_(s){
   if(s.bgFit !== "cover" && s.bgFit !== "stretch") s.bgFit = "cover";
   if(!COVER_STYLE_KEYS.includes(s.openStyle)) s.openStyle = "door";
   if(s.frameFit !== "stretch" && s.frameFit !== "cover") s.frameFit = "stretch";
+  if(s.frameScroll !== "fixed") s.frameScroll = "scroll";   // "scroll" = frame moves with the page, "fixed" = stays on the screen
   const num = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
   s.frameOpacity = num(s.frameOpacity, 10, 100, 100);
   s.bgOpacity = num(s.bgOpacity, 10, 100, 100);

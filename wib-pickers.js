@@ -140,8 +140,27 @@ function buildKbachFrameSelect(){
   renderPicker("pickKbach", Object.keys(KBACH_FRAME_STYLES).map(k => ({ key:k, title:KBACH_FRAME_STYLES[k].label, inner:kbachThumb("frame", k) })),
     state.kbachFrame, k => { state.kbachFrame = k; buildKbachFrameSelect(); update(); });
   buildKbachBgSelect();
+  buildFrameScrollSelect();
   if(typeof refreshFrameUI === "function") refreshFrameUI();
 }
+// Frame display mode (only for preset overlay frames): scroll with the page, or stay fixed on the screen.
+function buildFrameScrollSelect(){
+  const g = $("frameScrollGroup"); if(!g) return;
+  const id = state.kbachFrame, st = hasOwn(KBACH_FRAME_STYLES, id) ? KBACH_FRAME_STYLES[id] : null;
+  g.style.display = (id && id !== "none" && id !== "custom" && st && st.mode !== "slice") ? "" : "none";
+  g.querySelectorAll("button[data-v]").forEach(b => b.classList.toggle("active", b.dataset.v === state.frameScroll));
+  const h = $("frameScrollHint");
+  if(h) h.textContent = state.frameScroll === "fixed"
+    ? "ស៊ុមនៅជាប់គែមអេក្រង់ជានិច្ច ពេលរមូរ (អាចបាំងអក្សរ)។"
+    : "ផ្នែកលើនៅដើមទំព័រ ហើយផ្នែកក្រោមនៅចុងទំព័រ ពេលរមូរទើបឃើញ។";
+}
+(function bindFrameScroll(){
+  const g = $("frameScrollGroup"); if(!g) return;
+  g.querySelectorAll("button[data-v]").forEach(b => b.addEventListener("click", () => {
+    state.frameScroll = (b.dataset.v === "fixed") ? "fixed" : "scroll";
+    buildFrameScrollSelect(); update();
+  }));
+})();
 function buildKbachBgSelect(){
   if(!hasOwn(KBACH_BG_STYLES, state.kbachBg)) state.kbachBg = "none";
   renderPicker("pickKbachBg", Object.keys(KBACH_BG_STYLES).map(k => ({ key:k, title:KBACH_BG_STYLES[k].label, inner:kbachThumb("bg", k) })),
