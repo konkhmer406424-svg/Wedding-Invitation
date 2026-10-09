@@ -338,12 +338,12 @@ function buildFrameFxJs(s){
     var y=window.pageYOffset||document.documentElement.scrollTop||0;
     var p=ease(Math.min(1,Math.max(0,y/Math.max(180,window.innerHeight*0.6))));
     els.forEach(function(el){
-      var d=el.classList.contains('kb-ov-top')?-1:1, tr='translateX(-50%)', fl='', op=1-p;
-      if(fx==='slide'){ tr+=' translateY('+(d*p*105)+'%)'; op=1-p*p; }
-      else if(fx==='zoom'){ tr+=' scale('+(1+p*0.45)+')'; }
+      var d=el.classList.contains('kb-ov-top')?-1:1, sx=parseFloat(el.getAttribute('data-s'))||1, tr='', fl='', op=1-p;
+      if(fx==='slide'){ tr='translateY('+(d*p*105)+'%) '; op=1-p*p; }
+      else if(fx==='zoom'){ tr='scale('+(1+p*0.45)+') '; }
       else if(fx==='blur'){ fl='blur('+(p*14)+'px)'; }
-      else if(fx==='drift'){ tr+=' translate('+(d*p*16)+'%,'+(d*p*45)+'%) rotate('+(d*p*7)+'deg)'; }
-      el.style.transform=tr; el.style.filter=fl; el.style.opacity=op;
+      else if(fx==='drift'){ tr='translate('+(d*sx*p*16)+'%,'+(d*p*45)+'%) rotate('+(d*sx*p*7)+'deg) '; }
+      el.style.transform=tr+'scaleX('+sx+')'; el.style.filter=fl; el.style.opacity=op;
       el.style.visibility=(p>=0.999)?'hidden':'visible';
     });
   }
@@ -393,7 +393,12 @@ function buildKbachFrameOverlay(styleId, t, s, layer){
   if(KBACH_FRAME_STYLES[styleId].mode === "slice"){
     return `<div class="kb-frame" style="--kb-img:url('${pu}');" aria-hidden="true"><div class="kb-shine"></div></div>`;
   }
-  return `<div class="kb-ov kb-ov-top" style="--kb-img:url('${pu}');" aria-hidden="true"></div><div class="kb-ov kb-ov-bot" style="--kb-img:url('${pu}');" aria-hidden="true"></div>`;
+  // Wide screens: the picture is repeated to the left and right (mirrored next to the centre one, so the seams match),
+  // so the frame reaches both sides of the screen. On phones the side copies are hidden.
+  const piece = (half, ox, sx, side) => `<div class="kb-ov kb-ov-${half}${side ? " kb-ov-side" : ""}" data-s="${sx}" style="--kb-img:url('${pu}');--ox:${ox};--sx:${sx};" aria-hidden="true"></div>`;
+  return ["top", "bot"].map(h => piece(h, "0px", 1, false)
+    + piece(h, "calc(var(--kb-cw) * -1)", -1, true) + piece(h, "var(--kb-cw)", -1, true)
+    + piece(h, "calc(var(--kb-cw) * -2)", 1, true) + piece(h, "calc(var(--kb-cw) * 2)", 1, true)).join("");
 }
 // ---------- Text animation on scroll (guest invitation) ----------
 // Text/blocks start hidden and reveal once when they scroll into view. Everything is added by script and scoped
@@ -658,7 +663,8 @@ function renderInvitation(s){
 html{background:var(--bg);}
 body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
 .kb-frame{position:fixed;inset:0;z-index:60;pointer-events:none;box-sizing:border-box;border:var(--kb-w) solid transparent;border-image-source:var(--kb-img);border-image-slice:405;border-image-width:var(--kb-w);border-image-repeat:round;animation:kb-glow 6s ease-in-out infinite;}
-.kb-ov{position:fixed;left:50%;will-change:transform,opacity;width:min(100%,680px);transform:translateX(-50%);aspect-ratio:1024/640;z-index:60;pointer-events:none;background:var(--kb-img) no-repeat;background-size:100% 200%;}
+.kb-ov{position:fixed;left:calc(50% - var(--kb-cw) / 2 + var(--ox,0px));will-change:transform,opacity;width:var(--kb-cw);transform:scaleX(var(--sx,1));aspect-ratio:1024/640;z-index:60;pointer-events:none;background:var(--kb-img) no-repeat;background-size:100% 200%;}
+@media(max-width:680px){.kb-ov-side{display:none;}}
 .kb-ov-top{top:0;background-position:center top;}
 .kb-ov-bot{bottom:0;background-position:center bottom;}
 .kb-shine{position:absolute;inset:calc(-1 * var(--kb-w));pointer-events:none;-webkit-mask-box-image:var(--kb-img) 405 / var(--kb-w) round;mask-border:var(--kb-img) 405 / var(--kb-w) round;background:linear-gradient(115deg,transparent 38%,rgba(255,246,205,.95) 50%,transparent 62%) 0 0/300% 300%;animation:kb-shine 5.5s ease-in-out infinite;}
@@ -666,7 +672,7 @@ body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-web
 @supports ((-webkit-mask-box-image:none) or (mask-border:none)){.kb-shine{display:block;}}
 .kb-bg-anim{transform-origin:50% 50%;animation:kb-bgmove 14s ease-in-out infinite alternate;}
 .kb-bg-framed{inset:calc(var(--kb-w) * .3);-webkit-mask-image:linear-gradient(to right,transparent 0,#000 14%,#000 86%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0,#000 14%,#000 86%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;}
-:root{--kb-w:clamp(96px,24vw,170px);}
+:root{--kb-w:clamp(96px,24vw,170px);--kb-cw:min(100%,680px);}
 @keyframes kb-glow{0%,100%{filter:drop-shadow(0 0 2px rgba(255,205,100,.18));}50%{filter:drop-shadow(0 0 9px rgba(255,205,100,.75));}}
 @keyframes kb-shine{0%{background-position:100% 100%;}60%,100%{background-position:0% 0%;}}
 @keyframes kb-bgmove{0%{opacity:.78;}100%{opacity:1;}}
@@ -986,4 +992,3 @@ ${lbx.js}
 })();<\/script>
 </body></html>`;
 }
-
