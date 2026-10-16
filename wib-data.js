@@ -52,6 +52,8 @@ const LABELS = {
     toggleKm:"ខ្មែរ", toggleEn:"English" }
 };
 
+// Falling-effect toggle (🌸 ❄️ ✨) for guests. false = hidden and effects never start; set to true to bring it back.
+const FALLING_FX_ENABLED = false;
 const EFFECTS = {
   none:{ label:"គ្មាន", icon:"–" },
   petals:{ label:"ផ្កាធ្លាក់", icon:"🌸" },
@@ -135,10 +137,10 @@ const TEXT_ANIM_STYLES = {
 const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square", royal:"grid", emerald:"grid", blush:"grid" };
 
 // ===== រូបស៊ុម / ផ្ទៃខាងក្រោយ ជាឯកសាររូបភាព (PNG) នៅលើ GitHub =====
-// ដាក់ឯកសារក្នុង  images/frames/  (frame1.webp … frame5.webp)  និង  images/backgrounds/  (bg1.png … bg5.png)
+// ដាក់ឯកសារក្នុង  images/frames/  (frame1.png … frame5.png)  និង  images/backgrounds/  (bg1.png … bg5.png)
 // FRAME (ត្រួតពីលើខ្លឹមសារ)៖ រូប PNG ថ្លា បញ្ឈរ ទំហំ 1024×1280 (4:5) ដែលកណ្ដាលទុកថ្លា។
 //   កន្លះលើនៃរូប (បន្ទាត់ 0–640) នៅដើមទំព័រ និងកន្លះក្រោម (640–1280) នៅចុងទំព័រ → រមូរចុះក្រោមទើបឃើញផ្កាខាងក្រោម ហើយមិនលាតខុសសមាមាត្រលើទូរស័ព្ទ។
-//   ដូច្នេះរូបតុបតែងត្រូវនៅក្នុងកន្លះលើ ឬកន្លះក្រោម កុំឱ្យឆ្លងកណ្ដាល។ លើអេក្រង់ធំ (>680px) រូបត្រូវបានចម្លងបញ្ចាស់ (mirror) ទៅឆ្វេង-ស្តាំ ឱ្យពេញទទឹងអេក្រង់។
+//   ដូច្នេះរូបតុបតែងត្រូវនៅក្នុងកន្លះលើ ឬកន្លះក្រោម កុំឱ្យឆ្លងកណ្ដាល។ លើកុំព្យូទ័រ ទទឹងអតិបរមាស្មើ 680px (ស្មើទទឹងធៀប)។
 //   ចង់ប្រើរូបស៊ុមបួនជ្រុងបែបចាស់ (9-slice 1080×1080) សូមបន្ថែម mode:"slice" ក្នុងបន្ទាត់នោះ។
 // ចង់ប្តូររូប គ្រាន់តែ upload រូបថ្មីដាក់ឈ្មោះដូចគ្នា (ជំនួសរូបចាស់) ដោយមិនចាំបាច់កែកូដ។
 // ASSET_BASE_OVERRIDE៖ ទុកទទេ = ប្រើ folder តែមួយជាមួយ index.html របស់ Builder នេះ (folder images/ ស្ថិតក្នុងនោះ)។
@@ -146,18 +148,18 @@ const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square",
 const ASSET_BASE_OVERRIDE = "";
 // folder រូបទាំងអស់ (ទាក់ទងនឹង ASSET_BASE) — ចង់ប្តូរឈ្មោះ folder សូមកែត្រង់នេះតែមួយកន្លែង
 const ASSET_DIRS = { frame:"images/frames/", bg:"images/backgrounds/", cover:"images/covers/", gallery:"images/gallery/" };
-const ASSET_VERSION = "3";   // ប្តូរលេខនេះ (2, 3 …) ពេលជំនួសរូបថ្មី ដើម្បីបំបាត់ cache
+const ASSET_VERSION = "2";   // ប្តូរលេខនេះ (2, 3 …) ពេលជំនួសរូបថ្មី ដើម្បីបំបាត់ cache
 function assetBase(){
   if(ASSET_BASE_OVERRIDE) return ASSET_BASE_OVERRIDE;
   try{ return new URL("./", location.href).href; }catch(e){ return "./"; }
 }
 const KBACH_FRAME_STYLES = {   // FRAME: នៅពីលើខ្លឹមសារ ជាប់គែមអេក្រង់
   none:{ label:"គ្មាន" },
-  frame1:{ label:"ផ្កាកុលាប — ជ្រុងស្តាំក្រោម", file:"frame1.webp" },
-  frame2:{ label:"ផ្កាកុលាប — ខាងក្រោម", file:"frame2.webp" },
-  frame3:{ label:"អប្សរាចាក់ផ្កា — ពីរជ្រុងខាងលើ", file:"frame3.webp" },
-  frame4:{ label:"ស្លឹកព្យួរខាងលើ + គុម្ពឈើ", file:"frame4.webp" },
-  frame5:{ label:"គុម្ពឈើផ្កាលឿង — ជ្រុងក្រោម", file:"frame5.webp" },
+  frame1:{ label:"ផ្កាកុលាប — ជ្រុងស្តាំក្រោម", file:"frame1.png" },
+  frame2:{ label:"ផ្កាកុលាប — ខាងក្រោម", file:"frame2.png" },
+  frame3:{ label:"អប្សរាចាក់ផ្កា — ពីរជ្រុងខាងលើ", file:"frame3.png" },
+  frame4:{ label:"ស្លឹកព្យួរខាងលើ + គុម្ពឈើ", file:"frame4.png" },
+  frame5:{ label:"គុម្ពឈើផ្កាលឿង — ជ្រុងក្រោម", file:"frame5.png" },
   custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
 };
 // ចលនារបស់ស៊ុម (frame1–5) ពេលអូសចុះក្រោម៖ ស៊ុមបាត់បន្តិចម្ដងៗតាមចម្ងាយដែលអូស (ត្រឡប់មកវិញពេលអូសឡើងលើ)។
@@ -464,7 +466,7 @@ const defaultState = {
   coverArt:"none",
   kbachFrame:"none", kbachBg:"bg1",
   frameFit:"stretch", frameOpacity:100, frameFx:"fade",
-  bgFit:"cover", bgOpacity:100,
+  bgFit:"cover", bgOpacity:100, bgBlur:0,
   textAnim:"fadeup",
   openStyle:"door",
   coverAlways:false,
@@ -563,6 +565,7 @@ function migrateStyle_(s){
   const num = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
   s.frameOpacity = num(s.frameOpacity, 10, 100, 100);
   s.bgOpacity = num(s.bgOpacity, 10, 100, 100);
+  s.bgBlur = num(s.bgBlur, 0, 40, 0);
   s.coverBlur = num(s.coverBlur, 0, 40, 22); s.coverFocusX = num(s.coverFocusX, 0, 100, 50);
   s.coverFocusY = num(s.coverFocusY, 0, 100, 35); s.coverSharp = num(s.coverSharp, 30, 95, 60);
   s.coverVeil = num(s.coverVeil, 0, 100, 35);
@@ -596,3 +599,4 @@ function escapeHtml(s){
   return (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 const hasOwn = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+

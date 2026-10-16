@@ -156,7 +156,7 @@ function buildFrameFxSelect(){
   if(!hasOwn(FRAME_FX, state.frameFx)) state.frameFx = "fade";
   const g = $("frameFxGroup"); if(!g) return;
   const id = state.kbachFrame, st = hasOwn(KBACH_FRAME_STYLES, id) ? KBACH_FRAME_STYLES[id] : null;
-  g.style.display = (id && id !== "none" && id !== "custom" && st && st.mode !== "slice") ? "" : "none";
+  g.style.display = (id && id !== "none" && st && st.mode !== "slice") ? "" : "none";
   renderPicker("pickFrameFx", Object.keys(FRAME_FX).map(k => ({ key:k, title:FRAME_FX[k].label, inner:FRAME_FX_ICONS[k] })),
     state.frameFx, k => { state.frameFx = k; buildFrameFxSelect(); update(); });
   const h = $("frameFxHint");

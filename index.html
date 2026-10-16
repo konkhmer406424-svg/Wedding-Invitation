@@ -30,8 +30,10 @@
     </div>
     <p class="brand-sub">បំពេញព័ត៌មាន ជ្រើសរើសទម្រង់ រួចទាញយកជាឯកសារធៀបអញ្ជើញផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវនីមួយៗ (ខ្មែរ + English ជាមួយប៊ូតុងប្តូរភាសា)</p>
 
-    <a href="https://t.me/LTMediakh_bot" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;margin:0 0 20px;padding:11px 14px;background:linear-gradient(90deg,#2AABEE,#229ED9);color:#fff;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 3px 10px rgba(42,171,238,.25);transition:transform .12s ease, box-shadow .12s ease;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 5px 14px rgba(42,171,238,.35)';" onmouseout="this.style.transform='none';this.style.boxShadow='0 3px 10px rgba(42,171,238,.25)';">
-      💬 មិនចង់ធ្វើដោយខ្លួនឯង? ជួល Team ធ្វើជូន
+    <a class="team-cta" href="https://t.me/LTMediakh_bot" target="_blank" rel="noopener">
+      <span class="tc-ico" aria-hidden="true">✈️</span>
+      <span class="tc-txt">កុំពិបាកធ្វើខ្លួនឯង? ទាក់ទង Team ធ្វើជូនបានដូចគ្នា</span>
+      <span class="tc-go" aria-hidden="true">➜</span>
     </a>
 
     <fieldset id="backupFieldset">
@@ -75,6 +77,10 @@
       <div id="frameCustomBox"></div>
       <div class="pick-group"><div class="pick-label">ផ្ទៃខាងក្រោយ (នៅពីក្រោយ ជាប់អេក្រង់)</div><div class="pick-grid" id="pickKbachBg"></div></div>
       <div id="bgCustomBox"></div>
+      <div class="pick-group" id="bgBlurGroup" style="display:none;">
+        <label for="bgBlur">កម្រិតព្រិលផ្ទៃខាងក្រោយ <b id="bgBlurVal"></b></label>
+        <input type="range" id="bgBlur" min="0" max="40" step="1" style="width:100%;">
+      </div>
       <div class="pick-group"><div class="pick-label">ចលនាអត្ថបទពេល Scroll</div><div class="pick-grid" id="pickAnim"></div></div>
       <label class="chk-row"><input type="checkbox" id="coverAlways"><span>បង្ហាញអេក្រង់បើកធៀប ទោះមិនមានចម្រៀងក៏ដោយ (បើមានចម្រៀង អេក្រង់នេះបង្ហាញជានិច្ច)</span></label>
     </fieldset>

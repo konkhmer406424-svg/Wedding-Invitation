@@ -322,28 +322,28 @@ ${bodySections}
 // so the frame disappears little by little and comes back when you scroll up. Effects: fade / slide / zoom / blur / drift.
 function buildFrameFxJs(s){
   const id = s && s.kbachFrame;
-  if(!id || id === "none" || id === "custom" || !hasOwn(KBACH_FRAME_STYLES, id) || KBACH_FRAME_STYLES[id].mode === "slice") return "";
+  if(!id || id === "none" || !hasOwn(KBACH_FRAME_STYLES, id) || (id !== "custom" && KBACH_FRAME_STYLES[id].mode === "slice")) return "";
   const fx = hasOwn(FRAME_FX, s.frameFx) ? s.frameFx : "fade";
   if(fx === "none") return "";
   return `
 (function(){
-  var els=[].slice.call(document.querySelectorAll('.kb-ov'));
+  var els=[].slice.call(document.querySelectorAll('.kb-ov, .kbach-custom-frame'));
   if(!els.length) return;
   var fx=${JSON.stringify(fx)}, ticking=false;
   try{ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) fx='fade'; }catch(e){}
-  els.forEach(function(el){ el.style.transformOrigin=el.classList.contains('kb-ov-top')?'50% 0':'50% 100%'; });
+  els.forEach(function(el){ var b=parseFloat(el.style.opacity); el._b=isNaN(b)?1:b; el.style.transformOrigin=el.classList.contains('kbach-custom-frame')?'50% 50%':(el.classList.contains('kb-ov-top')?'50% 0':'50% 100%'); });
   function ease(p){ return p*p*(3-2*p); }
   function apply(){
     ticking=false;
     var y=window.pageYOffset||document.documentElement.scrollTop||0;
     var p=ease(Math.min(1,Math.max(0,y/Math.max(180,window.innerHeight*0.6))));
     els.forEach(function(el){
-      var d=el.classList.contains('kb-ov-top')?-1:1, sx=parseFloat(el.getAttribute('data-s'))||1, tr='', fl='', op=1-p;
-      if(fx==='slide'){ tr='translateY('+(d*p*105)+'%) '; op=1-p*p; }
-      else if(fx==='zoom'){ tr='scale('+(1+p*0.45)+') '; }
+      var cu=el.classList.contains('kbach-custom-frame'), d=(cu||el.classList.contains('kb-ov-top'))?-1:1, tr=cu?'':'translateX(-50%)', fl='', op=1-p;
+      if(fx==='slide'){ tr+=' translateY('+(d*p*105)+'%)'; op=1-p*p; }
+      else if(fx==='zoom'){ tr+=' scale('+(1+p*0.45)+')'; }
       else if(fx==='blur'){ fl='blur('+(p*14)+'px)'; }
-      else if(fx==='drift'){ tr='translate('+(d*sx*p*16)+'%,'+(d*p*45)+'%) rotate('+(d*sx*p*7)+'deg) '; }
-      el.style.transform=tr+'scaleX('+sx+')'; el.style.filter=fl; el.style.opacity=op;
+      else if(fx==='drift'){ tr+=' translate('+(d*p*16)+'%,'+(d*p*45)+'%) rotate('+(d*p*7)+'deg)'; }
+      el.style.transform=tr; el.style.filter=fl; el.style.opacity=op*el._b;
       el.style.visibility=(p>=0.999)?'hidden':'visible';
     });
   }
@@ -373,8 +373,10 @@ function buildKbachFrameOverlay(styleId, t, s, layer){
     if(layer === "bg"){
       const fitB = (s && s.bgFit === "stretch") ? "100% 100%" : "cover";
       const opB = cl(s && s.bgOpacity, 10, 100, 100) / 100;
+      const blB = Math.round(cl(s && s.bgBlur, 0, 40, 0));   // blur in px; the layer grows past the screen so blurred edges never show
+      const blCss = blB > 0 ? `filter:blur(${blB}px);inset:${-blB * 2}px;` : "";
       // The hero block paints its own solid colour; keep its soft glow but let the background image show through.
-      return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg" style="background-image:url('${asset.dataUrl}');background-size:${fitB};opacity:${opB};" aria-hidden="true"></div>`;
+      return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg" style="background-image:url('${asset.dataUrl}');background-size:${fitB};opacity:${opB};${blCss}" aria-hidden="true"></div>`;
     }
     const fit = (s && s.frameFit === "cover") ? "cover" : "100% 100%";
     const op = cl(s && s.frameOpacity, 10, 100, 100) / 100;
@@ -384,7 +386,9 @@ function buildKbachFrameOverlay(styleId, t, s, layer){
   const pu = kbachPresetUrl(layer, styleId);
   if(!pu) return "";
   if(layer === "bg"){
-    return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg kb-bg-anim${kbachFrameNeedsInset(s && s.kbachFrame) ? " kb-bg-framed" : ""}" style="background-image:url('${pu}');background-size:contain;" aria-hidden="true"></div>`;
+    const blP = Math.round(cl(s && s.bgBlur, 0, 40, 0));   // same blur slider as the uploaded background
+    const blPCss = blP > 0 ? `filter:blur(${blP}px);` : "";
+    return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg kb-bg-anim${kbachFrameNeedsInset(s && s.kbachFrame) ? " kb-bg-framed" : ""}" style="background-image:url('${pu}');background-size:contain;${blPCss}" aria-hidden="true"></div>`;
   }
   // "slice" = old 9-slice border frame (square picture, corners 3/8). Default = full-screen overlay picture (portrait 1024x1280):
   // the top half sticks to the top edge of the screen and the bottom half to the bottom edge (see buildFrameFxJs: they fade away as you scroll),
@@ -393,12 +397,7 @@ function buildKbachFrameOverlay(styleId, t, s, layer){
   if(KBACH_FRAME_STYLES[styleId].mode === "slice"){
     return `<div class="kb-frame" style="--kb-img:url('${pu}');" aria-hidden="true"><div class="kb-shine"></div></div>`;
   }
-  // Wide screens: the picture is repeated to the left and right (mirrored next to the centre one, so the seams match),
-  // so the frame reaches both sides of the screen. On phones the side copies are hidden.
-  const piece = (half, ox, sx, side) => `<div class="kb-ov kb-ov-${half}${side ? " kb-ov-side" : ""}" data-s="${sx}" style="--kb-img:url('${pu}');--ox:${ox};--sx:${sx};" aria-hidden="true"></div>`;
-  return ["top", "bot"].map(h => piece(h, "0px", 1, false)
-    + piece(h, "calc(var(--kb-cw) * -1)", -1, true) + piece(h, "var(--kb-cw)", -1, true)
-    + piece(h, "calc(var(--kb-cw) * -2)", 1, true) + piece(h, "calc(var(--kb-cw) * 2)", 1, true)).join("");
+  return `<div class="kb-ov kb-ov-top" style="--kb-img:url('${pu}');" aria-hidden="true"></div><div class="kb-ov kb-ov-bot" style="--kb-img:url('${pu}');" aria-hidden="true"></div>`;
 }
 // ---------- Text animation on scroll (guest invitation) ----------
 // Text/blocks start hidden and reveal once when they scroll into view. Everything is added by script and scoped
@@ -663,8 +662,7 @@ function renderInvitation(s){
 html{background:var(--bg);}
 body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
 .kb-frame{position:fixed;inset:0;z-index:60;pointer-events:none;box-sizing:border-box;border:var(--kb-w) solid transparent;border-image-source:var(--kb-img);border-image-slice:405;border-image-width:var(--kb-w);border-image-repeat:round;animation:kb-glow 6s ease-in-out infinite;}
-.kb-ov{position:fixed;left:calc(50% - var(--kb-cw) / 2 + var(--ox,0px));will-change:transform,opacity;width:var(--kb-cw);transform:scaleX(var(--sx,1));aspect-ratio:1024/640;z-index:60;pointer-events:none;background:var(--kb-img) no-repeat;background-size:100% 200%;}
-@media(max-width:680px){.kb-ov-side{display:none;}}
+.kb-ov{position:fixed;left:50%;will-change:transform,opacity;width:min(100%,680px);transform:translateX(-50%);aspect-ratio:1024/640;z-index:60;pointer-events:none;background:var(--kb-img) no-repeat;background-size:100% 200%;}
 .kb-ov-top{top:0;background-position:center top;}
 .kb-ov-bot{bottom:0;background-position:center bottom;}
 .kb-shine{position:absolute;inset:calc(-1 * var(--kb-w));pointer-events:none;-webkit-mask-box-image:var(--kb-img) 405 / var(--kb-w) round;mask-border:var(--kb-img) 405 / var(--kb-w) round;background:linear-gradient(115deg,transparent 38%,rgba(255,246,205,.95) 50%,transparent 62%) 0 0/300% 300%;animation:kb-shine 5.5s ease-in-out infinite;}
@@ -672,7 +670,7 @@ body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-web
 @supports ((-webkit-mask-box-image:none) or (mask-border:none)){.kb-shine{display:block;}}
 .kb-bg-anim{transform-origin:50% 50%;animation:kb-bgmove 14s ease-in-out infinite alternate;}
 .kb-bg-framed{inset:calc(var(--kb-w) * .3);-webkit-mask-image:linear-gradient(to right,transparent 0,#000 14%,#000 86%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0,#000 14%,#000 86%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;}
-:root{--kb-w:clamp(96px,24vw,170px);--kb-cw:min(100%,680px);}
+:root{--kb-w:clamp(96px,24vw,170px);}
 @keyframes kb-glow{0%,100%{filter:drop-shadow(0 0 2px rgba(255,205,100,.18));}50%{filter:drop-shadow(0 0 9px rgba(255,205,100,.75));}}
 @keyframes kb-shine{0%{background-position:100% 100%;}60%,100%{background-position:0% 0%;}}
 @keyframes kb-bgmove{0%{opacity:.78;}100%{opacity:1;}}
@@ -700,10 +698,11 @@ body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-web
 .hb-tint{opacity:var(--veil,.35);}
 .hero.no-blur .hb-blur,.hero.cover-art .hb-blur,.hero.cover-art .hb-tint{display:none;}
 .hero.no-blur .hb-sharp,.hero.cover-art .hb-sharp{-webkit-mask-image:none;mask-image:none;}
-.hero.has-cover .eyebrow{color:#fff;opacity:.92;text-shadow:0 2px 10px rgba(0,0,0,.55);}
-.hero.has-cover .names{color:#fff;text-shadow:0 4px 18px rgba(0,0,0,.55), 0 1px 4px rgba(0,0,0,.85);}
-.hero.has-cover .names .amp{color:var(--accent-2);}
-.hero.has-cover .hero-date{color:#fff;opacity:.95;text-shadow:0 2px 10px rgba(0,0,0,.55);}
+.hero.has-cover .eyebrow{color:#fff;opacity:1;text-shadow:0 0 3px rgba(0,0,0,.8), 0 2px 10px rgba(0,0,0,.75), 0 4px 20px rgba(0,0,0,.55);}
+.hero.has-cover .names{position:relative;z-index:1;color:#fff;-webkit-text-stroke:.5px rgba(0,0,0,.35);paint-order:stroke fill;text-shadow:0 0 2px rgba(0,0,0,.9), 0 2px 6px rgba(0,0,0,.8), 0 4px 18px rgba(0,0,0,.7), 0 8px 34px rgba(0,0,0,.55);}
+.hero.has-cover .names::before{content:"";position:absolute;left:50%;top:50%;width:125%;height:135%;transform:translate(-50%,-50%);background:radial-gradient(ellipse at center, rgba(0,0,0,.40) 0%, rgba(0,0,0,.24) 45%, transparent 72%);filter:blur(10px);z-index:-1;pointer-events:none;}
+.hero.has-cover .names .amp{color:color-mix(in srgb,var(--accent-2) 55%,#fff);-webkit-text-stroke:0;text-shadow:0 0 3px rgba(0,0,0,.9), 0 2px 8px rgba(0,0,0,.8), 0 4px 16px rgba(0,0,0,.6);}
+.hero.has-cover .hero-date{color:#fff;opacity:1;text-shadow:0 0 3px rgba(0,0,0,.8), 0 2px 10px rgba(0,0,0,.75), 0 4px 20px rgba(0,0,0,.55);}
 section{padding:30px 0;}
 .lang-section{padding:0;}
 .section-title{font-size:30px;text-align:center;margin:0 0 4px;}
@@ -807,7 +806,7 @@ ${buildKbachFrameOverlay(s.kbachBg, t, s, "bg")}${buildKbachFrameOverlay(s.kbach
   <button id="btn-km" class="active" type="button">${LKM.toggleKm}</button>
   <button id="btn-en" type="button">${LEN.toggleEn}</button>
 </div>
-<div class="fx-toggle" id="fxToggle">${Object.keys(EFFECTS).map(key => `<button data-fx="${key}" type="button" title="${escapeHtml(EFFECTS[key].label)}">${EFFECTS[key].icon}</button>`).join("")}</div>
+${FALLING_FX_ENABLED ? `<div class="fx-toggle" id="fxToggle">${Object.keys(EFFECTS).map(key => `<button data-fx="${key}" type="button" title="${escapeHtml(EFFECTS[key].label)}">${EFFECTS[key].icon}</button>`).join("")}</div>` : ""}
 ${mp.html}
 ${lbx.html}
 ${kmSection}
@@ -863,7 +862,8 @@ document.getElementById("btn-en").addEventListener("click", function(){ setLang(
 var fxColor1=${JSON.stringify(t.accent1)};
 var fxColor2=${JSON.stringify(t.accent2)};
 var fxType="none";   // each guest picks their own effect from the toggle on the invitation
-try{ var savedFx=localStorage.getItem("wib-guest-fx"); if(savedFx) fxType=savedFx; }catch(e){}
+var fxEnabled=${FALLING_FX_ENABLED ? "true" : "false"};
+try{ var savedFx=localStorage.getItem("wib-guest-fx"); if(savedFx && fxEnabled) fxType=savedFx; }catch(e){}
 
 var fxCanvas=null, fxCtx=null, fxParticles=[], fxAnimId=null;
 function fxResize(){ if(fxCanvas){ fxCanvas.width=window.innerWidth; fxCanvas.height=window.innerHeight; } }
@@ -992,3 +992,4 @@ ${lbx.js}
 })();<\/script>
 </body></html>`;
 }
+

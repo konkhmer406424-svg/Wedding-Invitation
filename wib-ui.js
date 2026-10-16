@@ -282,6 +282,8 @@ function makeImageSlot(c){
 ${c.fits.map(f => `<label class="chk-row"><input type="radio" name="${c.prefix}Fit" value="${f[0]}"><span>${f[1]}</span></label>`).join("")}
 <label style="margin-top:10px;">ភាពច្បាស់ <b id="${id("OpacityVal")}"></b></label>
 <input type="range" id="${id("Opacity")}" min="10" max="100" step="1" style="width:100%;">
+${c.blurKey ? `<label style="margin-top:10px;">កម្រិតព្រិល <b id="${id("BlurVal")}"></b></label>
+<input type="range" id="${id("Blur")}" min="0" max="40" step="1" style="width:100%;">` : ""}
 </div>`;
   S.refresh = () => {
     const on = state[c.styleKey] === "custom";
@@ -301,6 +303,7 @@ ${c.fits.map(f => `<label class="chk-row"><input type="radio" name="${c.prefix}F
     box.querySelectorAll('input[type=radio]').forEach(r => { r.checked = (r.value === state[c.fitKey]); });
     el("Opacity").value = String(state[c.opKey]);
     el("OpacityVal").textContent = state[c.opKey] + "%";
+    if(c.blurKey){ const bv = Number(state[c.blurKey]) || 0; el("Blur").value = String(bv); el("BlurVal").textContent = bv ? bv + " px" : "បិទ"; }
   };
   S.persist = async () => {
     try{
@@ -343,6 +346,11 @@ ${c.fits.map(f => `<label class="chk-row"><input type="radio" name="${c.prefix}F
     el("OpacityVal").textContent = state[c.opKey] + "%";
     scheduleUpdate();
   });
+  if(c.blurKey) el("Blur").addEventListener("input", ev => {
+    state[c.blurKey] = Math.max(0, Math.min(40, Number(ev.target.value) || 0));
+    el("BlurVal").textContent = state[c.blurKey] ? state[c.blurKey] + " px" : "បិទ";
+    scheduleUpdate();
+  });
   return S;
 }
 makeImageSlot({ prefix:"frame", key:FRAME_KEY, styleKey:"kbachFrame", fitKey:"frameFit", opKey:"frameOpacity",
@@ -350,12 +358,27 @@ makeImageSlot({ prefix:"frame", key:FRAME_KEY, styleKey:"kbachFrame", fitKey:"fr
   hint:"ស៊ុមនៅ <b>ពីលើ</b> ខ្លឹមសារ។ ល្អបំផុតគឺ <b>PNG ឬ GIF</b> ដែលចំកណ្ដាលថ្លា (transparent)។ GIF នឹងមានចលនា។ ទំហំណែនាំ ៩០០ × ១៦០០ px (បញ្ឈរ)។",
   addText:"＋ បញ្ចូលរូបភាពស៊ុម (JPG / PNG / GIF)", changeText:"🔄 ប្តូររូបភាពស៊ុម",
   fits:[["stretch","ទាញពេញអេក្រង់ (ស័ក្តិសមស៊ុម PNG/GIF)"],["cover","រក្សាសមាមាត្រ (អាចកាត់គែមខ្លះ)"]] });
-makeImageSlot({ prefix:"bg", key:BG_KEY, styleKey:"kbachBg", fitKey:"bgFit", opKey:"bgOpacity",
+makeImageSlot({ prefix:"bg", key:BG_KEY, styleKey:"kbachBg", fitKey:"bgFit", opKey:"bgOpacity", blurKey:"bgBlur",
   get:() => bgAsset, set:v => { bgAsset = v; },
   hint:"ផ្ទៃខាងក្រោយនៅ <b>ពីក្រោយ</b> ខ្លឹមសារ ហើយនៅជាប់អេក្រង់ខណៈ scroll។ ប្រើ JPG, PNG ឬ GIF ក៏បាន។ ទំហំណែនាំ ៩០០ × ១៦០០ px។ បើអក្សរពិបាកអាន សូមបន្ថយ «ភាពច្បាស់»។",
   addText:"＋ បញ្ចូលរូបភាពផ្ទៃខាងក្រោយ (JPG / PNG / GIF)", changeText:"🔄 ប្តូររូបភាពផ្ទៃខាងក្រោយ",
   fits:[["cover","រក្សាសមាមាត្រ (ពេញអេក្រង់ កាត់គែមបន្តិច)"],["stretch","ទាញពេញអេក្រង់"]] });
-function refreshFrameUI(){ IMG_SLOTS.forEach(S => { if(S.refresh) S.refresh(); }); }
+function refreshFrameUI(){ IMG_SLOTS.forEach(S => { if(S.refresh) S.refresh(); }); refreshBgBlurUI(); }
+// Blur slider for the preset BACKGROUNDS. Hidden for "none" and "custom" (the uploaded image has its own blur slider inside its box).
+function refreshBgBlurUI(){
+  const g = $("bgBlurGroup"), r = $("bgBlur"); if(!g || !r) return;
+  g.style.display = (state.kbachBg && state.kbachBg !== "none" && state.kbachBg !== "custom") ? "" : "none";
+  const v = Number(state.bgBlur) || 0;
+  r.value = String(v); $("bgBlurVal").textContent = v ? v + " px" : "បិទ";
+}
+(function bindBgBlur(){
+  const r = $("bgBlur"); if(!r) return;
+  r.addEventListener("input", ev => {
+    state.bgBlur = Math.max(0, Math.min(40, Number(ev.target.value) || 0));
+    $("bgBlurVal").textContent = state.bgBlur ? state.bgBlur + " px" : "បិទ";
+    scheduleUpdate();
+  });
+})();
 async function loadFrameOnStartup(){
   for(const S of IMG_SLOTS){
     try{ S.c.set(sanitizeFrameAsset_(await musicStoreOp("readonly", st => st.get(S.c.key)))); }
@@ -1388,7 +1411,7 @@ function normalizeImported(raw){
   s.venueMapLink = /^https?:\/\/\S+$/i.test(bkStr(r.venueMapLink, 2000).trim()) ? bkStr(r.venueMapLink, 2000).trim() : "";
   s.guestNamesFileRaw = bkStr(r.guestNamesFileRaw, 500000);
   s.theme = (typeof r.theme === "string" && hasOwn(THEMES, r.theme)) ? r.theme : defaultState.theme;
-  ["kbachFrame","kbachBg","frameFit","frameOpacity","frameFx","bgFit","bgOpacity","fontKm","fontEn","galleryStyle","galleryArt","coverArt","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil"]
+  ["kbachFrame","kbachBg","frameFit","frameOpacity","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","galleryArt","coverArt","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil"]
     .forEach(k => { if(r[k] !== undefined) s[k] = r[k]; });
   if(!hasOwn(GALLERY_ART, s.galleryArt)) s.galleryArt = "none";
   if(!hasOwn(COVER_ART, s.coverArt)) s.coverArt = "none";
