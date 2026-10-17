@@ -27,7 +27,59 @@ const THEMES = {
   blush:{ label:"ផ្កាឈូក", swatch:"linear-gradient(135deg,#C76B84,#E0A458)",
     bg:"#FFF8F5", ink:"#4A2E2A", accent1:"#C76B84", accent2:"#E0A458",
     card:"#FFFFFF", border:"rgba(199,107,132,0.18)", radius:"4px",
-    ornate:true }
+    ornate:true },
+  ruby:{ label:"ក្រហមទទឹម", swatch:"linear-gradient(135deg,#9B1C31,#C9A227)",
+    bg:"#FFF5F3", ink:"#3A1A1F", accent1:"#9B1C31", accent2:"#C9A227",
+    card:"#FFFFFF", border:"rgba(155,28,49,0.2)", radius:"4px",
+    ornate:true },
+  burgundy:{ label:"ស្រាក្រហម", swatch:"linear-gradient(135deg,#6D1F3A,#D4A24C)",
+    bg:"#FBF3F1", ink:"#35181F", accent1:"#6D1F3A", accent2:"#D4A24C",
+    card:"#FFFFFF", border:"rgba(109,31,58,0.2)", radius:"4px",
+    ornate:true },
+  terracotta:{ label:"ដីឥដ្ឋ", swatch:"linear-gradient(135deg,#B5563A,#D9A441)",
+    bg:"#FFF6EF", ink:"#3F2A22", accent1:"#B5563A", accent2:"#D9A441",
+    card:"#FFFFFF", border:"rgba(181,86,58,0.2)", radius:"4px",
+    ornate:true },
+  coral:{ label:"ផ្កាថ្ម", swatch:"linear-gradient(135deg,#D4574A,#F0B46A)",
+    bg:"#FFF6F2", ink:"#40251F", accent1:"#D4574A", accent2:"#C99A3C",
+    card:"#FFFFFF", border:"rgba(212,87,74,0.2)", radius:"4px",
+    ornate:true },
+  rosegold:{ label:"មាសផ្កាឈូក", swatch:"linear-gradient(135deg,#B76E79,#D8A47F)",
+    bg:"#FFF5F2", ink:"#44292C", accent1:"#B76E79", accent2:"#B98660",
+    card:"#FFFFFF", border:"rgba(183,110,121,0.22)", radius:"4px",
+    ornate:true },
+  mocha:{ label:"កាហ្វេ", swatch:"linear-gradient(135deg,#7A5238,#C9A27A)",
+    bg:"#FAF5EF", ink:"#35261C", accent1:"#7A5238", accent2:"#B38B5D",
+    card:"#FFFFFF", border:"rgba(122,82,56,0.2)", radius:"4px",
+    ornate:true },
+  sage:{ label:"បៃតងស្លឹកឈើ", swatch:"linear-gradient(135deg,#5F7F57,#C9A66B)",
+    bg:"#F5F8F2", ink:"#2A3626", accent1:"#5F7F57", accent2:"#B38F4F",
+    card:"#FFFFFF", border:"rgba(95,127,87,0.22)", radius:"4px",
+    ornate:true },
+  teal:{ label:"បៃតងទឹកសមុទ្រ", swatch:"linear-gradient(135deg,#1F7A7A,#E0A458)",
+    bg:"#F1F9F8", ink:"#173A3A", accent1:"#1F7A7A", accent2:"#C58A32",
+    card:"#FFFFFF", border:"rgba(31,122,122,0.2)", radius:"4px",
+    ornate:true },
+  sky:{ label:"ផ្ទៃមេឃ", swatch:"linear-gradient(135deg,#3C7DB5,#E8B64C)",
+    bg:"#F2F8FC", ink:"#1B2F42", accent1:"#2F6FA6", accent2:"#C99A2E",
+    card:"#FFFFFF", border:"rgba(47,111,166,0.2)", radius:"4px",
+    ornate:true },
+  dustyblue:{ label:"ខៀវស្រអាប់", swatch:"linear-gradient(135deg,#5B7C99,#D8B4A0)",
+    bg:"#F4F7F9", ink:"#25323E", accent1:"#4F6F8D", accent2:"#B98F78",
+    card:"#FFFFFF", border:"rgba(79,111,141,0.2)", radius:"4px",
+    ornate:true },
+  lavender:{ label:"ស្វាយខ្ចី", swatch:"linear-gradient(135deg,#7A5BA6,#D4A5C7)",
+    bg:"#F8F5FC", ink:"#2E2540", accent1:"#7A5BA6", accent2:"#B7799F",
+    card:"#FFFFFF", border:"rgba(122,91,166,0.2)", radius:"4px",
+    ornate:true },
+  plum:{ label:"ស្វាយចាស់", swatch:"linear-gradient(135deg,#5B2A6E,#C9A227)",
+    bg:"#F9F4FA", ink:"#2D1A36", accent1:"#5B2A6E", accent2:"#C9A227",
+    card:"#FFFFFF", border:"rgba(91,42,110,0.2)", radius:"4px",
+    ornate:true },
+  charcoal:{ label:"ប្រផេះខ្មៅ", swatch:"linear-gradient(135deg,#34383F,#B9976B)",
+    bg:"#F5F5F4", ink:"#24272C", accent1:"#34383F", accent2:"#A98558",
+    card:"#FFFFFF", border:"rgba(52,56,63,0.18)", radius:"2px",
+    ornate:false }
 };
 
 const KM_WEEKDAYS = ["អាទិត្យ","ចន្ទ","អង្គារ","ពុធ","ព្រហស្បតិ៍","សុក្រ","សៅរ៍"];
@@ -42,6 +94,9 @@ const LABELS = {
     gallerySub:"ដាក់រូបភាព pre-wedding របស់អ្នកជំនួសកន្លែងទាំងនេះ", videoTitle:"វិឌីអូនៃពួកយើង", videoSub:"សូមចុចលេងដើម្បីទស្សនា", venueTitle:"ទីតាំងកម្មវិធី",
     mapBtn:"មើលទីតាំងលើ Google Maps", calBtn:"📅 រក្សាទុកក្នុង Calendar", contactsTitle:"ទំនាក់ទំនង",
     contactsSub:"សម្រាប់ព័ត៌មានលម្អិត សូមទាក់ទងមកកាន់", thanks:"អរគុណ", and:"និង",
+    giftTitle:"ចំណងដៃ", giftSub:"ស្កេន KHQR ដោយកម្មវិធីធនាគារ ដើម្បីផ្ញើចំណងដៃជូនគូស្វាមីភរិយា", giftGroom:"ខាងកូនកម្លោះ", giftBride:"ខាងកូនក្រមុំ",
+    dressTitle:"ពណ៌សម្លៀកបំពាក់", dressSub:"ភ្ញៀវអាចរៀបចំសម្លៀកបំពាក់តាមពណ៌ខាងក្រោម",
+    giftSave:"⬇ រក្សាទុករូប KHQR", giftHint:"ប្រើទូរស័ព្ទតែមួយ? រក្សាទុករូបនេះ រួចបើកក្នុងកម្មវិធីធនាគារ ដើម្បីស្កេនពីរូបភាព",
     toggleKm:"ខ្មែរ", toggleEn:"English" },
   en:{ countdownTitle:"Countdown", countdownSub:"Time remaining until our special day",
     days:"Days", hours:"Hours", minutes:"Minutes", seconds:"Seconds", congrats:"Congratulations!",
@@ -49,6 +104,9 @@ const LABELS = {
     gallerySub:"Your pre-wedding photos will appear here", videoTitle:"Our Video", videoSub:"Tap play to watch", venueTitle:"Event Location",
     mapBtn:"View on Google Maps", calBtn:"📅 Save to Calendar", contactsTitle:"Contact Us",
     contactsSub:"For more details, please reach out to", thanks:"Thank You", and:"&",
+    giftTitle:"Wedding Gift", giftSub:"Scan the KHQR with your banking app to send a gift to the couple", giftGroom:"Groom's Side", giftBride:"Bride's Side",
+    dressTitle:"Dress Colours", dressSub:"Guests are warmly invited to dress in these colours",
+    giftSave:"⬇ Save KHQR image", giftHint:"On the same phone? Save this image, then scan it from your banking app's gallery.",
     toggleKm:"ខ្មែរ", toggleEn:"English" }
 };
 
@@ -82,7 +140,12 @@ const FONT_EN = {
 // What each theme used to force. Only used to keep old drafts / saved projects looking exactly as before.
 const THEME_FONT_DEFAULTS = {
   gold:["moul","greatVibes"], rose:["suwannaphum","parisienne"], minimal:["koulen","playfair"],
-  royal:["odormeanchey","ebGaramond"], emerald:["angkor","tangerine"], blush:["moulpali","marckScript"]
+  royal:["odormeanchey","ebGaramond"], emerald:["angkor","tangerine"], blush:["moulpali","marckScript"],
+  ruby:["moul","parisienne"], burgundy:["odormeanchey","playfair"], terracotta:["suwannaphum","greatVibes"],
+  coral:["moulpali","marckScript"], rosegold:["suwannaphum","parisienne"], mocha:["angkor","ebGaramond"],
+  sage:["angkor","tangerine"], teal:["koulen","playfair"], sky:["moulpali","ebGaramond"],
+  dustyblue:["suwannaphum","playfair"], lavender:["moulpali","parisienne"], plum:["odormeanchey","greatVibes"],
+  charcoal:["koulen","playfair"]
 };
 // ---- Photo gallery layout: chosen separately from colour/font/theme ----
 const GALLERY_STYLES = {
@@ -100,7 +163,7 @@ const GALLERY_STYLES = {
 //   images/covers/   → cover1.webp … cover5.webp      (បង្ហាញជារូបគម្រប ពេញក្រោមឈ្មោះ — ណែនាំរូបបញ្ឈរ ឧ. 1080×1920 ឬ 1080×1620)
 //   images/gallery/  → gallery1.webp … gallery5.webp  (បង្ហាញក្នុងផ្នែក "រូបភាពនៃពួកយើង" — ណែនាំ 1200×1200 ឬ 1200×900)
 // ចង់ប្តូរឈ្មោះក្នុងបញ្ជី (label), ប្តូរប្រភេទឯកសារ (jpg / webp) ឬបន្ថែមជម្រើសថ្មី គ្រាន់តែកែ/ថែមបន្ទាត់ខាងក្រោម។
-// ជម្រើសបណ្ដុំរូបភាពអាចមានរូបច្រើនសន្លឹក ដោយសរសេរ files:["a.png","b.png","c.png"] (បង្ហាញតាមទម្រង់ gallery ដែលបានជ្រើស)។
+// ជម្រើសបណ្ដុំរូបភាពអាចមានរូបច្រើនសន្លឹក (ម្ចាស់ធៀបជ្រើសបានច្រើនជម្រើស សរុបអតិបរមា ៦ សន្លឹក = MAX_ART) ដោយសរសេរ files:["a.png","b.png","c.png"] (បង្ហាញតាមទម្រង់ gallery ដែលបានជ្រើស)។
 const COVER_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
   cover1:{ label:"រូបគម្រប ១", file:"cover1.webp" },
@@ -115,7 +178,8 @@ const GALLERY_ART = {
   gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.webp"] },
   gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.webp"] },
   gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.webp"] },
-  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.webp"] }
+  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.webp"] },
+  gallery6:{ label:"បណ្ដុំរូបភាព ៦", files:["gallery6.webp"] }
 };
 function artUrl(file, kind){ return assetBase() + ASSET_DIRS[kind || "gallery"] + file + "?v=" + ASSET_VERSION; }   // kind: "cover" | "gallery"
 function coverArtUrl(s){
@@ -124,9 +188,12 @@ function coverArtUrl(s){
   return artUrl(COVER_ART[k].file, "cover");
 }
 function galleryArtUrls(s){
-  const k = s && s.galleryArt;
-  if(!k || !Object.prototype.hasOwnProperty.call(GALLERY_ART, k) || !Array.isArray(GALLERY_ART[k].files)) return [];
-  return GALLERY_ART[k].files.map(f => artUrl(f, "gallery"));
+  const ks = Array.isArray(s && s.galleryArts) ? s.galleryArts : [];
+  const out = [];
+  ks.forEach(k => {
+    if(Object.prototype.hasOwnProperty.call(GALLERY_ART, k) && Array.isArray(GALLERY_ART[k].files)) GALLERY_ART[k].files.forEach(f => out.push(artUrl(f, "gallery")));
+  });
+  return out.slice(0, MAX_ART);
 }
 const TEXT_ANIM_STYLES = {
   fadeup:{ label:"លេចឡើងពីក្រោម (Fade up)" },
@@ -134,7 +201,9 @@ const TEXT_ANIM_STYLES = {
   blur:{ label:"ព្រិលទៅច្បាស់ (Blur in)" },
   none:{ label:"គ្មាន" }
 };
-const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square", royal:"grid", emerald:"grid", blush:"grid" };
+const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square", royal:"grid", emerald:"grid", blush:"grid",
+  ruby:"grid", burgundy:"grid", terracotta:"grid", coral:"polaroid", rosegold:"polaroid", mocha:"classic",
+  sage:"grid", teal:"grid", sky:"grid", dustyblue:"classic", lavender:"polaroid", plum:"grid", charcoal:"square" };
 
 // ===== រូបស៊ុម / ផ្ទៃខាងក្រោយ ជាឯកសាររូបភាព (PNG) នៅលើ GitHub =====
 // ដាក់ឯកសារក្នុង  images/frames/  (frame1.png … frame5.png)  និង  images/backgrounds/  (bg1.png … bg5.png)
@@ -462,7 +531,7 @@ const defaultState = {
   fontKm:"moul",
   fontEn:"greatVibes",
   galleryStyle:"grid",
-  galleryArt:"none",
+  galleryArts:[],
   coverArt:"none",
   kbachFrame:"none", kbachBg:"bg1",
   frameFit:"stretch", frameOpacity:100, frameFx:"fade",
@@ -503,10 +572,49 @@ const defaultState = {
   photoNames:[],
   coverPhoto:null,
   coverPhotoName:"",
+  khqrGroom:null,
+  khqrBride:null,
+  dressColors:{ procession:[], evening:[], tent:[] },
   guestNamesFileRaw:"",
   publishToken:""
 };
-const MAX_PHOTOS = 10;
+const MAX_PHOTOS = 10;  // Pre-wedding photos the owner can upload
+const MAX_ART = 6;      // Stand-in pictures (from GitHub) the owner can choose when there are no photos of their own
+const DRESS_MAX = 6;    // colours per dress-code section
+// Colour guide for guests (gift procession outfits / evening reception / tent). Edit names or add colours here.
+const DRESS_CATS = [
+  { key:"procession", km:"ពេលហែជំនូន (ឈុតកូនកម្លោះ-កូនក្រមុំ)", en:"Gift Procession (Bride & Groom's outfits)" },
+  { key:"evening",    km:"ពេលល្ងាច (ពិសារអាហារ)",                 en:"Evening Reception" },
+  { key:"tent",       km:"ពណ៌រោង",                                 en:"Tent / Hall Colour" }
+];
+const DRESS_PALETTE = [
+  { hex:"#ffffff", km:"ស",             en:"White" },
+  { hex:"#f5ebdd", km:"ក្រែម",          en:"Cream" },
+  { hex:"#c9a227", km:"មាស",           en:"Gold" },
+  { hex:"#f4d03f", km:"លឿង",           en:"Yellow" },
+  { hex:"#e67e22", km:"ទឹកក្រូច",       en:"Orange" },
+  { hex:"#f6c6a0", km:"ទឹកក្រូចខ្ចី",   en:"Peach" },
+  { hex:"#c0392b", km:"ក្រហម",         en:"Red" },
+  { hex:"#7b1e3a", km:"ក្រហមស្រា",     en:"Burgundy" },
+  { hex:"#f4a6b7", km:"ផ្កាឈូកខ្ចី",    en:"Pink" },
+  { hex:"#c77c8a", km:"ផ្កាឈូកចាស់",    en:"Dusty Rose" },
+  { hex:"#c3b1e1", km:"ស្វាយខ្ចី",      en:"Lavender" },
+  { hex:"#7b4fa2", km:"ស្វាយ",          en:"Purple" },
+  { hex:"#8ec5e8", km:"ខៀវមេឃ",        en:"Sky Blue" },
+  { hex:"#2f6fa6", km:"ខៀវ",           en:"Blue" },
+  { hex:"#1b2a4e", km:"ខៀវចាស់",       en:"Navy" },
+  { hex:"#1f7a7a", km:"បៃតងទឹកសមុទ្រ",  en:"Teal" },
+  { hex:"#a8d5ba", km:"បៃតងខ្ចី",       en:"Mint" },
+  { hex:"#2e8b57", km:"បៃតង",          en:"Green" },
+  { hex:"#1f5c45", km:"បៃតងចាស់",      en:"Emerald" },
+  { hex:"#7a5238", km:"ត្នោត",          en:"Brown" },
+  { hex:"#9aa0a6", km:"ប្រផេះ",         en:"Grey" },
+  { hex:"#1a1a1a", km:"ខ្មៅ",           en:"Black" }
+];
+function dressColorName(hex, lang){
+  const p = DRESS_PALETTE.find(x => x.hex === String(hex).toLowerCase());
+  return p ? (lang === "en" ? p.en : p.km) : String(hex).toUpperCase();   // custom colour -> show its code
+}
 const COVER_STYLE_KEYS = ["door","curtain","lock","rings","lotus","heart"];   // keep in sync with COVER_STYLES below
 
 // Background song (one per project, this device). Kept out of `state` — far too big for
@@ -550,7 +658,10 @@ function migrateStyle_(s){
   if(!_ho(FONT_KM, s.fontKm)) s.fontKm = fd[0];
   if(!_ho(FONT_EN, s.fontEn)) s.fontEn = fd[1];
   if(!_ho(GALLERY_STYLES, s.galleryStyle)) s.galleryStyle = THEME_GALLERY_DEFAULTS[s.theme] || "grid";
-  if(!_ho(GALLERY_ART, s.galleryArt)) s.galleryArt = "none";
+  if(!Array.isArray(s.galleryArts)) s.galleryArts = [];
+  if(typeof s.galleryArt === "string" && s.galleryArt !== "none" && !s.galleryArts.length) s.galleryArts = [s.galleryArt];   // old single choice
+  delete s.galleryArt;
+  s.galleryArts = s.galleryArts.filter((k, i, a) => _ho(GALLERY_ART, k) && k !== "none" && a.indexOf(k) === i).slice(0, MAX_ART);
   if(!_ho(COVER_ART, s.coverArt)) s.coverArt = "none";
   if(!_ho(TEXT_ANIM_STYLES, s.textAnim)) s.textAnim = "fadeup";
   if(KBACH_WM_KEYS.indexOf(s.kbachFrame) >= 0){ s.kbachBg = s.kbachFrame; s.kbachFrame = "none"; }
@@ -571,6 +682,17 @@ function migrateStyle_(s){
   s.coverVeil = num(s.coverVeil, 0, 100, 35);
   s.venueCoords = (typeof s.venueCoords === "string") ? s.venueCoords.slice(0, 80) : "";
   s.videoUrl = (typeof s.videoUrl === "string" && /^https?:\/\//i.test(s.videoUrl.trim())) ? s.videoUrl.trim().slice(0, 500) : "";
+  const imgRe = /^data:image\/(?:jpeg|png|webp|gif);base64,[A-Za-z0-9+\/=]+$/;
+  if(typeof s.khqrImage === "string" && !s.khqrGroom) s.khqrGroom = s.khqrImage;   // earlier single-KHQR build
+  delete s.khqrImage; delete s.khqrImageName;
+  ["khqrGroom", "khqrBride"].forEach(k => { if(typeof s[k] !== "string" || !imgRe.test(s[k])) s[k] = null; });
+  const dc = (s.dressColors && typeof s.dressColors === "object") ? s.dressColors : {};
+  s.dressColors = {};
+  DRESS_CATS.forEach(c => {
+    s.dressColors[c.key] = (Array.isArray(dc[c.key]) ? dc[c.key] : [])
+      .filter(x => typeof x === "string" && /^#[0-9a-fA-F]{6}$/.test(x)).map(x => x.toLowerCase())
+      .filter((x, i, a) => a.indexOf(x) === i).slice(0, DRESS_MAX);
+  });
   return s;
 }
 let state = JSON.parse(JSON.stringify(defaultState));

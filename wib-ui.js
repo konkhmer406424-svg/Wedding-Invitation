@@ -1240,7 +1240,10 @@ function bindSimpleFields(){
   Object.entries(map).forEach(([id,key]) => {
     const el = $(id);
     el.value = state[key] || "";
+    const oneLine = el.classList.contains("one-line");
+    if(oneLine) el.onkeydown = ev => { if(ev.key === "Enter") ev.preventDefault(); };   // single-line texts: no manual line breaks
     el.oninput = () => {
+      if(oneLine && /[\r\n]/.test(el.value)) el.value = el.value.replace(/\s*[\r\n]+\s*/g, " ");
       state[key] = el.value;
       if(id === "eventDate") updateEventDateReadback_();
       scheduleUpdate();
@@ -1335,6 +1338,8 @@ buildTimelineTemplates();
 buildContacts();
 buildPhotos();
 buildCoverPhoto();
+buildKhqr();
+buildDressColors();
 buildTemplateChips();
 bindSimpleFields();
 restoreGuestFilesUI();
@@ -1347,7 +1352,7 @@ refreshMusicUI();
 function refreshAllBuildersFromState_(){
   buildThemeSelect(); buildFontSelects(); buildCoverStyleSelect(); buildGalleryStyleSelect(); buildGalleryArtSelect(); buildCoverArtSelect();
   buildKbachFrameSelect(); buildTextAnimSelect(); buildTimeline(); buildTimelineTemplates(); buildContacts();
-  buildPhotos(); buildCoverPhoto(); buildTemplateChips(); bindSimpleFields(); update();
+  buildPhotos(); buildCoverPhoto(); buildKhqr(); buildDressColors(); buildTemplateChips(); bindSimpleFields(); update();
 }
 function buildPresetCards(){
   const box = $("presetList");
@@ -1411,9 +1416,9 @@ function normalizeImported(raw){
   s.venueMapLink = /^https?:\/\/\S+$/i.test(bkStr(r.venueMapLink, 2000).trim()) ? bkStr(r.venueMapLink, 2000).trim() : "";
   s.guestNamesFileRaw = bkStr(r.guestNamesFileRaw, 500000);
   s.theme = (typeof r.theme === "string" && hasOwn(THEMES, r.theme)) ? r.theme : defaultState.theme;
-  ["kbachFrame","kbachBg","frameFit","frameOpacity","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","galleryArt","coverArt","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil"]
+  ["kbachFrame","kbachBg","frameFit","frameOpacity","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil"]
     .forEach(k => { if(r[k] !== undefined) s[k] = r[k]; });
-  if(!hasOwn(GALLERY_ART, s.galleryArt)) s.galleryArt = "none";
+  s.galleryArts = Array.isArray(r.galleryArts) ? r.galleryArts : (typeof r.galleryArt === "string" ? [r.galleryArt] : []);   // cleaned by migrateStyle_
   if(!hasOwn(COVER_ART, s.coverArt)) s.coverArt = "none";
   if(r.kbachFrame === undefined && typeof r.frameStyle === "string") s.kbachFrame = r.frameStyle;
   s.openStyle = r.openStyle === "envelope" ? "rings" : (r.openStyle === "book" ? "heart" : r.openStyle);
@@ -1432,6 +1437,9 @@ function normalizeImported(raw){
   });
   s.coverPhoto = bkImg(r.coverPhoto);
   if(!s.coverPhoto) s.coverPhotoName = "";
+  s.khqrGroom = bkImg(r.khqrGroom || r.khqrImage);
+  s.khqrBride = bkImg(r.khqrBride);
+  s.dressColors = r.dressColors;   // cleaned by migrateStyle_
   s.siteSlug = /^[A-Za-z0-9_-]{1,120}$/.test(r.siteSlug || "") ? r.siteSlug : "";
   s.publishedUrl = /^https:\/\/[^\s"'<>]+$/.test(r.publishedUrl || "") ? r.publishedUrl : "";
   s.publishToken = "";   // never taken from a file

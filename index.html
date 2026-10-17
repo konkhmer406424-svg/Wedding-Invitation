@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Koulen&family=Odor+Mean+Chey&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="style.css?v=3">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#B8912E">
 <link rel="icon" type="image/png" href="logo.png">
@@ -18,7 +18,7 @@
 
 <div class="mobile-tabs">
   <button id="tabEdit" class="active">កែប្រែ</button>
-  <button id="tabPreview">មើលសាកល្បង</button>
+  <button id="tabPreview">មើលលទ្ធផល</button>
 </div>
 
 <div class="app">
@@ -103,11 +103,11 @@
         <div class="field"><label>ពាក្យអញ្ជើញខ្លីៗ (Eyebrow)</label>
           <p class="photo-hint" style="margin:-4px 0 8px;">ជ្រើសរើសគំរូ ឬសរសេរខ្លួនឯង</p>
           <div class="template-row" id="tpl-eyebrow-km"></div>
-          <input type="text" id="eyebrow" placeholder="ឧ. សូមគោរពអញ្ជើញអ្នកមកចូលរួមព្រឹត្តិការណ៍ដ៏មានតម្លៃមួយនេះ"></div>
+          <textarea id="eyebrow" class="one-line" rows="1" placeholder="ឧ. សូមគោរពអញ្ជើញអ្នកមកចូលរួមព្រឹត្តិការណ៍ដ៏មានតម្លៃមួយនេះ"></textarea></div>
         <div class="field"><label>Short Invitation Line</label>
           <p class="photo-hint" style="margin:-4px 0 8px;">Pick a template, or write your own</p>
           <div class="template-row" id="tpl-eyebrow-en"></div>
-          <input type="text" id="eyebrowEn" placeholder="e.g. You are cordially invited to celebrate this special day"></div>
+          <textarea id="eyebrowEn" class="one-line" rows="1" placeholder="e.g. You are cordially invited to celebrate this special day"></textarea></div>
       </div>
     </fieldset>
 
@@ -151,6 +151,12 @@
     </fieldset>
 
     <fieldset>
+      <legend><span class="lg-icon">👗</span>ពណ៌សម្លៀកបំពាក់ & ពណ៌រោង (ស្រេចចិត្ត)</legend>
+      <p class="photo-hint">ប្រាប់ភ្ញៀវពីពណ៌ដែលអាចស្លៀកពាក់តាម។ ក្នុងមួយផ្នែក ជ្រើសបានច្រើនពណ៌ (រហូតដល់ ៦) — ចុចពណ៌ម្ដងទៀតដើម្បីដកចេញ។ បើគ្មានពណ៌ក្នុងបញ្ជី ចុចរង្វង់ពណ៌ឥន្ទធនូ ＋ ដើម្បីរើសពណ៌ផ្ទាល់ខ្លួន។ ផ្នែកណាទុកទទេ នឹងមិនបង្ហាញក្នុងធៀបទេ។</p>
+      <div id="dressBox"></div>
+    </fieldset>
+
+    <fieldset>
       <legend><span class="lg-icon">☎️</span>ទំនាក់ទំនង (ខ្មែរ + English, លេខទូរស័ព្ទរួម)</legend>
       <div id="contactList"></div>
       <button class="add-btn" id="addContact" type="button">+ បន្ថែមទំនាក់ទំនង</button>
@@ -160,8 +166,8 @@
       <legend><span class="lg-icon">📍</span>ទីតាំង (ខ្មែរ + English)</legend>
       <div class="lang-col-head"><span>ខ្មែរ</span><span>English</span></div>
       <div class="row2">
-        <div class="field"><label>ឈ្មោះកន្លែង</label><input type="text" id="venueName" placeholder="ឧ. សាលភោជនីយដ្ឋាន ..."></div>
-        <div class="field"><label>Venue Name</label><input type="text" id="venueNameEn" placeholder="e.g. ... Restaurant"></div>
+        <div class="field"><label>ឈ្មោះកន្លែង</label><textarea id="venueName" class="one-line" rows="1" placeholder="ឧ. សាលភោជនីយដ្ឋាន ..."></textarea></div>
+        <div class="field"><label>Venue Name</label><textarea id="venueNameEn" class="one-line" rows="1" placeholder="e.g. ... Restaurant"></textarea></div>
       </div>
       <div class="row2">
         <div class="field"><label>អាសយដ្ឋាន</label><textarea id="venueAddr" placeholder="ផ្លូវ, សង្កាត់, ខណ្ឌ, រាជធានី/ខេត្ត"></textarea></div>
@@ -202,7 +208,7 @@
       <div class="photo-grid" id="photoGrid"></div>
       <p class="guest-empty-hint" id="photoStatus"></p>
       <div class="pick-group" style="margin-top:14px;">
-        <div class="pick-label">រូបតំណាង (បង្ហាញជំនួស ពេលគ្មានរូប Pre-wedding)</div>
+        <div class="pick-label">រូបតំណាង (បង្ហាញជំនួស ពេលគ្មានរូប Pre-wedding) — ជ្រើសបានច្រើន ១ ដល់ ៦ សន្លឹក</div>
         <div class="pick-grid" id="pickGalleryArt"></div>
         <p class="photo-hint" id="galleryArtHint" style="margin:8px 0 0;"></p>
       </div>
@@ -257,6 +263,12 @@
         <input type="text" id="venueCoords" placeholder="11.5564, 104.9282"></div>
     </fieldset>
 
+    <fieldset id="khqrFieldset">
+      <legend><span class="lg-icon">💝</span>KHQR ទទួលចំណងដៃ (ស្រេចចិត្ត)</legend>
+      <p class="photo-hint">Upload រូប <b>KHQR របស់ម្ចាស់កម្មវិធី</b> (screenshot ពីកម្មវិធីធនាគារ ឬ Bakong) ដាច់ដោយឡែក <b>ខាងកូនកម្លោះ</b> និង <b>ខាងកូនក្រមុំ</b> ព្រោះភ្ញៀវអញ្ជើញខុសគ្នា។ ចង់ប្រើតែខាងម្ខាង ក៏បាន — ខាងណាទុកទទេ ខាងនោះនឹងមិនបង្ហាញទេ។</p>
+      <div id="khqrSlots"></div>
+    </fieldset>
+
     <fieldset>
       <legend><span class="lg-icon">🎁</span>ធៀបអញ្ជើញផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវ (Guest Copies)</legend>
       <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;">ចុចប៊ូតុងខាងក្រោមម្តងដើម្បី Publish គេហទំព័រ រួចវានឹងបង្កើត <b>Link ផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវម្នាក់ៗ</b> ភ្លាមៗ (គ្មានកំណត់ចំនួន)។ ការទូទាត់មានសុពលភាព ៣០ ថ្ងៃ ដរាបណាមិនប្តូរឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធី។</p>
@@ -280,7 +292,7 @@
 
   <div class="preview-col" id="previewCol">
     <div class="toolbar">
-      <span class="toolbar-title">មើលសាកល្បង</span>
+      <span class="toolbar-title">មើលលទ្ធផល</span>
     </div>
     <div class="frame-wrap"><iframe id="frame"></iframe></div>
   </div>
@@ -324,9 +336,9 @@
     <button class="pay-cancel" id="payCancelBtn" type="button">បោះបង់</button>
   </div>
 </div>
-<script src="wib-data.js?v=1"></script>
-<script src="wib-render.js?v=1"></script>
-<script src="wib-pickers.js?v=1"></script>
-<script src="wib-ui.js?v=1"></script>
+<script src="wib-data.js?v=3"></script>
+<script src="wib-render.js?v=3"></script>
+<script src="wib-pickers.js?v=3"></script>
+<script src="wib-ui.js?v=3"></script>
 </body>
 </html>

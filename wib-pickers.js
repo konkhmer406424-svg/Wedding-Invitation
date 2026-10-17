@@ -65,7 +65,7 @@ function renderPicker(id, items, current, onPick){
     el.innerHTML = sizes.map(cnt => {
       const row = p.items.slice(idx, idx + cnt).map(it => {
         const t = escapeHtml(it.title || "");
-        const on = it.key === p.current;
+        const on = Array.isArray(p.current) ? p.current.indexOf(it.key) >= 0 : it.key === p.current;
         return `<button type="button" class="pick-tile${on ? " active" : ""}" data-k="${it.key}" title="${t}" aria-label="${t}" aria-pressed="${on}">${it.inner}</button>`;
       }).join("");
       idx += cnt;
@@ -104,16 +104,28 @@ function artThumb(file, kind){
   return `<img class="art-thumb" src="${artUrl(file, kind)}" alt="" loading="lazy" onerror="this.style.opacity=.25">`;
 }
 function buildGalleryArtSelect(){
-  if(!hasOwn(GALLERY_ART, state.galleryArt)) state.galleryArt = "none";
+  // Multi-choice: the owner may pick 1..MAX_ART stand-in sets (shown in the order picked) when there are no photos of their own.
+  if(!Array.isArray(state.galleryArts)) state.galleryArts = [];
+  state.galleryArts = state.galleryArts.filter(k => hasOwn(GALLERY_ART, k) && k !== "none").slice(0, MAX_ART);
+  const cur = state.galleryArts.length ? state.galleryArts.slice() : ["none"];
   renderPicker("pickGalleryArt", Object.keys(GALLERY_ART).map(k => ({ key:k, title:GALLERY_ART[k].label, inner: (k === "none" || !GALLERY_ART[k].files) ? NONE_ICON : artThumb(GALLERY_ART[k].files[0], "gallery") })),
-    state.galleryArt, k => { state.galleryArt = k; buildGalleryArtSelect(); update(); });
+    cur, k => {
+      if(k === "none") state.galleryArts = [];
+      else{
+        const i = state.galleryArts.indexOf(k);
+        if(i >= 0) state.galleryArts.splice(i, 1);
+        else if(state.galleryArts.length < MAX_ART) state.galleryArts.push(k);
+      }
+      buildGalleryArtSelect(); update();
+    });
   const hint = $("galleryArtHint");
   if(hint){
+    const n = state.galleryArts.length;
     hint.textContent = state.photos.length
       ? "ℹ️ អ្នកបានបញ្ចូលរូបភាពពិតហើយ ដូច្នេះរូបភាពពិតនឹងបង្ហាញជំនួសរូបតំណាង។ (ប្រសិនបើលុបរូបទាំងអស់ រូបតំណាងដែលបានជ្រើសនឹងបង្ហាញវិញ។)"
-      : (state.galleryArt === "none"
-          ? "បើមិនមានរូប Pre-wedding សូមជ្រើសរូបតំណាងមួយ ដើម្បីបង្ហាញជំនួសផ្នែករូបភាព។"
-          : "✓ កំពុងប្រើ «" + GALLERY_ART[state.galleryArt].label + "» ជំនួសរូបភាព Pre-wedding។");
+      : (n === 0
+          ? "បើមិនមានរូប Pre-wedding សូមជ្រើសរូបតំណាង ១ ដល់ " + MAX_ART + " សន្លឹក (ចុចម្ដងទៀតដើម្បីដកចេញ) ដើម្បីបង្ហាញជំនួសផ្នែករូបភាព។"
+          : "✓ បានជ្រើសរូបតំណាង " + n + "/" + MAX_ART + (n >= MAX_ART ? " (អតិបរមា — ចុចរូបដែលបានជ្រើសដើម្បីដកចេញ)" : " — ចុចរូបផ្សេងទៀតដើម្បីបន្ថែម") + " ជំនួសរូបភាព Pre-wedding។");
   }
 }
 function buildCoverArtSelect(){
@@ -258,6 +270,68 @@ function buildCoverPhoto(){
   });
 })();
 
+// ---------- Owner's KHQR (wedding gift): one for the groom's side, one for the bride's side ----------
+const IMG_KHQR = { maxDim:1000, quality:0.92 };   // gentle compression so the QR stays scannable
+const KHQR_SLOTS = [
+  { key:"khqrGroom", title:"ខាងកូនកម្លោះ (Groom's side)" },
+  { key:"khqrBride", title:"ខាងកូនក្រមុំ (Bride's side)" }
+];
+function buildKhqr(){
+  const box = $("khqrSlots");
+  if(!box) return;
+  box.innerHTML = KHQR_SLOTS.map(sl => `<div class="khqr-slot"><h4>${sl.title}</h4>
+${state[sl.key]
+  ? `<div class="frame-prev khqr-prev"><img src="${state[sl.key]}" alt="KHQR"><button class="photo-clear cover-x" type="button" data-clear="${sl.key}" title="លុប KHQR" aria-label="លុប KHQR">×</button></div>
+<p class="guest-empty-hint">${fmtSize(dataUrlBytes(state[sl.key]))} · ឯកសារភ្ញៀវនីមួយៗនឹងធំបន្ថែមប្រហែលនេះ</p>`
+  : `<div class="photo-add-row"><span>+ បញ្ចូលរូប KHQR</span><input type="file" accept="image/*" data-pick="${sl.key}"></div>`}
+<p class="guest-empty-hint" data-status="${sl.key}"></p></div>`).join("");
+  box.querySelectorAll("[data-pick]").forEach(inp => inp.addEventListener("change", async e => {
+    const key = inp.dataset.pick, file = e.target.files[0];
+    if(!file) return;
+    const st = box.querySelector(`[data-status="${key}"]`);
+    if(st) st.textContent = "កំពុងរៀបចំរូប KHQR...";
+    try{
+      state[key] = await compressImage(file, IMG_KHQR);
+      buildKhqr(); update();
+    }catch(err){
+      if(st) st.textContent = "មិនអាចបើករូបភាពនេះបានទេ សូមជ្រើសរើសរូបភាព JPG/PNG ផ្សេង";
+    }
+  }));
+  box.querySelectorAll("[data-clear]").forEach(btn => btn.addEventListener("click", e => {
+    e.stopPropagation();
+    state[btn.dataset.clear] = null;
+    buildKhqr(); update();
+  }));
+}
+
+// ---------- Colour guide for guests: gift procession / evening / tent, several colours each ----------
+function buildDressColors(){
+  const box = $("dressBox");
+  if(!box) return;
+  if(!state.dressColors || typeof state.dressColors !== "object") state.dressColors = {};
+  DRESS_CATS.forEach(c => { if(!Array.isArray(state.dressColors[c.key])) state.dressColors[c.key] = []; });
+  box.innerHTML = DRESS_CATS.map(c => {
+    const cur = state.dressColors[c.key];
+    return `<div class="dress-cat" data-cat="${c.key}"><h4>${c.km}<small>${c.en}</small><span class="dress-count">${cur.length}/${DRESS_MAX}</span></h4>
+<div class="dress-pal">${DRESS_PALETTE.map(p => { const on = cur.indexOf(p.hex) >= 0; return `<button type="button" class="dress-sw${on ? " on" : ""}" data-hex="${p.hex}" title="${p.km} · ${p.en}" aria-label="${p.km}" aria-pressed="${on}" style="background:${p.hex}"></button>`; }).join("")}<label class="dress-custom" title="ពណ៌ផ្ទាល់ខ្លួន (Custom)"><input type="color" value="#c9a227" data-custom aria-label="ពណ៌ផ្ទាល់ខ្លួន"><span>＋</span></label></div>
+<div class="dress-chosen">${cur.map(h => `<span class="dress-chip"><i style="background:${h}"></i>${escapeHtml(dressColorName(h, "km"))}<button type="button" data-rm="${h}" aria-label="ដកចេញ">×</button></span>`).join("")}</div></div>`;
+  }).join("");
+  const add = (cat, hex, toggle) => {
+    const a = state.dressColors[cat], i = a.indexOf(hex);
+    if(i >= 0){ if(toggle) a.splice(i, 1); else return; }
+    else if(a.length < DRESS_MAX) a.push(hex);
+    else return;
+    buildDressColors(); update();
+  };
+  box.querySelectorAll(".dress-cat").forEach(sec => {
+    const cat = sec.dataset.cat;
+    sec.querySelectorAll(".dress-sw").forEach(b => b.addEventListener("click", () => add(cat, b.dataset.hex, true)));
+    sec.querySelectorAll("[data-rm]").forEach(b => b.addEventListener("click", () => add(cat, b.dataset.rm, true)));
+    const cu = sec.querySelector("[data-custom]");
+    if(cu) cu.addEventListener("change", () => add(cat, String(cu.value).toLowerCase(), false));
+  });
+}
+
 function buildCoverFocus(){
   const box = $("coverFocusBox");
   if(!box) return;
@@ -344,6 +418,7 @@ function buildPhotos(){
       </div>`
     : "";
   grid.innerHTML = existing + addTile;
+  if(state.photos.length > MAX_PHOTOS) setImgStatus("photoStatus", "មានរូប " + state.photos.length + " សន្លឹក — កំណត់ត្រឹម " + MAX_PHOTOS + " សន្លឹក សូមលុបរូបដែលលើស");
 
   const addInput = $("addPhotoInput");
   if(addInput){

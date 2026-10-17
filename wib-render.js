@@ -304,7 +304,28 @@ ${mapPrev.openUrl ? `<a class="map-btn" href="${escapeHtml(mapPrev.openUrl)}" ta
 <p class="section-sub">${L.contactsSub}</p>
 <div class="contact-grid">${contactsHtml}</div>
 </div></section>` : "";
-  const bodySections = [secWelcome, secCountdown, secProgram, secGallery, secVideo, secVenue, secContacts].filter(Boolean).join(divider);
+  // Owner's KHQR (wedding gift): groom's side / bride's side, each shown only when an image was uploaded
+  const imgOk = v => typeof v === "string" && /^data:image\/(?:jpeg|png|webp|gif);base64,[A-Za-z0-9+\/=]+$/.test(v);
+  const gifts = [["khqrGroom", L.giftGroom, "groom"], ["khqrBride", L.giftBride, "bride"]].filter(g => imgOk(s[g[0]]));
+  const secGift      = gifts.length ? `<section><div class="wrap">
+<h2 class="section-title display">${L.giftTitle}</h2>
+<p class="section-sub">${L.giftSub}</p>
+<div class="gift-grid">${gifts.map(g => `<div class="gift-card"><p class="gift-who">${g[1]}</p><img class="gift-qr" src="${s[g[0]]}" alt="KHQR">
+<a class="gift-save" href="${s[g[0]]}" download="KHQR-${g[2]}.${/^data:image\/png/.test(s[g[0]]) ? "png" : "jpg"}">${L.giftSave}</a></div>`).join("")}</div>
+<p class="gift-hint">${L.giftHint}</p>
+</div></section>` : "";
+  // Colour guide for guests: each part (procession / evening / tent) lists its own colours; empty parts are skipped
+  const dressRows = DRESS_CATS.map(cat => {
+    const cols = ((s.dressColors && Array.isArray(s.dressColors[cat.key])) ? s.dressColors[cat.key] : []).filter(x => /^#[0-9a-fA-F]{6}$/.test(x)).slice(0, DRESS_MAX);
+    if(!cols.length) return "";
+    return `<div class="dress-row"><p class="dress-label">${escapeHtml(cat[lang])}</p><div class="dress-dots">${cols.map(x => `<div class="dress-dot"><span style="background:${x}"></span><small>${escapeHtml(dressColorName(x, lang))}</small></div>`).join("")}</div></div>`;
+  }).join("");
+  const secDress     = dressRows ? `<section><div class="wrap">
+<h2 class="section-title display">${L.dressTitle}</h2>
+<p class="section-sub">${L.dressSub}</p>
+<div class="dress-card">${dressRows}</div>
+</div></section>` : "";
+  const bodySections = [secWelcome, secCountdown, secProgram, secDress, secGallery, secVideo, secVenue, secContacts, secGift].filter(Boolean).join(divider);
 
   return `<section id="section${suf}" class="lang-section lang-${lang}" style="display:${isKm ? "block" : "none"}">
 <p class="guest-line" id="guestLine${suf}"${guestLineAttrs}>${escapeHtml(guestLineText)}</p>
@@ -421,8 +442,8 @@ function buildTextAnimJs(mode, isPreview){
 var waMode=${JSON.stringify(mode)};
 var waPrev=${isPreview ? "true" : "false"};
 var waEls=[], waStarted=false;
-var WA_TEXT='.eyebrow,.names,.hero-date,.section-title,.section-sub,.welcome p,.hosts,.tl-time,.tl-name,.venue-name,.venue-addr,.contact-name,.thanks,footer > div:last-child';
-var WA_BLOCK='.countdown,.map-btn,.contact-phone,.map-embed,.video-card';
+var WA_TEXT='.eyebrow,.names,.hero-date,.section-title,.section-sub,.welcome p,.hosts,.tl-time,.tl-name,.venue-name,.venue-addr,.contact-name,.gift-hint,.thanks,footer > div:last-child';
+var WA_BLOCK='.countdown,.map-btn,.contact-phone,.map-embed,.video-card,.gift-card,.dress-row';
 function waReduced(){ try{ return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } }
 function waSplit(el){
   var lang=el.closest('.lang-en')?'en':'km', seg=null;
@@ -782,6 +803,21 @@ section{padding:30px 0;}
 .venue-name{font-size:25px;margin:0 0 8px;}
 .venue-addr{color:var(--ink);opacity:.75;font-size:16px;margin:0 0 16px;}
 .map-btn{display:inline-block;padding:12px 26px;border-radius:999px;background:var(--accent-1);color:#fff;text-decoration:none;font-size:14px;font-style:normal;}
+.gift-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;}
+.gift-card{flex:1 1 220px;max-width:320px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 18px 22px;text-align:center;}
+.gift-who{margin:0 0 12px;font-size:16px;color:var(--accent-1);}
+.gift-qr{display:block;width:100%;height:auto;border-radius:calc(var(--radius) + 4px);background:#fff;}
+.gift-save{display:inline-block;margin-top:16px;padding:11px 26px;border-radius:999px;border:1.5px solid var(--accent-1);background:transparent;color:var(--accent-1);text-decoration:none;font-size:14px;font-style:normal;}
+.gift-save:hover,.gift-save:focus-visible{background:var(--accent-1);color:#fff;outline:none;}
+.gift-hint{font-size:13px;opacity:.7;margin:14px 0 0;text-align:center;}
+.dress-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px 22px;}
+.dress-row{padding:18px 0;text-align:center;}
+.dress-row + .dress-row{border-top:1px solid var(--border);}
+.dress-label{margin:0 0 14px;font-size:16px;color:var(--accent-1);}
+.dress-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
+.dress-dot{display:flex;flex-direction:column;align-items:center;gap:7px;width:72px;}
+.dress-dot span{display:block;width:46px;height:46px;border-radius:50%;box-shadow:0 0 0 3px var(--card),0 0 0 4px var(--border),0 4px 10px rgba(0,0,0,.12);}
+.dress-dot small{font-size:12px;line-height:1.3;opacity:.8;font-style:normal;}
 .cal-wrap{text-align:center;margin-top:22px;}
 .cal-btn{display:inline-block;padding:11px 26px;border-radius:999px;border:1.5px solid var(--accent-1);background:transparent;color:var(--accent-1);font-family:inherit;font-size:14px;font-style:normal;cursor:pointer;transition:background .2s,color .2s;}
 .cal-btn:hover,.cal-btn:focus-visible{background:var(--accent-1);color:#fff;outline:none;}
