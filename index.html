@@ -67,7 +67,6 @@
       <div class="pick-group"><div class="pick-label">អក្សរខ្មែរ</div><div class="pick-grid" id="pickFontKm"></div></div>
       <div class="pick-group"><div class="pick-label">អក្សរ English</div><div class="pick-grid" id="pickFontEn"></div></div>
       <div class="pick-group"><div class="pick-label">អេក្រង់បើកធៀប</div><div class="pick-grid" id="pickCover"></div></div>
-      <div class="pick-group"><div class="pick-label">ទម្រង់រូបភាព</div><div class="pick-grid" id="pickGallery"></div></div>
       <div class="pick-group"><div class="pick-label">ស៊ុម (នៅពីលើ ជាប់អេក្រង់)</div><div class="pick-grid" id="pickKbach"></div></div>
       <div class="pick-group" id="frameFxGroup" style="display:none;">
         <div class="pick-label">ចលនាស៊ុម ពេលអូសចុះក្រោម (Transition)</div>
@@ -78,8 +77,8 @@
       <div class="pick-group"><div class="pick-label">ផ្ទៃខាងក្រោយ (នៅពីក្រោយ ជាប់អេក្រង់)</div><div class="pick-grid" id="pickKbachBg"></div></div>
       <div id="bgCustomBox"></div>
       <div class="pick-group" id="bgBlurGroup" style="display:none;">
-        <label for="bgBlur">កម្រិតព្រិលផ្ទៃខាងក្រោយ <b id="bgBlurVal"></b></label>
-        <input type="range" id="bgBlur" min="0" max="40" step="1" style="width:100%;">
+        <label for="bgBlurStd">កម្រិតព្រិលផ្ទៃខាងក្រោយ <b id="bgBlurStdVal"></b></label>
+        <input type="range" id="bgBlurStd" min="0" max="40" step="1" style="width:100%;">
       </div>
       <div class="pick-group"><div class="pick-label">ចលនាអត្ថបទពេល Scroll</div><div class="pick-grid" id="pickAnim"></div></div>
       <label class="chk-row"><input type="checkbox" id="coverAlways"><span>បង្ហាញអេក្រង់បើកធៀប ទោះមិនមានចម្រៀងក៏ដោយ (បើមានចម្រៀង អេក្រង់នេះបង្ហាញជានិច្ច)</span></label>
@@ -180,7 +179,7 @@
     <div class="tab-pane" data-pane="features">
     <fieldset>
       <legend><span class="lg-icon">📷</span>រូបភាពគម្រប (Cover)</legend>
-      <p class="photo-hint">រូបភាពរួម ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា (រូបភាពត្រូវបានបង្រួមទំហំដោយស្វ័យប្រវត្តិ)</p>
+      <p class="photo-hint">រូបភាព <b>JPG ឬ PNG</b> រួម ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា (រូបភាពត្រូវបានបង្រួមទំហំដោយស្វ័យប្រវត្តិ)</p>
       <div class="photo-grid" id="coverGrid"></div>
       <p class="guest-empty-hint" id="coverStatus"></p>
       <div class="pick-group" style="margin-top:14px;">
@@ -204,13 +203,17 @@
 
     <fieldset>
       <legend><span class="lg-icon">🖼️</span>រូបភាព (Pre-wedding) — រួម</legend>
-      <p class="photo-hint">បញ្ចូលបានតិច-ច្រើនតាមចិត្ត (រហូតដល់ ១០ សន្លឹក) ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា (រូបភាពត្រូវបានបង្រួមទំហំដោយស្វ័យប្រវត្តិ)។ អូសចំណុច ⋮⋮ លើរូប ដើម្បីប្តូរលំដាប់ (ឬចុចលើចំណុចនោះ រួចប្រើព្រួញលើក្តារចុច)។</p>
+      <p class="photo-hint">បញ្ចូលរូបភាព <b>JPG ឬ PNG</b> បានតិច-ច្រើនតាមចិត្ត (រហូតដល់ ១០ សន្លឹក) ប្រើដូចគ្នាសម្រាប់ទាំងពីរភាសា (រូបភាពត្រូវបានបង្រួមទំហំដោយស្វ័យប្រវត្តិ)។ អូសចំណុច ⋮⋮ លើរូប ដើម្បីប្តូរលំដាប់ (ឬចុចលើចំណុចនោះ រួចប្រើព្រួញលើក្តារចុច)។</p>
       <div class="photo-grid" id="photoGrid"></div>
       <p class="guest-empty-hint" id="photoStatus"></p>
       <div class="pick-group" style="margin-top:14px;">
         <div class="pick-label">រូបតំណាង (បង្ហាញជំនួស ពេលគ្មានរូប Pre-wedding) — ជ្រើសបានច្រើន ១ ដល់ ៦ សន្លឹក</div>
         <div class="pick-grid" id="pickGalleryArt"></div>
         <p class="photo-hint" id="galleryArtHint" style="margin:8px 0 0;"></p>
+      </div>
+      <div class="pick-group" style="margin-top:14px;">
+        <div class="pick-label">ទម្រង់រូបភាព (របៀបរៀបរូបក្នុងធៀប)</div>
+        <div class="pick-grid" id="pickGallery"></div>
       </div>
     </fieldset>
 
@@ -336,9 +339,9 @@
     <button class="pay-cancel" id="payCancelBtn" type="button">បោះបង់</button>
   </div>
 </div>
-<script src="wib-data.js?v=3"></script>
-<script src="wib-render.js?v=3"></script>
-<script src="wib-pickers.js?v=3"></script>
-<script src="wib-ui.js?v=3"></script>
+<script src="wib-data.js?v=4"></script>
+<script src="wib-render.js?v=4"></script>
+<script src="wib-pickers.js?v=4"></script>
+<script src="wib-ui.js?v=4"></script>
 </body>
 </html>

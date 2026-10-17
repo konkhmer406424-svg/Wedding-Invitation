@@ -366,16 +366,16 @@ makeImageSlot({ prefix:"bg", key:BG_KEY, styleKey:"kbachBg", fitKey:"bgFit", opK
 function refreshFrameUI(){ IMG_SLOTS.forEach(S => { if(S.refresh) S.refresh(); }); refreshBgBlurUI(); }
 // Blur slider for the preset BACKGROUNDS. Hidden for "none" and "custom" (the uploaded image has its own blur slider inside its box).
 function refreshBgBlurUI(){
-  const g = $("bgBlurGroup"), r = $("bgBlur"); if(!g || !r) return;
+  const g = $("bgBlurGroup"), r = $("bgBlurStd"); if(!g || !r) return;
   g.style.display = (state.kbachBg && state.kbachBg !== "none" && state.kbachBg !== "custom") ? "" : "none";
   const v = Number(state.bgBlur) || 0;
-  r.value = String(v); $("bgBlurVal").textContent = v ? v + " px" : "បិទ";
+  r.value = String(v); $("bgBlurStdVal").textContent = v ? v + " px" : "បិទ";
 }
 (function bindBgBlur(){
-  const r = $("bgBlur"); if(!r) return;
+  const r = $("bgBlurStd"); if(!r) return;
   r.addEventListener("input", ev => {
     state.bgBlur = Math.max(0, Math.min(40, Number(ev.target.value) || 0));
-    $("bgBlurVal").textContent = state.bgBlur ? state.bgBlur + " px" : "បិទ";
+    $("bgBlurStdVal").textContent = state.bgBlur ? state.bgBlur + " px" : "បិទ";
     scheduleUpdate();
   });
 })();

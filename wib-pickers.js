@@ -241,11 +241,12 @@ function buildCoverPhoto(){
     grid.style.display = "";
     grid.innerHTML = `<div class="photo-add-row">
       <span>+ បញ្ចូលរូបភាពគម្រប</span>
-      <input type="file" accept="image/*" id="coverInput">
+      <input type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg" id="coverInput">
     </div>`;
     $("coverInput").addEventListener("change", async e => {
       const file = e.target.files[0];
       if(!file) return;
+      if(!isJpgOrPng_(file)){ e.target.value = ""; setImgStatus("coverStatus", "សូមជ្រើសរើសរូបភាព JPG ឬ PNG ប៉ុណ្ណោះ"); return; }
       setImgStatus("coverStatus", "កំពុងបង្រួមរូបភាព...");
       try{
         const data = await compressImage(file, IMG_COVER);
@@ -258,6 +259,11 @@ function buildCoverPhoto(){
     });
   }
   buildCoverFocus();
+}
+// Cover and Pre-wedding photos accept JPG or PNG only (checked by type and by file extension, because some pickers ignore the accept filter).
+function isJpgOrPng_(file){
+  const ext = ((file && file.name || "").split(".").pop() || "").toLowerCase();
+  return !!file && (/^image\/(jpeg|jpg|png)$/i.test(file.type || "") || ((!file.type) && /^(jpe?g|png)$/.test(ext)));
 }
 (function bindCoverClear(){
   const x = $("coverClear");
@@ -414,7 +420,7 @@ function buildPhotos(){
   const addTile = state.photos.length < MAX_PHOTOS
     ? `<div class="photo-add-row">
         <span>+ បញ្ចូលរូបភាព (${state.photos.length}/${MAX_PHOTOS})</span>
-        <input type="file" accept="image/*" id="addPhotoInput" multiple>
+        <input type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg" id="addPhotoInput" multiple>
       </div>`
     : "";
   grid.innerHTML = existing + addTile;
@@ -423,10 +429,12 @@ function buildPhotos(){
   const addInput = $("addPhotoInput");
   if(addInput){
     addInput.addEventListener("change", async e => {
-      const files = Array.from(e.target.files || []);
+      const allFiles = Array.from(e.target.files || []);
+      const files = allFiles.filter(isJpgOrPng_);          // JPG / PNG only
+      const skippedType = allFiles.length - files.length;
       const remaining = MAX_PHOTOS - state.photos.length;
       const toAdd = files.slice(0, remaining);
-      if(!toAdd.length) return;
+      if(!toAdd.length){ e.target.value = ""; if(skippedType) setImgStatus("photoStatus", "សូមជ្រើសរើសរូបភាព JPG ឬ PNG ប៉ុណ្ណោះ"); return; }
       setImgStatus("photoStatus", "កំពុងបង្រួមរូបភាព...");
       let before = 0, after = 0, ok = 0, failed = 0;
       for(const file of toAdd){
@@ -441,6 +449,7 @@ function buildPhotos(){
       let msg = ok ? "បានបង្រួម " + ok + " សន្លឹក៖ " + fmtSize(before) + " → " + fmtSize(after) : "";
       if(failed) msg += (msg ? " · " : "") + "មិនអាចបើករូបភាព " + failed + " សន្លឹក";
       if(files.length > remaining) msg += (msg ? " · " : "") + "បន្ថែមបានត្រឹម " + MAX_PHOTOS + " សន្លឹក";
+      if(skippedType) msg += (msg ? " · " : "") + "រំលង " + skippedType + " ឯកសារ ដែលមិនមែន JPG/PNG";
       setImgStatus("photoStatus", msg);
     });
   }
