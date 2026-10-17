@@ -166,20 +166,20 @@ const GALLERY_STYLES = {
 // ជម្រើសបណ្ដុំរូបភាពអាចមានរូបច្រើនសន្លឹក (ម្ចាស់ធៀបជ្រើសបានច្រើនជម្រើស សរុបអតិបរមា ៦ សន្លឹក = MAX_ART) ដោយសរសេរ files:["a.png","b.png","c.png"] (បង្ហាញតាមទម្រង់ gallery ដែលបានជ្រើស)។
 const COVER_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  cover1:{ label:"រូបគម្រប ១", file:"cover1.webp" },
-  cover2:{ label:"រូបគម្រប ២", file:"cover2.webp" },
-  cover3:{ label:"រូបគម្រប ៣", file:"cover3.webp" },
-  cover4:{ label:"រូបគម្រប ៤", file:"cover4.webp" },
-  cover5:{ label:"រូបគម្រប ៥", file:"cover5.webp" }
+  cover1:{ label:"រូបគម្រប ១", file:"cover1.jpg" },
+  cover2:{ label:"រូបគម្រប ២", file:"cover2.jpg" },
+  cover3:{ label:"រូបគម្រប ៣", file:"cover3.jpg" },
+  cover4:{ label:"រូបគម្រប ៤", file:"cover4.jpg" },
+  cover5:{ label:"រូបគម្រប ៥", file:"cover5.jpg" }
 };
 const GALLERY_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  gallery1:{ label:"បណ្ដុំរូបភាព ១", files:["gallery1.webp"] },
-  gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.webp"] },
-  gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.webp"] },
-  gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.webp"] },
-  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.webp"] },
-  gallery6:{ label:"បណ្ដុំរូបភាព ៦", files:["gallery6.webp"] }
+  gallery1:{ label:"បណ្ដុំរូបភាព ១", files:["gallery1.jpg"] },
+  gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.jpg"] },
+  gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.jpg"] },
+  gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.jpg"] },
+  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.jpg"] },
+  gallery6:{ label:"បណ្ដុំរូបភាព ៦", files:["gallery6.jpg"] }
 };
 function artUrl(file, kind){ return assetBase() + ASSET_DIRS[kind || "gallery"] + file + "?v=" + ASSET_VERSION; }   // kind: "cover" | "gallery"
 function coverArtUrl(s){
