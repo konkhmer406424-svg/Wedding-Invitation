@@ -90,7 +90,7 @@ if(ocEl){
       setTimeout(function(){
         ocEl.classList.add('finish');
         document.body.classList.remove('oc-noscroll');
-        if(typeof waStart==='function'){ try{ waStart(); }catch(e){} }
+        if(typeof waStart==='function'){ try{ waStart(true); }catch(e){} }
         setTimeout(function(){ if(ocEl.parentNode){ ocEl.parentNode.removeChild(ocEl); } },650);
       },reduce?0:${cfg.finishMs});
     });
@@ -434,6 +434,9 @@ body.wa-on .wa-sp .wa-w{opacity:0;transform:translateY(.7em);transition:opacity 
 body.wa-on .wa-sp .wa-w:not(.wa-e){display:inline-block;}
 body.wa-on .wa-sp.wa-in .wa-w{opacity:1;transform:none;}
 body.wa-on .wa.wa-now,body.wa-on .wa-sp.wa-now .wa-w{transition:none !important;}
+body.wa-on .hero .wa{transition:opacity 1.2s ease var(--wd,0ms),transform 1.3s cubic-bezier(.22,1,.36,1) var(--wd,0ms),filter 1.2s ease var(--wd,0ms);}
+body.wa-on.wa-fadeup .hero .wa:not(.wa-in){transform:translateY(46px);}
+body.wa-on.wa-blur .hero .wa:not(.wa-in){filter:blur(18px);transform:scale(.9);}
 `;
 }
 function buildTextAnimJs(mode, isPreview){
@@ -483,15 +486,21 @@ function waPrepare(){
   });
   Array.prototype.forEach.call(document.querySelectorAll(WA_BLOCK),function(el){ el.classList.add('wa'); waEls.push(el); });
 }
-function waStart(){
+function waStart(fromOpen){
   if(waStarted||!waEls.length){ return; }
   waStarted=true;
   var first=true, instant=false;
   if(waPrev){ try{ instant=sessionStorage.getItem('wib-anim-seen')==='1'; sessionStorage.setItem('wib-anim-seen','1'); }catch(e){} }
+  // Cover (hero) text always animates when a guest opens the invitation; in the builder preview it replays only when the cover is opened (not on every edit).
+  var heroLive=(fromOpen===true)||!waPrev;
   var io=new IntersectionObserver(function(entries){
     var vis=entries.filter(function(e){ return e.isIntersecting; }).sort(function(a,b){ return a.boundingClientRect.top-b.boundingClientRect.top; });
     vis.forEach(function(e,i){
       var el=e.target;
+      if(heroLive&&el.closest&&el.closest('.hero')){
+        el.style.setProperty('--wd',(el.classList.contains('names')?600:(el.classList.contains('hero-date')?1100:250))+'ms');
+        el.classList.add('wa-in'); io.unobserve(el); return;
+      }
       if(instant&&first){ el.classList.add('wa-now'); }
       el.style.setProperty('--wd',(Math.min(i,6)*110)+'ms');
       el.classList.add('wa-in');
@@ -825,6 +834,13 @@ section{padding:30px 0;}
 .contact-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;text-align:center;}
 .contact-name{font-size:17px;margin:0 0 6px;}
 .contact-phone{display:inline-block;color:var(--accent-1);font-weight:600;text-decoration:none;font-size:16.5px;font-style:normal;}
+/* ---- Glass + 3D cards (countdown, short invitation, venue, contacts): see-through so the animated background shows behind. Tune --glass-a1 / --glass-a2 (higher = more solid) ---- */
+.welcome,.cd-unit,.venue-card,.contact-card{--glass-a1:58%;--glass-a2:30%;position:relative;background:linear-gradient(160deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,0) 44%),linear-gradient(145deg,color-mix(in srgb,var(--card) var(--glass-a1),transparent),color-mix(in srgb,var(--card) var(--glass-a2),transparent));-webkit-backdrop-filter:blur(3px) saturate(1.25);backdrop-filter:blur(3px) saturate(1.25);border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 1px 0 0 rgba(255,255,255,.3),inset 0 -2px 5px rgba(0,0,0,.06),0 14px 28px -8px rgba(0,0,0,.30),0 4px 10px rgba(0,0,0,.10);}
+/* Countdown: dark-tinted glass tile (theme colour) so the 3D digits stay clear on any background */
+.cd-unit{width:80px;padding:18px 0 14px;background:linear-gradient(160deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,0) 40%),linear-gradient(145deg,color-mix(in srgb,color-mix(in srgb,var(--accent-1) 24%,#14100c) 64%,transparent),color-mix(in srgb,color-mix(in srgb,var(--accent-1) 18%,#14100c) 38%,transparent));border:1px solid rgba(255,255,255,.5);}
+.cd-label{color:#fff;opacity:1;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.7);}
+.cd-num{font-size:38px;font-weight:900;line-height:1.1;letter-spacing:.5px;background:linear-gradient(180deg,#fff 0%,color-mix(in srgb,var(--accent-1) 35%,#fff) 50%,color-mix(in srgb,var(--accent-1) 85%,#fff) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 55%,#000)) drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 45%,#000)) drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 36%,#000)) drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 28%,#000)) drop-shadow(4px 7px 6px rgba(0,0,0,.5));}
+@media(max-width:420px){.countdown{gap:8px;flex-wrap:nowrap;}.cd-unit{width:auto;flex:1 1 0;min-width:0;}.cd-num{font-size:30px;}}
 footer{text-align:center;padding:30px 24px 36px;color:var(--ink);opacity:.75;font-size:15px;}
 footer .thanks{font-size:22px;color:var(--accent-1);opacity:1;margin-bottom:6px;}
 .lang-toggle{position:fixed;top:16px;right:16px;z-index:100;display:flex;background:var(--ctl-bg);border:1px solid color-mix(in srgb, var(--border) 55%, transparent);border-radius:999px;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,.08);}

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Koulen&family=Odor+Mean+Chey&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=5">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#B8912E">
 <link rel="icon" type="image/png" href="logo.png">
@@ -80,7 +80,7 @@
         <label for="bgBlurStd">កម្រិតព្រិលផ្ទៃខាងក្រោយ <b id="bgBlurStdVal"></b></label>
         <input type="range" id="bgBlurStd" min="0" max="40" step="1" style="width:100%;">
       </div>
-      <div class="pick-group"><div class="pick-label">ចលនាអត្ថបទពេល Scroll</div><div class="pick-grid" id="pickAnim"></div></div>
+      <div class="pick-group"><div class="pick-label">ចលនាអត្ថបទ (លើ Cover ពេលបើកធៀប + ពេល Scroll)</div><div class="pick-grid" id="pickAnim"></div></div>
       <label class="chk-row"><input type="checkbox" id="coverAlways"><span>បង្ហាញអេក្រង់បើកធៀប ទោះមិនមានចម្រៀងក៏ដោយ (បើមានចម្រៀង អេក្រង់នេះបង្ហាញជានិច្ច)</span></label>
     </fieldset>
 
@@ -272,21 +272,25 @@
       <div id="khqrSlots"></div>
     </fieldset>
 
-    <fieldset>
-      <legend><span class="lg-icon">🎁</span>ធៀបអញ្ជើញផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវ (Guest Copies)</legend>
-      <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;">ចុចប៊ូតុងខាងក្រោមម្តងដើម្បី Publish គេហទំព័រ រួចវានឹងបង្កើត <b>Link ផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវម្នាក់ៗ</b> ភ្លាមៗ (គ្មានកំណត់ចំនួន)។ ការទូទាត់មានសុពលភាព ៣០ ថ្ងៃ ដរាបណាមិនប្តូរឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធី។</p>
-      <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;color:#C0392B;font-weight:600;">⚠️ សំខាន់៖ បន្ទាប់ពីទូទាត់រួច <u>កុំកែឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធីម្តងទៀត</u> — ព្រោះការទូទាត់ភ្ជាប់ទៅនឹងឈ្មោះ/ថ្ងៃពិតប្រាកដ។ បើកែ ប្រព័ន្ធនឹងសុំទូទាត់ថ្មី ទោះជាអ្នកមានលេខកូដក៏ដោយ (លេខកូដនឹងប្រើមិនកើតរហូតដល់អ្នកបំពេញឈ្មោះ/ថ្ងៃឲ្យដូចដើមវិញ)។</p>
-      <div class="field"><label>បញ្ជីឈ្មោះភ្ញៀវ (មួយបន្ទាត់ម្នាក់)</label>
-        <textarea id="guestNamesFile" style="min-height:110px;" placeholder="ចាន់ សុវណ្ណា
+    </div>
+
+    <!-- Guest Copies: always visible at the bottom of the builder, under the Style / Info / Features tabs -->
+    <div class="panel-foot" id="panelFoot">
+      <fieldset>
+        <legend><span class="lg-icon">🎁</span>ធៀបអញ្ជើញផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវ (Guest Copies)</legend>
+        <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;">ចុចប៊ូតុងខាងក្រោមម្តងដើម្បី Publish គេហទំព័រ រួចវានឹងបង្កើត <b>Link ផ្ទាល់ខ្លួនសម្រាប់ភ្ញៀវម្នាក់ៗ</b> ភ្លាមៗ (គ្មានកំណត់ចំនួន)។ ការទូទាត់មានសុពលភាព ៣០ ថ្ងៃ ដរាបណាមិនប្តូរឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធី។</p>
+        <p class="photo-hint" style="margin:-4px 0 12px;line-height:1.7;color:#C0392B;font-weight:600;">⚠️ សំខាន់៖ បន្ទាប់ពីទូទាត់រួច <u>កុំកែឈ្មោះកូនកម្លោះ/កូនក្រមុំ ឬថ្ងៃពិធីម្តងទៀត</u> — ព្រោះការទូទាត់ភ្ជាប់ទៅនឹងឈ្មោះ/ថ្ងៃពិតប្រាកដ។ បើកែ ប្រព័ន្ធនឹងសុំទូទាត់ថ្មី ទោះជាអ្នកមានលេខកូដក៏ដោយ (លេខកូដនឹងប្រើមិនកើតរហូតដល់អ្នកបំពេញឈ្មោះ/ថ្ងៃឲ្យដូចដើមវិញ)។</p>
+        <div class="field"><label>បញ្ជីឈ្មោះភ្ញៀវ (មួយបន្ទាត់ម្នាក់)</label>
+          <textarea id="guestNamesFile" style="min-height:110px;" placeholder="ចាន់ សុវណ្ណា
 សុខ ស្រីពៅ
 លោក គង់ សុភាព"></textarea></div>
-      <p class="guest-empty-hint" id="guestCount" style="padding:0 0 10px;text-align:right;"></p>
-      <button class="add-btn" id="uploadFilesBtn" type="button" style="margin-top:2px;border:none;background:linear-gradient(135deg,#2E7D32,#66BB6A);color:#fff;font-weight:700;box-shadow:0 3px 10px rgba(46,125,50,.25);">🚀 បង្កើត Link ស្វ័យប្រវត្តិសម្រាប់ភ្ញៀវម្នាក់ៗ</button>
-      <div id="publishedUrlBox"></div>
-      <div id="exportReminder"></div>
-      <p class="guest-empty-hint" id="genFilesStatus"></p>
-      <div id="guestLinksResult"></div>
-    </fieldset>
+        <p class="guest-empty-hint" id="guestCount" style="padding:0 0 10px;text-align:right;"></p>
+        <button class="add-btn" id="uploadFilesBtn" type="button" style="margin-top:2px;border:none;background:linear-gradient(135deg,#2E7D32,#66BB6A);color:#fff;font-weight:700;box-shadow:0 3px 10px rgba(46,125,50,.25);">🚀 បង្កើត Link ស្វ័យប្រវត្តិសម្រាប់ភ្ញៀវម្នាក់ៗ</button>
+        <div id="publishedUrlBox"></div>
+        <div id="exportReminder"></div>
+        <p class="guest-empty-hint" id="genFilesStatus"></p>
+        <div id="guestLinksResult"></div>
+      </fieldset>
     </div>
   </aside>
 
@@ -340,7 +344,7 @@
   </div>
 </div>
 <script src="wib-data.js?v=4"></script>
-<script src="wib-render.js?v=4"></script>
+<script src="wib-render.js?v=5"></script>
 <script src="wib-pickers.js?v=4"></script>
 <script src="wib-ui.js?v=4"></script>
 </body>
