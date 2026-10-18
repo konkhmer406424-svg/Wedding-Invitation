@@ -283,9 +283,9 @@ ${c.fits.map(f => `<label class="chk-row"><input type="radio" name="${c.prefix}F
 <label style="margin-top:10px;">ភាពច្បាស់ <b id="${id("OpacityVal")}"></b></label>
 <input type="range" id="${id("Opacity")}" min="10" max="100" step="1" style="width:100%;">
 ${c.snapKey ? `<label class="chk-row" style="margin-top:10px;"><input type="checkbox" id="${id("Snap")}"><span>ស៊ុមជាប់គែមអេក្រង់ស្វ័យប្រវត្តិ (កាត់ចន្លោះទទេសងខាងចេញ)</span></label>` : ""}
-${c.spreadKey ? `<label style="margin-top:10px;">រុញស៊ុមចេញទៅគែម (ឱ្យសរសរបាក់ពាក់កណ្ដាល) <b id="${id("SpreadVal")}"></b></label>
+${c.spreadKey ? `<label style="margin-top:10px;">រុញស៊ុមចេញទៅគែម (ឱ្យស៊ុមត្រូវកាត់ពាក់កណ្ដាល) <b id="${id("SpreadVal")}"></b></label>
 <input type="range" id="${id("Spread")}" min="0" max="40" step="1" style="width:100%;">` : ""}
-${c.spreadEndKey ? `<label style="margin-top:10px;">ពេលអូសចុះក្រោម ស៊ុមពង្រីកបន្ថែម (ណែនាំ ៤–៨% ដើម្បីនៅឃើញសរសរខ្លះ) <b id="${id("SpreadEndVal")}"></b></label>
+${c.spreadEndKey ? `<label style="margin-top:10px;">ពេលអូសចុះក្រោម ស៊ុមពង្រីកបន្ថែម (ណែនាំ ៤–៨% ដើម្បីនៅឃើញស៊ុមខ្លះ) <b id="${id("SpreadEndVal")}"></b></label>
 <input type="range" id="${id("SpreadEnd")}" min="0" max="30" step="1" style="width:100%;">` : ""}
 ${c.blurKey ? `<label style="margin-top:10px;">កម្រិតព្រិល <b id="${id("BlurVal")}"></b></label>
 <input type="range" id="${id("Blur")}" min="0" max="40" step="1" style="width:100%;">` : ""}

@@ -161,25 +161,25 @@ const GALLERY_STYLES = {
 // ---- រូបតំណាង (Stand-in pictures) — បង្ហាញពេលគ្មានរូប Cover ឬគ្មានរូប Pre-wedding ----
 // ដាក់ឯកសាររូបទុកក្នុង GitHub តាម folder ដូចខាងក្រោម (ក្នុង images/) ហើយប្រើ ASSET_VERSION ដូចគ្នា។
 //   images/covers/   → cover1.jpg … cover5.jpg      (បង្ហាញជារូបគម្រប ពេញក្រោមឈ្មោះ — ណែនាំរូបបញ្ឈរ ឧ. 1080×1920 ឬ 1080×1620)
-//   images/gallery/  → gallery1.webp … gallery5.webp  (បង្ហាញក្នុងផ្នែក "រូបភាពនៃពួកយើង" — ណែនាំ 1200×1200 ឬ 1200×900)
+//   images/gallery/  → gallery1.jpg … gallery6.jpg  (បង្ហាញក្នុងផ្នែក "រូបភាពនៃពួកយើង" — ណែនាំ 1200×1200 ឬ 1200×900)
 // ចង់ប្តូរឈ្មោះក្នុងបញ្ជី (label), ប្តូរប្រភេទឯកសារ (jpg / webp) ឬបន្ថែមជម្រើសថ្មី គ្រាន់តែកែ/ថែមបន្ទាត់ខាងក្រោម។
 // ជម្រើសបណ្ដុំរូបភាពអាចមានរូបច្រើនសន្លឹក (ម្ចាស់ធៀបជ្រើសបានច្រើនជម្រើស សរុបអតិបរមា ៦ សន្លឹក = MAX_ART) ដោយសរសេរ files:["a.png","b.png","c.png"] (បង្ហាញតាមទម្រង់ gallery ដែលបានជ្រើស)។
 const COVER_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  cover1:{ label:"រូបគម្រប ១", file:"cover1.jpg" },
-  cover2:{ label:"រូបគម្រប ២", file:"cover2.jpg" },
-  cover3:{ label:"រូបគម្រប ៣", file:"cover3.jpg" },
-  cover4:{ label:"រូបគម្រប ៤", file:"cover4.jpg" },
-  cover5:{ label:"រូបគម្រប ៥", file:"cover5.jpg" }
+  cover1:{ label:"រូបតំណាងទី១", file:"cover1.jpg" },
+  cover2:{ label:"រូបតំណាងទី២", file:"cover2.jpg" },
+  cover3:{ label:"រូបតំណាងទី៣", file:"cover3.jpg" },
+  cover4:{ label:"រូបតំណាងទី៤", file:"cover4.jpg" },
+  cover5:{ label:"រូបតំណាងទី៥", file:"cover5.jpg" }
 };
 const GALLERY_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  gallery1:{ label:"បណ្ដុំរូបភាព ១", files:["gallery1.webp"] },
-  gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.webp"] },
-  gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.webp"] },
-  gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.webp"] },
-  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.webp"] },
-  gallery6:{ label:"បណ្ដុំរូបភាព ៦", files:["gallery6.webp"] }
+  gallery1:{ label:"រូបតំណាងទី១", files:["gallery1.jpg"] },
+  gallery2:{ label:"រូបតំណាងទី២", files:["gallery2.jpg"] },
+  gallery3:{ label:"រូបតំណាងទី៣", files:["gallery3.jpg"] },
+  gallery4:{ label:"រូបតំណាងទី៤", files:["gallery4.jpg"] },
+  gallery5:{ label:"រូបតំណាងទី៥", files:["gallery5.jpg"] },
+  gallery6:{ label:"រូបតំណាងទី៦", files:["gallery6.jpg"] }
 };
 function artUrl(file, kind){ return assetBase() + ASSET_DIRS[kind || "gallery"] + file + "?v=" + ASSET_VERSION; }   // kind: "cover" | "gallery"
 function coverArtUrl(s){
@@ -206,7 +206,7 @@ const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square",
   sage:"grid", teal:"grid", sky:"grid", dustyblue:"classic", lavender:"polaroid", plum:"grid", charcoal:"square" };
 
 // ===== រូបស៊ុម / ផ្ទៃខាងក្រោយ ជាឯកសាររូបភាព (PNG) នៅលើ GitHub =====
-// ដាក់ឯកសារក្នុង  images/frames/  (frame1.jpg … frame5.jpg)  និង  images/backgrounds/  (bg1.webp … bg5.webp)
+// ដាក់ឯកសារក្នុង  images/frames/  (frame1.png … frame5.png)  និង  images/backgrounds/  (bg1.webp … bg5.webp)
 // FRAME (ត្រួតពីលើខ្លឹមសារ)៖ រូប PNG ថ្លា បញ្ឈរ ទំហំ 1024×1280 (4:5) ដែលកណ្ដាលទុកថ្លា។
 //   កន្លះលើនៃរូប (បន្ទាត់ 0–640) នៅដើមទំព័រ និងកន្លះក្រោម (640–1280) នៅចុងទំព័រ → រមូរចុះក្រោមទើបឃើញផ្កាខាងក្រោម ហើយមិនលាតខុសសមាមាត្រលើទូរស័ព្ទ។
 //   ដូច្នេះរូបតុបតែងត្រូវនៅក្នុងកន្លះលើ ឬកន្លះក្រោម កុំឱ្យឆ្លងកណ្ដាល។ លើកុំព្យូទ័រ ទទឹងអតិបរមាស្មើ 680px (ស្មើទទឹងធៀប)។
@@ -224,11 +224,11 @@ function assetBase(){
 }
 const KBACH_FRAME_STYLES = {   // FRAME: នៅពីលើខ្លឹមសារ ជាប់គែមអេក្រង់
   none:{ label:"គ្មាន" },
-  frame1:{ label:"ផ្កាកុលាប — ជ្រុងស្តាំក្រោម", file:"frame1.jpg" },
-  frame2:{ label:"ផ្កាកុលាប — ខាងក្រោម", file:"frame2.jpg" },
-  frame3:{ label:"អប្សរាចាក់ផ្កា — ពីរជ្រុងខាងលើ", file:"frame3.jpg" },
-  frame4:{ label:"សរសរ ពេញអេក្រង់ (ឆ្វេង-ស្តាំ)", file:"frame4.jpg", full:true },   // full:true = one full-screen picture (like the custom frame) instead of top/bottom halves; supports auto-snap / spread / open
-  frame5:{ label:"គុម្ពឈើផ្កាលឿង — ជ្រុងក្រោម", file:"frame5.jpg" },
+  frame1:{ label:"ស៊ុមទី១", file:"frame1.png" },
+  frame2:{ label:"ស៊ុមទី២", file:"frame2.png" },
+  frame3:{ label:"ស៊ុមទី៣", file:"frame3.png" },
+  frame4:{ label:"ស៊ុមទី៤ (ពេញអេក្រង់)", file:"frame4.png", full:true },   // full:true = one full-screen picture (like the custom frame) instead of top/bottom halves; supports auto-snap / spread / open
+  frame5:{ label:"ស៊ុមទី៥", file:"frame5.png" },
   custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
 };
 // ចលនារបស់ស៊ុម (frame1–5) ពេលអូសចុះក្រោម៖ ស៊ុមបាត់បន្តិចម្ដងៗតាមចម្ងាយដែលអូស (ត្រឡប់មកវិញពេលអូសឡើងលើ)។
@@ -239,15 +239,15 @@ const FRAME_FX = {
   zoom:{ label:"ពង្រីករួចបាត់" },
   blur:{ label:"ព្រិលរួចបាត់" },
   drift:{ label:"បក់ផ្លុំចេញ" },
-  open:{ label:"ពង្រីកចេញសងខាង (សរសរបាក់ពាក់កណ្ដាល)" }
+  open:{ label:"ពង្រីកចេញសងខាង (សម្រាប់ស៊ុមពេញអេក្រង់)" }
 };
 const KBACH_BG_STYLES = {      // BACKGROUND: នៅពីក្រោយខ្លឹមសារ ជាប់អេក្រង់
   none:{ label:"គ្មាន" },
-  bg1:{ label:"ផ្ទៃ ១ — មែកផ្កាទ្រេត", file:"bg1.webp" },
-  bg2:{ label:"ផ្ទៃ ២ — ព័ទ្ធជុំវិញ", file:"bg2.webp" },
-  bg3:{ label:"ផ្ទៃ ៣ — ជ្រុងតែមួយ", file:"bg3.webp" },
-  bg4:{ label:"ផ្ទៃ ៤ — កម្រងផ្កាក្រោម", file:"bg4.webp" },
-  bg5:{ label:"ផ្ទៃ ៥ — មែកសងខាង", file:"bg5.webp" },
+  bg1:{ label:"ផ្ទៃទី១", file:"bg1.webp" },
+  bg2:{ label:"ផ្ទៃទី២", file:"bg2.webp" },
+  bg3:{ label:"ផ្ទៃទី៣", file:"bg3.webp" },
+  bg4:{ label:"ផ្ទៃទី៤", file:"bg4.webp" },
+  bg5:{ label:"ផ្ទៃទី៥", file:"bg5.webp" },
   custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
 };
 function kbachPresetUrl(layer, key){
@@ -525,7 +525,7 @@ const PRESET_DESIGN_BASE = {
   coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60, coverVeil:35
 };
 const INVITATION_PRESETS = {
-  classic:{ label:"ប្រពៃណីខ្មែរ (មាស)", desc:"ផ្កាឈូកបើក · អប្សរាជ្រុងលើ · ផ្ទៃព័ទ្ធជុំវិញ · រូបធំ-តូចឆ្លាស់ · អក្សរលេចឡើង",
+  classic:{ label:"ប្រពៃណីខ្មែរ (មាស)", desc:"បើកផ្កាឈូក · ស៊ុមទី៣ + ផ្ទៃទី២ · រូបធំ-តូចឆ្លាស់ · អក្សរលេចឡើង",
     swatch:THEMES.gold.swatch, tpl:0, timeline:0, startTime:"16:00",
     design:Object.assign({}, PRESET_DESIGN_BASE, {
       theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"grid",
@@ -534,7 +534,7 @@ const INVITATION_PRESETS = {
       kbachBg:"bg2", bgOpacity:60, bgBlur:0,
       textAnim:"fadeup", openStyle:"lotus",
       coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60, coverVeil:35 }) },
-  romantic:{ label:"ស្នេហ៍ទន់ភ្លន់ (ផ្កាឈូក)", desc:"បេះដូងបែក · ផ្កាកុលាបជ្រុងស្តាំក្រោម · កម្រងផ្កាព្រិលស្រាល · រូបប៉ូឡារ៉ូអ៊ីត · អក្សរព្រិលទៅច្បាស់",
+  romantic:{ label:"ស្នេហ៍ទន់ភ្លន់ (ផ្កាឈូក)", desc:"បើកបេះដូង · ស៊ុមទី១ + ផ្ទៃទី៤ (ព្រិលស្រាល) · រូបប៉ូឡារ៉ូអ៊ីត · អក្សរព្រិលទៅច្បាស់",
     swatch:THEMES.blush.swatch, tpl:1, timeline:1, startTime:"06:30",
     design:Object.assign({}, PRESET_DESIGN_BASE, {
       theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"polaroid",
@@ -543,7 +543,7 @@ const INVITATION_PRESETS = {
       kbachBg:"bg4", bgOpacity:55, bgBlur:6,
       textAnim:"blur", openStyle:"heart",
       coverBlur:28, coverFocusX:50, coverFocusY:30, coverSharp:55, coverVeil:25 }) },
-  elegant:{ label:"ទំនើបថ្លៃថ្នូរ (ខៀវ-មាស)", desc:"វាំងនន · សរសរបើកសងខាង · ផ្ទៃស្រាល · រូបក្រឡាការ៉េ · អក្សរស្រាយម្តងមួយពាក្យ",
+  elegant:{ label:"ទំនើបថ្លៃថ្នូរ (ខៀវ-មាស)", desc:"បើកវាំងនន · ស៊ុមទី៤ (ពេញអេក្រង់) + ផ្ទៃទី៥ · រូបក្រឡាការ៉េ · អក្សរស្រាយម្តងមួយពាក្យ",
     swatch:THEMES.royal.swatch, tpl:2, timeline:2, startTime:"06:30",
     design:Object.assign({}, PRESET_DESIGN_BASE, {
       theme:"royal", fontKm:"koulen", fontEn:"playfair", galleryStyle:"square",
