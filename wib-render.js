@@ -344,7 +344,8 @@ ${bodySections}
 // Auto-snap (frameSnap): find how much empty space the uploaded frame picture has on its left/right sides (transparent columns) and push the
 // picture outward by exactly that much, so the outermost pillar/border touches the screen edge from the very first view. Only for "stretch" fit.
 function buildFrameSnapJs(s){
-  if(!s || s.kbachFrame !== "custom" || s.frameSnap === false || s.frameFit === "cover") return "";
+  const isFull = s && (s.kbachFrame === "custom" || (hasOwn(KBACH_FRAME_STYLES, s.kbachFrame) && KBACH_FRAME_STYLES[s.kbachFrame].full));
+  if(!s || !isFull || s.frameSnap === false || s.frameFit === "cover") return "";
   return `
 (function(){
   var el=document.querySelector('.kbach-custom-frame'); if(!el||el.getAttribute('data-snap')!=='1') return;
@@ -364,6 +365,7 @@ function buildFrameSnapJs(s){
     el.style.left='-'+(bl+sp)+'%'; el.style.right='-'+(br+sp)+'%';
     if(window.__kbFrameApply) window.__kbFrameApply();
   }catch(e){} };
+  if(!/^data:/.test(m[1])) im.crossOrigin='anonymous';
   im.src=m[1];
 })();`;
 }
@@ -432,7 +434,7 @@ function buildKbachFrameOverlay(styleId, t, s, layer){
     // frameSpread (% of screen width): the picture is made wider than the screen on BOTH sides, so pillars/borders that sit inside the
     // picture slide outward and are only half visible at the edge of the screen (0 = exactly the screen, as before)
     const spr = Math.round(cl(s && s.frameSpread, 0, 40, 0));
-    const spr1 = Math.round(cl(s && s.frameSpreadEnd, 0, 60, 18));   // spread reached after scrolling (frameFx "open")
+    const spr1 = spr + Math.round(cl(s && s.frameSpreadMore, 0, 30, 6));   // spread reached after scrolling (frameFx "open") = start + a small extra, so part of the pillar always stays visible
     const sprCss = spr > 0 ? `left:-${spr}%;right:-${spr}%;` : "";
     return `<div class="kbach-custom-frame" data-snap="${(s && s.frameSnap === false) ? 0 : 1}" data-sp0="${spr}" data-sp1="${spr1}" style="background-image:url('${asset.dataUrl}');background-size:${fit};opacity:${op};${sprCss}" aria-hidden="true"></div>`;
   }
@@ -443,6 +445,15 @@ function buildKbachFrameOverlay(styleId, t, s, layer){
     const blP = Math.round(cl(s && s.bgBlur, 0, 40, 0));   // same blur slider as the uploaded background
     const blPCss = blP > 0 ? `filter:blur(${blP}px);inset:${-blP * 2}px;` : "";
     return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg kb-bg-anim${kbachFrameNeedsInset(s && s.kbachFrame) ? " kb-bg-framed" : ""}" style="background-image:url('${pu}');background-size:cover;background-position:center;${blPCss}" aria-hidden="true"></div>`;
+  }
+  if(KBACH_FRAME_STYLES[styleId].full){
+    // Preset picture that is ONE full-screen overlay (e.g. two pillars, portrait 1080x1920): same rendering as the uploaded frame
+    const fitF = (s && s.frameFit === "cover") ? "cover" : "100% 100%";
+    const opF = cl(s && s.frameOpacity, 10, 100, 100) / 100;
+    const sprF = Math.round(cl(s && s.frameSpread, 0, 40, 0));
+    const sprF1 = sprF + Math.round(cl(s && s.frameSpreadMore, 0, 30, 6));
+    const sprFCss = sprF > 0 ? `left:-${sprF}%;right:-${sprF}%;` : "";
+    return `<div class="kbach-custom-frame" data-snap="${(s && s.frameSnap === false) ? 0 : 1}" data-sp0="${sprF}" data-sp1="${sprF1}" style="background-image:url('${pu}');background-size:${fitF};opacity:${opF};${sprFCss}" aria-hidden="true"></div>`;
   }
   // "slice" = old 9-slice border frame (square picture, corners 3/8). Default = full-screen overlay picture (portrait 1024x1280):
   // the top half sticks to the top edge of the screen and the bottom half to the bottom edge (see buildFrameFxJs: they fade away as you scroll),
@@ -873,10 +884,10 @@ section{padding:30px 0;}
 .dress-dot span{box-shadow:0 0 0 3px color-mix(in srgb,var(--card) 80%,transparent),0 0 0 4px var(--border),inset 0 3px 5px rgba(255,255,255,.55),inset 0 -5px 8px rgba(0,0,0,.18),0 8px 14px -3px rgba(0,0,0,.35);}
 .dress-row + .dress-row{border-top-color:color-mix(in srgb,var(--border) 70%,rgba(255,255,255,.6));}
 /* Countdown: dark-tinted glass tile (theme colour) so the 3D digits stay clear on any background */
-.cd-unit{width:80px;padding:18px 0 14px;background:linear-gradient(160deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,0) 40%),linear-gradient(145deg,color-mix(in srgb,color-mix(in srgb,var(--accent-1) 22%,#14100c) 84%,transparent),color-mix(in srgb,color-mix(in srgb,var(--accent-1) 16%,#14100c) 66%,transparent));border:1px solid rgba(255,255,255,.5);}
-.cd-label{color:#fff;opacity:1;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.7);}
-.cd-num{font-size:38px;font-weight:900;line-height:1.1;letter-spacing:.5px;background:linear-gradient(180deg,#fff 0%,color-mix(in srgb,var(--accent-1) 35%,#fff) 50%,color-mix(in srgb,var(--accent-1) 85%,#fff) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 55%,#000)) drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 45%,#000)) drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 36%,#000)) drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 28%,#000)) drop-shadow(4px 7px 6px rgba(0,0,0,.5));}
-@media(max-width:420px){.countdown{gap:8px;flex-wrap:nowrap;}.cd-unit{width:auto;flex:1 1 0;min-width:0;}.cd-num{font-size:32px;}}
+.cd-unit{width:80px;padding:6px 0 4px;background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;}
+.cd-label{color:#fff;opacity:1;font-weight:700;margin-top:6px;text-shadow:0 1px 0 rgba(0,0,0,.65),0 2px 7px rgba(0,0,0,.7);}
+.cd-num{font-size:40px;font-weight:900;line-height:1.1;letter-spacing:.5px;font-variant-numeric:tabular-nums;background:none;-webkit-background-clip:border-box;background-clip:border-box;filter:none;color:#fff;-webkit-text-fill-color:#fff;text-shadow:0 1px 0 color-mix(in srgb,var(--accent-1) 60%,#000),0 2px 0 color-mix(in srgb,var(--accent-1) 52%,#000),0 3px 0 color-mix(in srgb,var(--accent-1) 44%,#000),0 4px 0 color-mix(in srgb,var(--accent-1) 36%,#000),0 5px 0 color-mix(in srgb,var(--accent-1) 28%,#000),0 11px 14px rgba(0,0,0,.5);}
+@media(max-width:420px){.countdown{gap:8px;flex-wrap:nowrap;}.cd-unit{width:auto;flex:1 1 0;min-width:0;}.cd-num{font-size:34px;}}
 footer{text-align:center;padding:30px 24px 36px;color:var(--ink);opacity:.75;font-size:15px;}
 footer .thanks{font-size:22px;color:var(--accent-1);opacity:1;margin-bottom:6px;}
 .lang-toggle{position:fixed;top:16px;right:16px;z-index:100;display:flex;background:var(--ctl-bg);border:1px solid color-mix(in srgb, var(--border) 55%, transparent);border-radius:999px;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
