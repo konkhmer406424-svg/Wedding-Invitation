@@ -166,20 +166,20 @@ const GALLERY_STYLES = {
 // ជម្រើសបណ្ដុំរូបភាពអាចមានរូបច្រើនសន្លឹក (ម្ចាស់ធៀបជ្រើសបានច្រើនជម្រើស សរុបអតិបរមា ៦ សន្លឹក = MAX_ART) ដោយសរសេរ files:["a.png","b.png","c.png"] (បង្ហាញតាមទម្រង់ gallery ដែលបានជ្រើស)។
 const COVER_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  cover1:{ label:"រូបគម្រប ១", file:"cover1.jpg" },
-  cover2:{ label:"រូបគម្រប ២", file:"cover2.jpg" },
-  cover3:{ label:"រូបគម្រប ៣", file:"cover3.jpg" },
-  cover4:{ label:"រូបគម្រប ៤", file:"cover4.jpg" },
-  cover5:{ label:"រូបគម្រប ៥", file:"cover5.jpg" }
+  cover1:{ label:"រូបគម្រប ១", file:"cover1.webp" },
+  cover2:{ label:"រូបគម្រប ២", file:"cover2.webp" },
+  cover3:{ label:"រូបគម្រប ៣", file:"cover3.webp" },
+  cover4:{ label:"រូបគម្រប ៤", file:"cover4.webp" },
+  cover5:{ label:"រូបគម្រប ៥", file:"cover5.webp" }
 };
 const GALLERY_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  gallery1:{ label:"បណ្ដុំរូបភាព ១", files:["gallery1.jpg"] },
-  gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.jpg"] },
-  gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.jpg"] },
-  gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.jpg"] },
-  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.jpg"] },
-  gallery6:{ label:"បណ្ដុំរូបភាព ៦", files:["gallery6.jpg"] }
+  gallery1:{ label:"បណ្ដុំរូបភាព ១", files:["gallery1.webp"] },
+  gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.webp"] },
+  gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.webp"] },
+  gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.webp"] },
+  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.webp"] },
+  gallery6:{ label:"បណ្ដុំរូបភាព ៦", files:["gallery6.webp"] }
 };
 function artUrl(file, kind){ return assetBase() + ASSET_DIRS[kind || "gallery"] + file + "?v=" + ASSET_VERSION; }   // kind: "cover" | "gallery"
 function coverArtUrl(s){
@@ -238,15 +238,16 @@ const FRAME_FX = {
   slide:{ label:"រុញចេញ (លើឡើងលើ ក្រោមចុះក្រោម)" },
   zoom:{ label:"ពង្រីករួចបាត់" },
   blur:{ label:"ព្រិលរួចបាត់" },
-  drift:{ label:"បក់ផ្លុំចេញ" }
+  drift:{ label:"បក់ផ្លុំចេញ" },
+  open:{ label:"ពង្រីកចេញសងខាង (សរសរបាក់ពាក់កណ្ដាល)" }
 };
 const KBACH_BG_STYLES = {      // BACKGROUND: នៅពីក្រោយខ្លឹមសារ ជាប់អេក្រង់
   none:{ label:"គ្មាន" },
-  bg1:{ label:"ផ្ទៃ ១ — មែកផ្កាទ្រេត", file:"bg1.webp" },
-  bg2:{ label:"ផ្ទៃ ២ — ព័ទ្ធជុំវិញ", file:"bg2.webp" },
-  bg3:{ label:"ផ្ទៃ ៣ — ជ្រុងតែមួយ", file:"bg3.webp" },
-  bg4:{ label:"ផ្ទៃ ៤ — កម្រងផ្កាក្រោម", file:"bg4.webp" },
-  bg5:{ label:"ផ្ទៃ ៥ — មែកសងខាង", file:"bg5.webp" },
+  bg1:{ label:"ផ្ទៃ ១ — មែកផ្កាទ្រេត", file:"bg1.png" },
+  bg2:{ label:"ផ្ទៃ ២ — ព័ទ្ធជុំវិញ", file:"bg2.png" },
+  bg3:{ label:"ផ្ទៃ ៣ — ជ្រុងតែមួយ", file:"bg3.png" },
+  bg4:{ label:"ផ្ទៃ ៤ — កម្រងផ្កាក្រោម", file:"bg4.png" },
+  bg5:{ label:"ផ្ទៃ ៥ — មែកសងខាង", file:"bg5.png" },
   custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
 };
 function kbachPresetUrl(layer, key){
@@ -534,7 +535,7 @@ const defaultState = {
   galleryArts:[],
   coverArt:"none",
   kbachFrame:"none", kbachBg:"bg1",
-  frameFit:"stretch", frameOpacity:100, frameFx:"fade",
+  frameFit:"stretch", frameOpacity:100, frameFx:"fade", frameSpread:0, frameSpreadEnd:18, frameSnap:true,
   bgFit:"cover", bgOpacity:100, bgBlur:0,
   textAnim:"fadeup",
   openStyle:"door",
@@ -675,6 +676,9 @@ function migrateStyle_(s){
   if(!_ho(FRAME_FX, s.frameFx)) s.frameFx = "fade";
   const num = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
   s.frameOpacity = num(s.frameOpacity, 10, 100, 100);
+  s.frameSpread = num(s.frameSpread, 0, 40, 0);
+  s.frameSpreadEnd = num(s.frameSpreadEnd, 0, 60, 18);
+  s.frameSnap = s.frameSnap !== false;
   s.bgOpacity = num(s.bgOpacity, 10, 100, 100);
   s.bgBlur = num(s.bgBlur, 0, 40, 0);
   s.coverBlur = num(s.coverBlur, 0, 40, 22); s.coverFocusX = num(s.coverFocusX, 0, 100, 50);

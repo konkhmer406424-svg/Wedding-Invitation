@@ -162,6 +162,7 @@ const FRAME_FX_ICONS = {
   slide: PK.svg("0 0 40 40", '<path d="M20 15V5M15 10l5-5 5 5"/><path d="M20 25v10M15 30l5 5 5-5"/><path d="M8 20h24" opacity=".4" stroke-dasharray="2 3"/>'),
   zoom: PK.svg("0 0 40 40", '<rect x="14" y="14" width="12" height="12" rx="1.5" fill="currentColor" stroke="none"/><rect x="8" y="8" width="24" height="24" rx="2" opacity=".5"/><rect x="3.5" y="3.5" width="33" height="33" rx="3" opacity=".25" stroke-dasharray="3 3"/>'),
   blur: PK.svg("0 0 40 40", '<circle cx="20" cy="20" r="4.5" fill="currentColor" stroke="none"/><circle cx="20" cy="20" r="9.5" opacity=".55"/><circle cx="20" cy="20" r="15" opacity=".28" stroke-dasharray="2 3"/>'),
+  open: PK.svg("0 0 40 40", '<rect x="15" y="8" width="10" height="24" rx="2" fill="currentColor" stroke="none"/><path d="M12 20H4M7 16l-4 4 4 4"/><path d="M28 20h8M33 16l4 4-4 4"/>'),
   drift: PK.svg("0 0 40 40", '<path d="M14 15L6 7M6 14V7h7"/><path d="M26 25l8 8M34 26v7h-7"/><path d="M20 20h.1" stroke-width="3" opacity=".6"/>')
 };
 function buildFrameFxSelect(){

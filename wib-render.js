@@ -341,6 +341,32 @@ ${bodySections}
 
 // Transition of the full-screen overlay frames while scrolling down: progress p (0 at the top -> 1 after ~60% of a screen) drives the effect,
 // so the frame disappears little by little and comes back when you scroll up. Effects: fade / slide / zoom / blur / drift.
+// Auto-snap (frameSnap): find how much empty space the uploaded frame picture has on its left/right sides (transparent columns) and push the
+// picture outward by exactly that much, so the outermost pillar/border touches the screen edge from the very first view. Only for "stretch" fit.
+function buildFrameSnapJs(s){
+  if(!s || s.kbachFrame !== "custom" || s.frameSnap === false || s.frameFit === "cover") return "";
+  return `
+(function(){
+  var el=document.querySelector('.kbach-custom-frame'); if(!el||el.getAttribute('data-snap')!=='1') return;
+  var m=/url\\(["']?([^"')]+)["']?\\)/.exec(el.style.backgroundImage||''); if(!m) return;
+  var im=new Image();
+  im.onload=function(){ try{
+    var w=Math.min(240,im.naturalWidth), h=Math.max(1,Math.round(im.naturalHeight*w/im.naturalWidth));
+    var c=document.createElement('canvas'); c.width=w; c.height=h;
+    var x=c.getContext('2d'); x.drawImage(im,0,0,w,h);
+    var d=x.getImageData(0,0,w,h).data, need=Math.max(2,Math.round(h*0.03)), first=-1, last=-1;
+    for(var i=0;i<w;i++){ var n=0; for(var j=0;j<h;j++){ if(d[(j*w+i)*4+3]>60) n++; } if(n>=need){ if(first<0) first=i; last=i; } }
+    if(first<0) return;
+    var a=Math.min(first/w,0.3), b=Math.min((w-1-last)/w,0.3);
+    if(a+b>=0.6||(a<0.004&&b<0.004)) return;
+    var T=100/(1-a-b), bl=a*T, br=b*T, sp=+el.getAttribute('data-sp0')||0;
+    el.setAttribute('data-bl',bl); el.setAttribute('data-br',br);
+    el.style.left='-'+(bl+sp)+'%'; el.style.right='-'+(br+sp)+'%';
+    if(window.__kbFrameApply) window.__kbFrameApply();
+  }catch(e){} };
+  im.src=m[1];
+})();`;
+}
 function buildFrameFxJs(s){
   const id = s && s.kbachFrame;
   if(!id || id === "none" || !hasOwn(KBACH_FRAME_STYLES, id) || (id !== "custom" && KBACH_FRAME_STYLES[id].mode === "slice")) return "";
@@ -360,16 +386,18 @@ function buildFrameFxJs(s){
     var p=ease(Math.min(1,Math.max(0,y/Math.max(180,window.innerHeight*0.6))));
     els.forEach(function(el){
       var cu=el.classList.contains('kbach-custom-frame'), d=(cu||el.classList.contains('kb-ov-top'))?-1:1, tr=cu?'':'translateX(-50%)', fl='', op=1-p;
-      if(fx==='slide'){ tr+=' translateY('+(d*p*105)+'%)'; op=1-p*p; }
+      if(fx==='open'){ if(cu){ var s0=+el.getAttribute('data-sp0')||0, s1=+el.getAttribute('data-sp1')||0, bb=s0+(Math.max(s1,s0)-s0)*p, bl=+el.getAttribute('data-bl')||0, br=+el.getAttribute('data-br')||0; el.style.left='-'+(bl+bb)+'%'; el.style.right='-'+(br+bb)+'%'; op=1; } else { tr+=' scale('+(1+p*0.45)+')'; } }
+      else if(fx==='slide'){ tr+=' translateY('+(d*p*105)+'%)'; op=1-p*p; }
       else if(fx==='zoom'){ tr+=' scale('+(1+p*0.45)+')'; }
       else if(fx==='blur'){ fl='blur('+(p*14)+'px)'; }
       else if(fx==='drift'){ tr+=' translate('+(d*p*16)+'%,'+(d*p*45)+'%) rotate('+(d*p*7)+'deg)'; }
       el.style.transform=tr; el.style.filter=fl; el.style.opacity=op*el._b;
-      el.style.visibility=(p>=0.999)?'hidden':'visible';
+      el.style.visibility=(p>=0.999&&!(fx==='open'&&cu))?'hidden':'visible';
     });
   }
   window.addEventListener('scroll',function(){ if(!ticking){ ticking=true; (window.requestAnimationFrame||setTimeout)(apply); } },{passive:true});
   window.addEventListener('resize',apply);
+  window.__kbFrameApply=apply;
   apply();
 })();`;
 }
@@ -401,7 +429,12 @@ function buildKbachFrameOverlay(styleId, t, s, layer){
     }
     const fit = (s && s.frameFit === "cover") ? "cover" : "100% 100%";
     const op = cl(s && s.frameOpacity, 10, 100, 100) / 100;
-    return `<div class="kbach-custom-frame" style="background-image:url('${asset.dataUrl}');background-size:${fit};opacity:${op};" aria-hidden="true"></div>`;
+    // frameSpread (% of screen width): the picture is made wider than the screen on BOTH sides, so pillars/borders that sit inside the
+    // picture slide outward and are only half visible at the edge of the screen (0 = exactly the screen, as before)
+    const spr = Math.round(cl(s && s.frameSpread, 0, 40, 0));
+    const spr1 = Math.round(cl(s && s.frameSpreadEnd, 0, 60, 18));   // spread reached after scrolling (frameFx "open")
+    const sprCss = spr > 0 ? `left:-${spr}%;right:-${spr}%;` : "";
+    return `<div class="kbach-custom-frame" data-snap="${(s && s.frameSnap === false) ? 0 : 1}" data-sp0="${spr}" data-sp1="${spr1}" style="background-image:url('${asset.dataUrl}');background-size:${fit};opacity:${op};${sprCss}" aria-hidden="true"></div>`;
   }
   // រូបភាពរៀបចំស្រាប់ពី GitHub (assets/frames/… និង assets/backgrounds/…)
   const pu = kbachPresetUrl(layer, styleId);
@@ -676,7 +709,7 @@ function renderInvitation(s){
   const mp = buildMusicParts(s);
   const ta = hasOwn(TEXT_ANIM_STYLES, s.textAnim) ? s.textAnim : "fadeup";
   const taJs = buildTextAnimJs(ta, !!s.__preview);
-  const frameFxJs = buildFrameFxJs(s);
+  const frameFxJs = buildFrameSnapJs(s) + buildFrameFxJs(s);
   const lbx = buildLightbox();
   const calJs = (targetIso && !isNaN(Date.parse(targetIso))) ? `try{(${wibCalendarRuntime.toString()})(${JSON.stringify(buildCalendarCfg(s, targetIso)).replace(/</g, "\\u003c")});}catch(e){}` : "";
 
