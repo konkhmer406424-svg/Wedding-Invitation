@@ -166,20 +166,20 @@ const GALLERY_STYLES = {
 // ជម្រើសបណ្ដុំរូបភាពអាចមានរូបច្រើនសន្លឹក (ម្ចាស់ធៀបជ្រើសបានច្រើនជម្រើស សរុបអតិបរមា ៦ សន្លឹក = MAX_ART) ដោយសរសេរ files:["a.png","b.png","c.png"] (បង្ហាញតាមទម្រង់ gallery ដែលបានជ្រើស)។
 const COVER_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  cover1:{ label:"រូបគម្រប ១", file:"cover1.jpg" },
-  cover2:{ label:"រូបគម្រប ២", file:"cover2.jpg" },
-  cover3:{ label:"រូបគម្រប ៣", file:"cover3.jpg" },
-  cover4:{ label:"រូបគម្រប ៤", file:"cover4.jpg" },
-  cover5:{ label:"រូបគម្រប ៥", file:"cover5.jpg" }
+  cover1:{ label:"រូបគម្រប ១", file:"cover1.webp" },
+  cover2:{ label:"រូបគម្រប ២", file:"cover2.webp" },
+  cover3:{ label:"រូបគម្រប ៣", file:"cover3.webp" },
+  cover4:{ label:"រូបគម្រប ៤", file:"cover4.webp" },
+  cover5:{ label:"រូបគម្រប ៥", file:"cover5.webp" }
 };
 const GALLERY_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  gallery1:{ label:"បណ្ដុំរូបភាព ១", files:["gallery1.jpg"] },
-  gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.jpg"] },
-  gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.jpg"] },
-  gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.jpg"] },
-  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.jpg"] },
-  gallery6:{ label:"បណ្ដុំរូបភាព ៦", files:["gallery6.jpg"] }
+  gallery1:{ label:"បណ្ដុំរូបភាព ១", files:["gallery1.webp"] },
+  gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.webp"] },
+  gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.webp"] },
+  gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.webp"] },
+  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.webp"] },
+  gallery6:{ label:"បណ្ដុំរូបភាព ៦", files:["gallery6.webp"] }
 };
 function artUrl(file, kind){ return assetBase() + ASSET_DIRS[kind || "gallery"] + file + "?v=" + ASSET_VERSION; }   // kind: "cover" | "gallery"
 function coverArtUrl(s){
@@ -242,11 +242,11 @@ const FRAME_FX = {
 };
 const KBACH_BG_STYLES = {      // BACKGROUND: នៅពីក្រោយខ្លឹមសារ ជាប់អេក្រង់
   none:{ label:"គ្មាន" },
-  bg1:{ label:"ផ្ទៃ ១ — មែកផ្កាទ្រេត", file:"bg1.webp" },
-  bg2:{ label:"ផ្ទៃ ២ — ព័ទ្ធជុំវិញ", file:"bg2.webp" },
-  bg3:{ label:"ផ្ទៃ ៣ — ជ្រុងតែមួយ", file:"bg3.webp" },
-  bg4:{ label:"ផ្ទៃ ៤ — កម្រងផ្កាក្រោម", file:"bg4.webp" },
-  bg5:{ label:"ផ្ទៃ ៥ — មែកសងខាង", file:"bg5.webp" },
+  bg1:{ label:"ផ្ទៃ ១ — មែកផ្កាទ្រេត", file:"bg1.png" },
+  bg2:{ label:"ផ្ទៃ ២ — ព័ទ្ធជុំវិញ", file:"bg2.png" },
+  bg3:{ label:"ផ្ទៃ ៣ — ជ្រុងតែមួយ", file:"bg3.png" },
+  bg4:{ label:"ផ្ទៃ ៤ — កម្រងផ្កាក្រោម", file:"bg4.png" },
+  bg5:{ label:"ផ្ទៃ ៥ — មែកសងខាង", file:"bg5.png" },
   custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
 };
 function kbachPresetUrl(layer, key){
@@ -264,7 +264,7 @@ const KBACH_WM_KEYS = ["diagbranch","fullwrap","onecorner","bottomgarland","side
 const SAMPLE_NAMES = { km:["សុវណ្ណ","ស្រីល័ក្ខ"], en:["Sovann","Srey Leak"] };
 
 const ocDarkText = c => `.open-cover.oc-s-${c} .oc-guest{color:#fff;opacity:.92;text-shadow:0 1px 8px rgba(0,0,0,.5);}
-.open-cover.oc-s-${c} .oc-names{color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.55);}
+.open-cover.oc-s-${c} .oc-names{color:#fff;font-weight:700;text-shadow:0 1px 0 rgba(0,0,0,.75),0 2px 0 rgba(0,0,0,.6),0 3px 0 rgba(0,0,0,.45),0 4px 0 rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.65);}
 .open-cover.oc-s-${c} .oc-hint{color:#fff;opacity:.85;text-shadow:0 1px 6px rgba(0,0,0,.55);}
 .open-cover.oc-s-${c} .oc-btn{background:#fff;color:var(--ink);box-shadow:0 8px 22px rgba(0,0,0,.4);}`;
 

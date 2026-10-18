@@ -408,8 +408,8 @@ function buildKbachFrameOverlay(styleId, t, s, layer){
   if(!pu) return "";
   if(layer === "bg"){
     const blP = Math.round(cl(s && s.bgBlur, 0, 40, 0));   // same blur slider as the uploaded background
-    const blPCss = blP > 0 ? `filter:blur(${blP}px);` : "";
-    return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg kb-bg-anim${kbachFrameNeedsInset(s && s.kbachFrame) ? " kb-bg-framed" : ""}" style="background-image:url('${pu}');background-size:contain;${blPCss}" aria-hidden="true"></div>`;
+    const blPCss = blP > 0 ? `filter:blur(${blP}px);inset:${-blP * 2}px;` : "";
+    return `<style>.hero{background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, transparent 60%) !important;}</style><div class="kbach-custom-bg kb-bg-anim${kbachFrameNeedsInset(s && s.kbachFrame) ? " kb-bg-framed" : ""}" style="background-image:url('${pu}');background-size:cover;background-position:center;${blPCss}" aria-hidden="true"></div>`;
   }
   // "slice" = old 9-slice border frame (square picture, corners 3/8). Default = full-screen overlay picture (portrait 1024x1280):
   // the top half sticks to the top edge of the screen and the bottom half to the bottom edge (see buildFrameFxJs: they fade away as you scroll),
@@ -729,9 +729,9 @@ body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-web
 .hero.no-blur .hb-blur,.hero.cover-art .hb-blur,.hero.cover-art .hb-tint{display:none;}
 .hero.no-blur .hb-sharp,.hero.cover-art .hb-sharp{-webkit-mask-image:none;mask-image:none;}
 .hero.has-cover .eyebrow{color:#fff;opacity:1;text-shadow:0 0 3px rgba(0,0,0,.8), 0 2px 10px rgba(0,0,0,.75), 0 4px 20px rgba(0,0,0,.55);}
-.hero.has-cover .names{position:relative;z-index:1;color:#fff;-webkit-text-stroke:.5px rgba(0,0,0,.35);paint-order:stroke fill;text-shadow:0 0 2px rgba(0,0,0,.9), 0 2px 6px rgba(0,0,0,.8), 0 4px 18px rgba(0,0,0,.7), 0 8px 34px rgba(0,0,0,.55);}
-.hero.has-cover .names::before{content:"";position:absolute;left:50%;top:50%;width:125%;height:135%;transform:translate(-50%,-50%);background:radial-gradient(ellipse at center, rgba(0,0,0,.40) 0%, rgba(0,0,0,.24) 45%, transparent 72%);filter:blur(10px);z-index:-1;pointer-events:none;}
-.hero.has-cover .names .amp{color:color-mix(in srgb,var(--accent-2) 55%,#fff);-webkit-text-stroke:0;text-shadow:0 0 3px rgba(0,0,0,.9), 0 2px 8px rgba(0,0,0,.8), 0 4px 16px rgba(0,0,0,.6);}
+.hero.has-cover .names{position:relative;z-index:1;color:#fff;-webkit-text-stroke:0;font-weight:700;text-shadow:0 1px 0 rgba(0,0,0,.75),0 2px 0 rgba(0,0,0,.6),0 3px 0 rgba(0,0,0,.45),0 4px 0 rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.65);}
+.hero.has-cover .names::before{content:"";position:absolute;left:50%;top:50%;width:125%;height:135%;transform:translate(-50%,-50%);background:radial-gradient(ellipse at center, rgba(0,0,0,.50) 0%, rgba(0,0,0,.30) 45%, transparent 72%);filter:blur(10px);z-index:-1;pointer-events:none;}
+.hero.has-cover .names .amp{color:color-mix(in srgb,var(--accent-2) 40%,#fff);-webkit-text-stroke:0;text-shadow:0 1px 0 rgba(0,0,0,.7),0 2px 0 rgba(0,0,0,.5),0 5px 12px rgba(0,0,0,.6);}
 .hero.has-cover .hero-date{color:#fff;opacity:1;text-shadow:0 0 3px rgba(0,0,0,.8), 0 2px 10px rgba(0,0,0,.75), 0 4px 20px rgba(0,0,0,.55);}
 section{padding:30px 0;}
 .lang-section{padding:0;}
@@ -744,7 +744,7 @@ section{padding:30px 0;}
 .hosts{margin-top:14px;font-size:18px;color:var(--accent-1);font-weight:600;}
 .countdown{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
 .cd-unit{width:76px;padding:16px 0;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);}
-.cd-num{font-size:26px;font-weight:700;color:var(--accent-1);font-variant-numeric:tabular-nums;font-style:normal;}
+.cd-num{font-size:40px;font-weight:800;line-height:1.1;letter-spacing:.5px;font-variant-numeric:tabular-nums;background:none;-webkit-background-clip:border-box;background-clip:border-box;filter:none;color:#fff;-webkit-text-fill-color:#fff;text-shadow:0 1px 0 color-mix(in srgb,var(--accent-1) 45%,#000),0 2px 0 color-mix(in srgb,var(--accent-1) 38%,#000),0 3px 0 color-mix(in srgb,var(--accent-1) 30%,#000),0 4px 0 color-mix(in srgb,var(--accent-1) 22%,#000),0 8px 12px rgba(0,0,0,.45);}
 .cd-label{font-size:12px;color:var(--ink);opacity:.7;margin-top:3px;}
 .timeline{position:relative;padding-left:26px;border-left:1px solid var(--border);}
 .tl-item{position:relative;padding-bottom:28px;}
@@ -835,12 +835,15 @@ section{padding:30px 0;}
 .contact-name{font-size:17px;margin:0 0 6px;}
 .contact-phone{display:inline-block;color:var(--accent-1);font-weight:600;text-decoration:none;font-size:16.5px;font-style:normal;}
 /* ---- Glass + 3D cards (countdown, short invitation, venue, contacts): see-through so the animated background shows behind. Tune --glass-a1 / --glass-a2 (higher = more solid) ---- */
-.welcome,.cd-unit,.venue-card,.contact-card{--glass-a1:58%;--glass-a2:30%;position:relative;background:linear-gradient(160deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,0) 44%),linear-gradient(145deg,color-mix(in srgb,var(--card) var(--glass-a1),transparent),color-mix(in srgb,var(--card) var(--glass-a2),transparent));-webkit-backdrop-filter:blur(3px) saturate(1.25);backdrop-filter:blur(3px) saturate(1.25);border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 1px 0 0 rgba(255,255,255,.3),inset 0 -2px 5px rgba(0,0,0,.06),0 14px 28px -8px rgba(0,0,0,.30),0 4px 10px rgba(0,0,0,.10);}
+.welcome,.cd-unit,.venue-card,.contact-card,.dress-card,.gift-card{--glass-a1:58%;--glass-a2:30%;position:relative;background:linear-gradient(160deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,0) 44%),linear-gradient(145deg,color-mix(in srgb,var(--card) var(--glass-a1),transparent),color-mix(in srgb,var(--card) var(--glass-a2),transparent));-webkit-backdrop-filter:blur(3px) saturate(1.25);backdrop-filter:blur(3px) saturate(1.25);border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 1px 0 0 rgba(255,255,255,.3),inset 0 -2px 5px rgba(0,0,0,.06),0 14px 28px -8px rgba(0,0,0,.30),0 4px 10px rgba(0,0,0,.10);}
+/* Dress colours: 3D glossy swatches (inset highlight + soft drop shadow) to match the glass cards */
+.dress-dot span{box-shadow:0 0 0 3px color-mix(in srgb,var(--card) 80%,transparent),0 0 0 4px var(--border),inset 0 3px 5px rgba(255,255,255,.55),inset 0 -5px 8px rgba(0,0,0,.18),0 8px 14px -3px rgba(0,0,0,.35);}
+.dress-row + .dress-row{border-top-color:color-mix(in srgb,var(--border) 70%,rgba(255,255,255,.6));}
 /* Countdown: dark-tinted glass tile (theme colour) so the 3D digits stay clear on any background */
-.cd-unit{width:80px;padding:18px 0 14px;background:linear-gradient(160deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,0) 40%),linear-gradient(145deg,color-mix(in srgb,color-mix(in srgb,var(--accent-1) 24%,#14100c) 64%,transparent),color-mix(in srgb,color-mix(in srgb,var(--accent-1) 18%,#14100c) 38%,transparent));border:1px solid rgba(255,255,255,.5);}
+.cd-unit{width:80px;padding:18px 0 14px;background:linear-gradient(160deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,0) 40%),linear-gradient(145deg,color-mix(in srgb,color-mix(in srgb,var(--accent-1) 22%,#14100c) 84%,transparent),color-mix(in srgb,color-mix(in srgb,var(--accent-1) 16%,#14100c) 66%,transparent));border:1px solid rgba(255,255,255,.5);}
 .cd-label{color:#fff;opacity:1;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.7);}
 .cd-num{font-size:38px;font-weight:900;line-height:1.1;letter-spacing:.5px;background:linear-gradient(180deg,#fff 0%,color-mix(in srgb,var(--accent-1) 35%,#fff) 50%,color-mix(in srgb,var(--accent-1) 85%,#fff) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 55%,#000)) drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 45%,#000)) drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 36%,#000)) drop-shadow(1px 1px 0 color-mix(in srgb,var(--accent-1) 28%,#000)) drop-shadow(4px 7px 6px rgba(0,0,0,.5));}
-@media(max-width:420px){.countdown{gap:8px;flex-wrap:nowrap;}.cd-unit{width:auto;flex:1 1 0;min-width:0;}.cd-num{font-size:30px;}}
+@media(max-width:420px){.countdown{gap:8px;flex-wrap:nowrap;}.cd-unit{width:auto;flex:1 1 0;min-width:0;}.cd-num{font-size:32px;}}
 footer{text-align:center;padding:30px 24px 36px;color:var(--ink);opacity:.75;font-size:15px;}
 footer .thanks{font-size:22px;color:var(--accent-1);opacity:1;margin-bottom:6px;}
 .lang-toggle{position:fixed;top:16px;right:16px;z-index:100;display:flex;background:var(--ctl-bg);border:1px solid color-mix(in srgb, var(--border) 55%, transparent);border-radius:999px;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
