@@ -312,6 +312,7 @@ ${state[sl.key]
 }
 
 // ---------- Colour guide for guests: gift procession / evening / tent, several colours each ----------
+const DRESS_PALETTE_SHOWN = 6;   // swatches shown per section (first N of DRESS_PALETTE); the + button still allows any custom colour
 function buildDressColors(){
   const box = $("dressBox");
   if(!box) return;
@@ -320,7 +321,7 @@ function buildDressColors(){
   box.innerHTML = DRESS_CATS.map(c => {
     const cur = state.dressColors[c.key];
     return `<div class="dress-cat" data-cat="${c.key}"><h4>${c.km}<small>${c.en}</small><span class="dress-count">${cur.length}/${DRESS_MAX}</span></h4>
-<div class="dress-pal">${DRESS_PALETTE.map(p => { const on = cur.indexOf(p.hex) >= 0; return `<button type="button" class="dress-sw${on ? " on" : ""}" data-hex="${p.hex}" title="${p.km} · ${p.en}" aria-label="${p.km}" aria-pressed="${on}" style="background:${p.hex}"></button>`; }).join("")}<label class="dress-custom" title="ពណ៌ផ្ទាល់ខ្លួន (Custom)"><input type="color" value="#c9a227" data-custom aria-label="ពណ៌ផ្ទាល់ខ្លួន"><span>＋</span></label></div>
+<div class="dress-pal">${DRESS_PALETTE.slice(0, DRESS_PALETTE_SHOWN).map(p => { const on = cur.indexOf(p.hex) >= 0; return `<button type="button" class="dress-sw${on ? " on" : ""}" data-hex="${p.hex}" title="${p.km} · ${p.en}" aria-label="${p.km}" aria-pressed="${on}" style="background:${p.hex}"></button>`; }).join("")}<label class="dress-custom" title="ពណ៌ផ្ទាល់ខ្លួន (Custom)"><input type="color" value="#c9a227" data-custom aria-label="ពណ៌ផ្ទាល់ខ្លួន"><span>＋</span></label></div>
 <div class="dress-chosen">${cur.map(h => `<span class="dress-chip"><i style="background:${h}"></i>${escapeHtml(dressColorName(h, "km"))}<button type="button" data-rm="${h}" aria-label="ដកចេញ">×</button></span>`).join("")}</div></div>`;
   }).join("");
   const add = (cat, hex, toggle) => {

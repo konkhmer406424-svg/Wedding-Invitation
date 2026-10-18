@@ -160,7 +160,7 @@ const GALLERY_STYLES = {
 // ---- Text animation when the guest scrolls (chosen separately from colour/font/theme) ----
 // ---- រូបតំណាង (Stand-in pictures) — បង្ហាញពេលគ្មានរូប Cover ឬគ្មានរូប Pre-wedding ----
 // ដាក់ឯកសាររូបទុកក្នុង GitHub តាម folder ដូចខាងក្រោម (ក្នុង images/) ហើយប្រើ ASSET_VERSION ដូចគ្នា។
-//   images/covers/   → cover1.webp … cover5.webp      (បង្ហាញជារូបគម្រប ពេញក្រោមឈ្មោះ — ណែនាំរូបបញ្ឈរ ឧ. 1080×1920 ឬ 1080×1620)
+//   images/covers/   → cover1.jpg … cover5.jpg      (បង្ហាញជារូបគម្រប ពេញក្រោមឈ្មោះ — ណែនាំរូបបញ្ឈរ ឧ. 1080×1920 ឬ 1080×1620)
 //   images/gallery/  → gallery1.webp … gallery5.webp  (បង្ហាញក្នុងផ្នែក "រូបភាពនៃពួកយើង" — ណែនាំ 1200×1200 ឬ 1200×900)
 // ចង់ប្តូរឈ្មោះក្នុងបញ្ជី (label), ប្តូរប្រភេទឯកសារ (jpg / webp) ឬបន្ថែមជម្រើសថ្មី គ្រាន់តែកែ/ថែមបន្ទាត់ខាងក្រោម។
 // ជម្រើសបណ្ដុំរូបភាពអាចមានរូបច្រើនសន្លឹក (ម្ចាស់ធៀបជ្រើសបានច្រើនជម្រើស សរុបអតិបរមា ៦ សន្លឹក = MAX_ART) ដោយសរសេរ files:["a.png","b.png","c.png"] (បង្ហាញតាមទម្រង់ gallery ដែលបានជ្រើស)។
@@ -174,12 +174,12 @@ const COVER_ART = {
 };
 const GALLERY_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  gallery1:{ label:"បណ្ដុំរូបភាព ១", files:["gallery1.jpg"] },
-  gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.jpg"] },
-  gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.jpg"] },
-  gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.jpg"] },
-  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.jpg"] },
-  gallery6:{ label:"បណ្ដុំរូបភាព ៦", files:["gallery6.jpg"] }
+  gallery1:{ label:"បណ្ដុំរូបភាព ១", files:["gallery1.webp"] },
+  gallery2:{ label:"បណ្ដុំរូបភាព ២", files:["gallery2.webp"] },
+  gallery3:{ label:"បណ្ដុំរូបភាព ៣", files:["gallery3.webp"] },
+  gallery4:{ label:"បណ្ដុំរូបភាព ៤", files:["gallery4.webp"] },
+  gallery5:{ label:"បណ្ដុំរូបភាព ៥", files:["gallery5.webp"] },
+  gallery6:{ label:"បណ្ដុំរូបភាព ៦", files:["gallery6.webp"] }
 };
 function artUrl(file, kind){ return assetBase() + ASSET_DIRS[kind || "gallery"] + file + "?v=" + ASSET_VERSION; }   // kind: "cover" | "gallery"
 function coverArtUrl(s){
@@ -206,7 +206,7 @@ const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square",
   sage:"grid", teal:"grid", sky:"grid", dustyblue:"classic", lavender:"polaroid", plum:"grid", charcoal:"square" };
 
 // ===== រូបស៊ុម / ផ្ទៃខាងក្រោយ ជាឯកសាររូបភាព (PNG) នៅលើ GitHub =====
-// ដាក់ឯកសារក្នុង  images/frames/  (frame1.png … frame5.png)  និង  images/backgrounds/  (bg1.png … bg5.png)
+// ដាក់ឯកសារក្នុង  images/frames/  (frame1.jpg … frame5.jpg)  និង  images/backgrounds/  (bg1.webp … bg5.webp)
 // FRAME (ត្រួតពីលើខ្លឹមសារ)៖ រូប PNG ថ្លា បញ្ឈរ ទំហំ 1024×1280 (4:5) ដែលកណ្ដាលទុកថ្លា។
 //   កន្លះលើនៃរូប (បន្ទាត់ 0–640) នៅដើមទំព័រ និងកន្លះក្រោម (640–1280) នៅចុងទំព័រ → រមូរចុះក្រោមទើបឃើញផ្កាខាងក្រោម ហើយមិនលាតខុសសមាមាត្រលើទូរស័ព្ទ។
 //   ដូច្នេះរូបតុបតែងត្រូវនៅក្នុងកន្លះលើ ឬកន្លះក្រោម កុំឱ្យឆ្លងកណ្ដាល។ លើកុំព្យូទ័រ ទទឹងអតិបរមាស្មើ 680px (ស្មើទទឹងធៀប)។
@@ -224,11 +224,11 @@ function assetBase(){
 }
 const KBACH_FRAME_STYLES = {   // FRAME: នៅពីលើខ្លឹមសារ ជាប់គែមអេក្រង់
   none:{ label:"គ្មាន" },
-  frame1:{ label:"ផ្កាកុលាប — ជ្រុងស្តាំក្រោម", file:"frame1.png" },
-  frame2:{ label:"ផ្កាកុលាប — ខាងក្រោម", file:"frame2.png" },
-  frame3:{ label:"អប្សរាចាក់ផ្កា — ពីរជ្រុងខាងលើ", file:"frame3.png" },
-  frame4:{ label:"ស្លឹកព្យួរខាងលើ + គុម្ពឈើ", file:"frame4.png" },
-  frame5:{ label:"គុម្ពឈើផ្កាលឿង — ជ្រុងក្រោម", file:"frame5.png" },
+  frame1:{ label:"ផ្កាកុលាប — ជ្រុងស្តាំក្រោម", file:"frame1.jpg" },
+  frame2:{ label:"ផ្កាកុលាប — ខាងក្រោម", file:"frame2.jpg" },
+  frame3:{ label:"អប្សរាចាក់ផ្កា — ពីរជ្រុងខាងលើ", file:"frame3.jpg" },
+  frame4:{ label:"សរសរ ពេញអេក្រង់ (ឆ្វេង-ស្តាំ)", file:"frame4.jpg", full:true },   // full:true = one full-screen picture (like the custom frame) instead of top/bottom halves; supports auto-snap / spread / open
+  frame5:{ label:"គុម្ពឈើផ្កាលឿង — ជ្រុងក្រោម", file:"frame5.jpg" },
   custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
 };
 // ចលនារបស់ស៊ុម (frame1–5) ពេលអូសចុះក្រោម៖ ស៊ុមបាត់បន្តិចម្ដងៗតាមចម្ងាយដែលអូស (ត្រឡប់មកវិញពេលអូសឡើងលើ)។
@@ -515,16 +515,43 @@ const TIMELINE_PRESETS = [
 ];
 
 
+// Every design field a template controls. Each template starts from this base, so choosing a template ALWAYS
+// replaces the whole look (nothing is left over from the previous template). Text, photos, song, links are never here.
+const PRESET_DESIGN_BASE = {
+  theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"grid", galleryArts:[], coverArt:"none",
+  kbachFrame:"none", frameFit:"stretch", frameOpacity:100, frameFx:"fade", frameSpread:0, frameSpreadMore:6, frameSnap:true,
+  kbachBg:"none", bgFit:"cover", bgOpacity:100, bgBlur:0,
+  textAnim:"fadeup", openStyle:"door",
+  coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60, coverVeil:35
+};
 const INVITATION_PRESETS = {
-  classic:{ label:"ប្រពៃណីខ្មែរ (មាស)", desc:"ផ្កាឈូកបើក · ក្របខណ្ឌព័ទ្ធពេញ · រូបធំ-តូចឆ្លាស់ · អក្សរលេចឡើង",
+  classic:{ label:"ប្រពៃណីខ្មែរ (មាស)", desc:"ផ្កាឈូកបើក · អប្សរាជ្រុងលើ · ផ្ទៃព័ទ្ធជុំវិញ · រូបធំ-តូចឆ្លាស់ · អក្សរលេចឡើង",
     swatch:THEMES.gold.swatch, tpl:0, timeline:0, startTime:"16:00",
-    design:{ theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"grid", kbachFrame:"none", kbachBg:"bg2", textAnim:"fadeup", openStyle:"lotus" } },
-  romantic:{ label:"ស្នេហ៍ទន់ភ្លន់ (ផ្កាឈូក)", desc:"បេះដូងបែក · កម្រងផ្កាក្រោម · រូបប៉ូឡារ៉ូអ៊ីត · អក្សរព្រិលទៅច្បាស់",
+    design:Object.assign({}, PRESET_DESIGN_BASE, {
+      theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"grid",
+      galleryArts:["gallery1","gallery2","gallery3","gallery4"], coverArt:"cover1",
+      kbachFrame:"frame3", frameFx:"fade", frameOpacity:100,
+      kbachBg:"bg2", bgOpacity:60, bgBlur:0,
+      textAnim:"fadeup", openStyle:"lotus",
+      coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60, coverVeil:35 }) },
+  romantic:{ label:"ស្នេហ៍ទន់ភ្លន់ (ផ្កាឈូក)", desc:"បេះដូងបែក · ផ្កាកុលាបជ្រុងស្តាំក្រោម · កម្រងផ្កាព្រិលស្រាល · រូបប៉ូឡារ៉ូអ៊ីត · អក្សរព្រិលទៅច្បាស់",
     swatch:THEMES.blush.swatch, tpl:1, timeline:1, startTime:"06:30",
-    design:{ theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"polaroid", kbachFrame:"none", kbachBg:"bg4", textAnim:"blur", openStyle:"heart" } },
-  elegant:{ label:"ទំនើបថ្លៃថ្នូរ (ខៀវ-មាស)", desc:"វាំងនន · មែកសងខាង · រូបក្រឡាការ៉េ · អក្សរស្រាយម្តងមួយពាក្យ",
+    design:Object.assign({}, PRESET_DESIGN_BASE, {
+      theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"polaroid",
+      galleryArts:["gallery3","gallery4","gallery5","gallery6"], coverArt:"cover2",
+      kbachFrame:"frame1", frameFx:"drift", frameOpacity:90,
+      kbachBg:"bg4", bgOpacity:55, bgBlur:6,
+      textAnim:"blur", openStyle:"heart",
+      coverBlur:28, coverFocusX:50, coverFocusY:30, coverSharp:55, coverVeil:25 }) },
+  elegant:{ label:"ទំនើបថ្លៃថ្នូរ (ខៀវ-មាស)", desc:"វាំងនន · សរសរបើកសងខាង · ផ្ទៃស្រាល · រូបក្រឡាការ៉េ · អក្សរស្រាយម្តងមួយពាក្យ",
     swatch:THEMES.royal.swatch, tpl:2, timeline:2, startTime:"06:30",
-    design:{ theme:"royal", fontKm:"koulen", fontEn:"playfair", galleryStyle:"square", kbachFrame:"none", kbachBg:"bg5", textAnim:"words", openStyle:"curtain" } }
+    design:Object.assign({}, PRESET_DESIGN_BASE, {
+      theme:"royal", fontKm:"koulen", fontEn:"playfair", galleryStyle:"square",
+      galleryArts:["gallery1","gallery3","gallery5","gallery6"], coverArt:"cover3",
+      kbachFrame:"frame4", frameFx:"open", frameOpacity:100,
+      kbachBg:"bg5", bgOpacity:40, bgBlur:2,
+      textAnim:"words", openStyle:"curtain",
+      coverBlur:18, coverFocusX:50, coverFocusY:40, coverSharp:70, coverVeil:45 }) }
 };
 
 const defaultState = {
@@ -535,7 +562,7 @@ const defaultState = {
   galleryArts:[],
   coverArt:"none",
   kbachFrame:"none", kbachBg:"bg1",
-  frameFit:"stretch", frameOpacity:100, frameFx:"fade", frameSpread:0, frameSpreadEnd:18, frameSnap:true,
+  frameFit:"stretch", frameOpacity:100, frameFx:"fade", frameSpread:0, frameSpreadMore:6, frameSnap:true,
   bgFit:"cover", bgOpacity:100, bgBlur:0,
   textAnim:"fadeup",
   openStyle:"door",
@@ -677,7 +704,7 @@ function migrateStyle_(s){
   const num = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
   s.frameOpacity = num(s.frameOpacity, 10, 100, 100);
   s.frameSpread = num(s.frameSpread, 0, 40, 0);
-  s.frameSpreadEnd = num(s.frameSpreadEnd, 0, 60, 18);
+  s.frameSpreadMore = num(s.frameSpreadMore, 0, 30, 6);
   s.frameSnap = s.frameSnap !== false;
   s.bgOpacity = num(s.bgOpacity, 10, 100, 100);
   s.bgBlur = num(s.bgBlur, 0, 40, 0);

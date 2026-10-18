@@ -285,20 +285,23 @@ ${c.fits.map(f => `<label class="chk-row"><input type="radio" name="${c.prefix}F
 ${c.snapKey ? `<label class="chk-row" style="margin-top:10px;"><input type="checkbox" id="${id("Snap")}"><span>ស៊ុមជាប់គែមអេក្រង់ស្វ័យប្រវត្តិ (កាត់ចន្លោះទទេសងខាងចេញ)</span></label>` : ""}
 ${c.spreadKey ? `<label style="margin-top:10px;">រុញស៊ុមចេញទៅគែម (ឱ្យសរសរបាក់ពាក់កណ្ដាល) <b id="${id("SpreadVal")}"></b></label>
 <input type="range" id="${id("Spread")}" min="0" max="40" step="1" style="width:100%;">` : ""}
-${c.spreadEndKey ? `<label style="margin-top:10px;">ពេលអូសចុះក្រោម ស៊ុមពង្រីកទៅ (ប្រើពេលជ្រើសចលនា «ពង្រីកចេញសងខាង») <b id="${id("SpreadEndVal")}"></b></label>
-<input type="range" id="${id("SpreadEnd")}" min="0" max="60" step="1" style="width:100%;">` : ""}
+${c.spreadEndKey ? `<label style="margin-top:10px;">ពេលអូសចុះក្រោម ស៊ុមពង្រីកបន្ថែម (ណែនាំ ៤–៨% ដើម្បីនៅឃើញសរសរខ្លះ) <b id="${id("SpreadEndVal")}"></b></label>
+<input type="range" id="${id("SpreadEnd")}" min="0" max="30" step="1" style="width:100%;">` : ""}
 ${c.blurKey ? `<label style="margin-top:10px;">កម្រិតព្រិល <b id="${id("BlurVal")}"></b></label>
 <input type="range" id="${id("Blur")}" min="0" max="40" step="1" style="width:100%;">` : ""}
 </div>`;
   S.refresh = () => {
-    const on = state[c.styleKey] === "custom";
+    const pre = c.prefix === "frame" && hasOwn(KBACH_FRAME_STYLES, state[c.styleKey]) && !!KBACH_FRAME_STYLES[state[c.styleKey]].full;
+    const on = state[c.styleKey] === "custom" || pre;
     box.style.display = on ? "" : "none";
     if(!on) return;
-    const a = c.get(), has = !!(a && a.dataUrl);
-    el("Prev").style.display = has ? "" : "none";
+    const a = c.get(), has = pre ? true : !!(a && a.dataUrl);
+    const hintEl = box.querySelector(".photo-hint"); if(hintEl) hintEl.style.display = pre ? "none" : "";
+    el("AddBtn").style.display = pre ? "none" : ""; el("Status").style.display = pre ? "none" : "";
+    el("Prev").style.display = (has && !pre) ? "" : "none";
     el("Opts").style.display = has ? "" : "none";
     el("AddBtn").textContent = has ? c.changeText : c.addText;
-    if(has){
+    if(has && !pre){
       el("PrevImg").src = a.dataUrl;
       const kind = (a.type || "").replace("image/", "").toUpperCase();
       el("Status").textContent = `${a.name} — ${kind} · ${fmtSize(a.size)}\nឯកសារភ្ញៀវនីមួយៗនឹងធំបន្ថែមប្រហែល ${fmtSize(a.dataUrl.length)}`;
@@ -308,7 +311,7 @@ ${c.blurKey ? `<label style="margin-top:10px;">កម្រិតព្រិល
     box.querySelectorAll('input[type=radio]').forEach(r => { r.checked = (r.value === state[c.fitKey]); });
     el("Opacity").value = String(state[c.opKey]);
     el("OpacityVal").textContent = state[c.opKey] + "%";
-    if(c.spreadEndKey){ const ev2 = Number(state[c.spreadEndKey]); const sv2 = Number.isFinite(ev2) ? ev2 : 18; el("SpreadEnd").value = String(sv2); el("SpreadEndVal").textContent = sv2 + "%"; }
+    if(c.spreadEndKey){ const ev2 = Number(state[c.spreadEndKey]); const sv2 = Number.isFinite(ev2) ? ev2 : 6; el("SpreadEnd").value = String(sv2); el("SpreadEndVal").textContent = sv2 + "%"; }
     if(c.snapKey){ el("Snap").checked = state[c.snapKey] !== false; }
     if(c.spreadKey){ const sv = Number(state[c.spreadKey]) || 0; el("Spread").value = String(sv); el("SpreadVal").textContent = sv ? sv + "%" : "បិទ"; }
     if(c.blurKey){ const bv = Number(state[c.blurKey]) || 0; el("Blur").value = String(bv); el("BlurVal").textContent = bv ? bv + " px" : "បិទ"; }
@@ -355,7 +358,7 @@ ${c.blurKey ? `<label style="margin-top:10px;">កម្រិតព្រិល
     scheduleUpdate();
   });
   if(c.spreadEndKey) el("SpreadEnd").addEventListener("input", ev => {
-    state[c.spreadEndKey] = Math.max(0, Math.min(60, Number(ev.target.value) || 0));
+    state[c.spreadEndKey] = Math.max(0, Math.min(30, Number(ev.target.value) || 0));
     el("SpreadEndVal").textContent = state[c.spreadEndKey] + "%";
     scheduleUpdate();
   });
@@ -372,7 +375,7 @@ ${c.blurKey ? `<label style="margin-top:10px;">កម្រិតព្រិល
   });
   return S;
 }
-makeImageSlot({ prefix:"frame", key:FRAME_KEY, styleKey:"kbachFrame", fitKey:"frameFit", opKey:"frameOpacity", spreadKey:"frameSpread", spreadEndKey:"frameSpreadEnd", snapKey:"frameSnap",
+makeImageSlot({ prefix:"frame", key:FRAME_KEY, styleKey:"kbachFrame", fitKey:"frameFit", opKey:"frameOpacity", spreadKey:"frameSpread", spreadEndKey:"frameSpreadMore", snapKey:"frameSnap",
   get:() => frameAsset, set:v => { frameAsset = v; },
   hint:"ស៊ុមនៅ <b>ពីលើ</b> ខ្លឹមសារ។ ល្អបំផុតគឺ <b>PNG ឬ GIF</b> ដែលចំកណ្ដាលថ្លា (transparent)។ GIF នឹងមានចលនា។ ទំហំណែនាំ ៩០០ × ១៦០០ px (បញ្ឈរ)។",
   addText:"＋ បញ្ចូលរូបភាពស៊ុម (JPG / PNG / GIF)", changeText:"🔄 ប្តូររូបភាពស៊ុម",
@@ -1385,7 +1388,7 @@ function buildPresetCards(){
 function applyPreset(id){
   const p = INVITATION_PRESETS[id];
   if(!p) return;
-  Object.assign(state, p.design);
+  Object.assign(state, JSON.parse(JSON.stringify(p.design)));   // full design set, cloned (galleryArts etc.) so the preset itself is never modified
   const fill = (k, v) => { if(!String(state[k] || "").trim()) state[k] = v; };
   fill("groomName", SAMPLE_NAMES.km[0]); fill("brideName", SAMPLE_NAMES.km[1]);
   fill("groomNameEn", SAMPLE_NAMES.en[0]); fill("brideNameEn", SAMPLE_NAMES.en[1]);
@@ -1435,7 +1438,7 @@ function normalizeImported(raw){
   s.venueMapLink = /^https?:\/\/\S+$/i.test(bkStr(r.venueMapLink, 2000).trim()) ? bkStr(r.venueMapLink, 2000).trim() : "";
   s.guestNamesFileRaw = bkStr(r.guestNamesFileRaw, 500000);
   s.theme = (typeof r.theme === "string" && hasOwn(THEMES, r.theme)) ? r.theme : defaultState.theme;
-  ["kbachFrame","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadEnd","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil"]
+  ["kbachFrame","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadMore","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil"]
     .forEach(k => { if(r[k] !== undefined) s[k] = r[k]; });
   s.galleryArts = Array.isArray(r.galleryArts) ? r.galleryArts : (typeof r.galleryArt === "string" ? [r.galleryArt] : []);   // cleaned by migrateStyle_
   if(!hasOwn(COVER_ART, s.coverArt)) s.coverArt = "none";
