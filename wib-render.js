@@ -387,14 +387,16 @@ function buildFrameFxJs(s){
     var y=window.pageYOffset||document.documentElement.scrollTop||0;
     var p=ease(Math.min(1,Math.max(0,y/Math.max(180,window.innerHeight*0.6))));
     els.forEach(function(el){
-      var cu=el.classList.contains('kbach-custom-frame'), d=(cu||el.classList.contains('kb-ov-top'))?-1:1, tr=cu?'':'translateX(-50%)', fl='', op=1-p;
+      var cu=el.classList.contains('kbach-custom-frame'), d=(cu||el.classList.contains('kb-ov-top'))?-1:1, tr=cu?'':'translateX(-50%)', fl='';
+      var keep=(cu&&fx!=='open'), q=keep?p*0.4:p, op=1-q;   /* full-screen frame: every effect is only partial and the outer sides always stay visible */
       if(fx==='open'){ if(cu){ var s0=+el.getAttribute('data-sp0')||0, s1=+el.getAttribute('data-sp1')||0, bb=s0+(Math.max(s1,s0)-s0)*p, bl=+el.getAttribute('data-bl')||0, br=+el.getAttribute('data-br')||0; el.style.left='-'+(bl+bb)+'%'; el.style.right='-'+(br+bb)+'%'; op=1; } else { tr+=' scale('+(1+p*0.45)+')'; } }
-      else if(fx==='slide'){ tr+=' translateY('+(d*p*105)+'%)'; op=1-p*p; }
-      else if(fx==='zoom'){ tr+=' scale('+(1+p*0.45)+')'; }
-      else if(fx==='blur'){ fl='blur('+(p*14)+'px)'; }
-      else if(fx==='drift'){ tr+=' translate('+(d*p*16)+'%,'+(d*p*45)+'%) rotate('+(d*p*7)+'deg)'; }
+      else if(fx==='slide'){ tr+=' translateY('+(d*q*(keep?40:105))+'%)'; op=1-q*q; }
+      else if(fx==='zoom'){ tr+=' scale('+(1+q*0.45)+')'; }
+      else if(fx==='blur'){ fl='blur('+(q*14)+'px)'; }
+      else if(fx==='drift'){ tr+=' translate('+(d*q*16)+'%,'+(d*q*45)+'%) rotate('+(d*q*7)+'deg)'; }
+      if(keep){ var k0=+el.getAttribute('data-sp0')||0, k1=+el.getAttribute('data-sp1')||0, kb=k0+(Math.max(k1,k0)-k0)*p, kl=+el.getAttribute('data-bl')||0, kr=+el.getAttribute('data-br')||0; el.style.left='-'+(kl+kb)+'%'; el.style.right='-'+(kr+kb)+'%'; }   /* push the pillars toward the screen edges: only the outer sides stay */
       el.style.transform=tr; el.style.filter=fl; el.style.opacity=op*el._b;
-      el.style.visibility=(p>=0.999&&!(fx==='open'&&cu))?'hidden':'visible';
+      el.style.visibility=(p>=0.999&&!cu)?'hidden':'visible';
     });
   }
   window.addEventListener('scroll',function(){ if(!ticking){ ticking=true; (window.requestAnimationFrame||setTimeout)(apply); } },{passive:true});
