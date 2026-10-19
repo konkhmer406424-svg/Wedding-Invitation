@@ -217,18 +217,18 @@ const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square",
 const ASSET_BASE_OVERRIDE = "";
 // folder រូបទាំងអស់ (ទាក់ទងនឹង ASSET_BASE) — ចង់ប្តូរឈ្មោះ folder សូមកែត្រង់នេះតែមួយកន្លែង
 const ASSET_DIRS = { frame:"images/frames/", bg:"images/backgrounds/", cover:"images/covers/", gallery:"images/gallery/" };
-const ASSET_VERSION = "2";   // ប្តូរលេខនេះ (2, 3 …) ពេលជំនួសរូបថ្មី ដើម្បីបំបាត់ cache
+const ASSET_VERSION = "3";   // ប្តូរលេខនេះ (2, 3 …) ពេលជំនួសរូបថ្មី ដើម្បីបំបាត់ cache
 function assetBase(){
   if(ASSET_BASE_OVERRIDE) return ASSET_BASE_OVERRIDE;
   try{ return new URL("./", location.href).href; }catch(e){ return "./"; }
 }
 const KBACH_FRAME_STYLES = {   // FRAME: នៅពីលើខ្លឹមសារ ជាប់គែមអេក្រង់
   none:{ label:"គ្មាន" },
-  frame1:{ label:"ស៊ុមទី១", file:"frame1.png" },
-  frame2:{ label:"ស៊ុមទី២", file:"frame2.png" },
-  frame3:{ label:"ស៊ុមទី៣", file:"frame3.png" },
-  frame4:{ label:"ស៊ុមទី៤ (ពេញអេក្រង់)", file:"frame4.png", full:true },   // full:true = one full-screen picture (like the custom frame) instead of top/bottom halves; supports auto-snap / spread / open
-  frame5:{ label:"ស៊ុមទី៥", file:"frame5.png" },
+  frame1:{ label:"ស៊ុមទី១", file:"frame1.png", full:true },
+  frame2:{ label:"ស៊ុមទី២", file:"frame2.png", full:true },
+  frame3:{ label:"ស៊ុមទី៣", file:"frame3.png", full:true },
+  frame4:{ label:"ស៊ុមទី៤", file:"frame4.png", full:true },   // full:true = one full-screen picture (like the custom frame) instead of top/bottom halves; supports auto-snap / spread / open
+  frame5:{ label:"ស៊ុមទី៥", file:"frame5.png", full:true },
   custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
 };
 // ចលនារបស់ស៊ុម (frame1–5) ពេលអូសចុះក្រោម៖ ស៊ុមបាត់បន្តិចម្ដងៗតាមចម្ងាយដែលអូស (ត្រឡប់មកវិញពេលអូសឡើងលើ)។
@@ -239,7 +239,7 @@ const FRAME_FX = {
   zoom:{ label:"ពង្រីករួចបាត់" },
   blur:{ label:"ព្រិលរួចបាត់" },
   drift:{ label:"បក់ផ្លុំចេញ" },
-  open:{ label:"ពង្រីកចេញសងខាង (សម្រាប់ស៊ុមពេញអេក្រង់)" }
+  open:{ label:"ពង្រីកចេញសងខាង (ទុកគែមសងខាង)" }
 };
 const KBACH_BG_STYLES = {      // BACKGROUND: នៅពីក្រោយខ្លឹមសារ ជាប់អេក្រង់
   none:{ label:"គ្មាន" },
