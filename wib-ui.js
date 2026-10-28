@@ -1146,7 +1146,9 @@ function buildTemplateChips(){
     { id:"tpl-eyebrow-km", items:TEMPLATES.eyebrow.km, target:"eyebrow", toggleLabel:"មើលគំរូ", hideLabel:"លាក់គំរូ" },
     { id:"tpl-eyebrow-en", items:TEMPLATES.eyebrow.en, target:"eyebrowEn", toggleLabel:"Show templates", hideLabel:"Hide templates" },
     { id:"tpl-welcome-km", items:TEMPLATES.welcomeText.km, target:"welcomeText", toggleLabel:"មើលគំរូ", hideLabel:"លាក់គំរូ" },
-    { id:"tpl-welcome-en", items:TEMPLATES.welcomeText.en, target:"welcomeTextEn", toggleLabel:"Show templates", hideLabel:"Hide templates" }
+    { id:"tpl-welcome-en", items:TEMPLATES.welcomeText.en, target:"welcomeTextEn", toggleLabel:"Show templates", hideLabel:"Hide templates" },
+    { id:"tpl-thanks-km", items:TEMPLATES.thanksText.km, target:"thanksText", toggleLabel:"មើលគំរូ", hideLabel:"លាក់គំរូ" },
+    { id:"tpl-thanks-en", items:TEMPLATES.thanksText.en, target:"thanksTextEn", toggleLabel:"Show templates", hideLabel:"Hide templates" }
   ];
   function truncate(text, max){
     return text.length > max ? text.slice(0, max).trim() + "…" : text;
@@ -1253,6 +1255,7 @@ function bindSimpleFields(){
     eventDate:"eventDate", startTime:"startTime",
     welcomeText:"welcomeText", host1:"host1", host2:"host2",
     welcomeTextEn:"welcomeTextEn", host1En:"host1En", host2En:"host2En",
+    thanksText:"thanksText", thanksTextEn:"thanksTextEn",
     venueName:"venueName", venueAddr:"venueAddr",
     venueNameEn:"venueNameEn", venueAddrEn:"venueAddrEn",
     venueMapLink:"venueMapLink",
@@ -1381,9 +1384,18 @@ function buildPresetCards(){
   if(!box) return;
   box.innerHTML = Object.keys(INVITATION_PRESETS).map(id => {
     const p = INVITATION_PRESETS[id];
-    return `<button type="button" class="preset-card" data-id="${id}" title="${p.desc}"><span class="preset-swatch" style="background:${p.swatch}"></span><span class="preset-txt"><b>${p.label}</b><small>${p.desc}</small></span></button>`;
-  }).join("");
-  box.querySelectorAll(".preset-card").forEach(b => b.addEventListener("click", () => applyPreset(b.dataset.id)));
+    const on = state.layout === id ? " on" : "";
+    return `<button type="button" class="preset-card${on}" data-id="${id}" title="${p.desc}"><span class="preset-swatch" style="background:${p.swatch}"></span><span class="preset-txt"><b>${p.label}</b><small>${p.desc}</small></span></button>`;
+  }).join("") + `<button type="button" class="preset-card${(!state.layout || state.layout === "none") ? " on" : ""}" data-id="__none" title="ប្រើការរចនាធម្មតា"><span class="preset-swatch" style="background:repeating-linear-gradient(45deg,#e9e9e9,#e9e9e9 6px,#fff 6px,#fff 12px)"></span><span class="preset-txt"><b>គ្មានឈុត</b><small>រចនាធម្មតា — ជ្រើសពណ៌ ស៊ុម ផ្ទៃ និងការបើកដោយខ្លួនឯង</small></span></button>`;
+  box.querySelectorAll(".preset-card").forEach(b => b.addEventListener("click", () => { if(b.dataset.id === "__none") clearLayout(); else applyPreset(b.dataset.id); }));
+}
+function clearLayout(){
+  state.layout = "none";
+  saveDraft();
+  refreshAllBuildersFromState_();
+  buildPresetCards();
+  const st = $("presetStatus");
+  if(st) st.textContent = "បានបិទឈុតកំណត់ជាស្រេច — ត្រឡប់ទៅការរចនាធម្មតា (ពណ៌ ស៊ុម ផ្ទៃ ការបើក ជ្រើសដោយខ្លួនឯង)។";
 }
 function applyPreset(id){
   const p = INVITATION_PRESETS[id];
@@ -1411,8 +1423,11 @@ function applyPreset(id){
   state = migrateStyle_(state);
   saveDraft();
   refreshAllBuildersFromState_();
+  buildPresetCards();
   const st = $("presetStatus");
-  if(st) st.textContent = `✅ បានប្រើគំរូ «${p.label}» — ឥឡូវបញ្ចូលរូបភាព ចម្រៀង Link ផែនទី និង Link វិឌីអូ។ ត្រូវប្តូរឈ្មោះ ថ្ងៃ និងទីតាំងគំរូ មុនផ្ញើឲ្យភ្ញៀវ។`;
+  const lyNow = (typeof layoutOf_ === "function") ? layoutOf_(state) : null;
+  const lyNote = (lyNow && lyNow.hint) ? " " + lyNow.hint : "";   // sentence comes from the layout file (hint:"…")
+  if(st) st.textContent = `✅ បានប្រើឈុត «${p.label}» — ឥឡូវបញ្ចូលរូបភាព ចម្រៀង Link ផែនទី និង Link វិឌីអូ។${lyNote} ត្រូវប្តូរឈ្មោះ ថ្ងៃ និងទីតាំងគំរូ មុនផ្ញើឲ្យភ្ញៀវ។`;
 }
 buildPresetCards();
 
@@ -1433,12 +1448,12 @@ function normalizeImported(raw){
   const r = (raw && typeof raw === "object" && !Array.isArray(raw)) ? raw : {};
   legacyFill_(r);
   ["groomName","brideName","eyebrow","groomNameEn","brideNameEn","eyebrowEn","welcomeText","host1","host2",
-   "welcomeTextEn","host1En","host2En","venueName","venueAddr","venueNameEn","venueAddrEn","coverPhotoName"
+   "welcomeTextEn","thanksText","thanksTextEn","host1En","host2En","venueName","venueAddr","venueNameEn","venueAddrEn","coverPhotoName"
   ].forEach(k => { s[k] = bkStr(r[k], 20000); });
   s.venueMapLink = /^https?:\/\/\S+$/i.test(bkStr(r.venueMapLink, 2000).trim()) ? bkStr(r.venueMapLink, 2000).trim() : "";
   s.guestNamesFileRaw = bkStr(r.guestNamesFileRaw, 500000);
   s.theme = (typeof r.theme === "string" && hasOwn(THEMES, r.theme)) ? r.theme : defaultState.theme;
-  ["kbachFrame","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadMore","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil"]
+  ["kbachFrame","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadMore","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","layout","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil","sealBtn","textFx"]
     .forEach(k => { if(r[k] !== undefined) s[k] = r[k]; });
   s.galleryArts = Array.isArray(r.galleryArts) ? r.galleryArts : (typeof r.galleryArt === "string" ? [r.galleryArt] : []);   // cleaned by migrateStyle_
   if(!hasOwn(COVER_ART, s.coverArt)) s.coverArt = "none";

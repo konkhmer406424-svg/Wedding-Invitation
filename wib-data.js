@@ -96,7 +96,7 @@ const LABELS = {
     contactsSub:"សម្រាប់ព័ត៌មានលម្អិត សូមទាក់ទងមកកាន់", thanks:"អរគុណ", and:"និង",
     giftTitle:"ចំណងដៃ", giftSub:"ស្កេន KHQR ដោយកម្មវិធីធនាគារ ដើម្បីផ្ញើចំណងដៃជូនគូស្វាមីភរិយា", giftGroom:"ខាងកូនកម្លោះ", giftBride:"ខាងកូនក្រមុំ",
     dressTitle:"ពណ៌សម្លៀកបំពាក់", dressSub:"ភ្ញៀវអាចរៀបចំសម្លៀកបំពាក់តាមពណ៌ខាងក្រោម",
-    giftSave:"⬇ រក្សាទុករូប KHQR", giftHint:"ប្រើទូរស័ព្ទតែមួយ? រក្សាទុករូបនេះ រួចបើកក្នុងកម្មវិធីធនាគារ ដើម្បីស្កេនពីរូបភាព",
+    giftSave:"⬇ រក្សាទុករូប KHQR", thanksTitle:"សេចក្ដីថ្លែងអំណរគុណ និងសូមអភ័យទោស", giftHint:"ប្រើទូរស័ព្ទតែមួយ? រក្សាទុករូបនេះ រួចបើកក្នុងកម្មវិធីធនាគារ ដើម្បីស្កេនពីរូបភាព",
     toggleKm:"ខ្មែរ", toggleEn:"English" },
   en:{ countdownTitle:"Countdown", countdownSub:"Time remaining until our special day",
     days:"Days", hours:"Hours", minutes:"Minutes", seconds:"Seconds", congrats:"Congratulations!",
@@ -106,12 +106,12 @@ const LABELS = {
     contactsSub:"For more details, please reach out to", thanks:"Thank You", and:"&",
     giftTitle:"Wedding Gift", giftSub:"Scan the KHQR with your banking app to send a gift to the couple", giftGroom:"Groom's Side", giftBride:"Bride's Side",
     dressTitle:"Dress Colours", dressSub:"Guests are warmly invited to dress in these colours",
-    giftSave:"⬇ Save KHQR image", giftHint:"On the same phone? Save this image, then scan it from your banking app's gallery.",
+    giftSave:"⬇ Save KHQR image", thanksTitle:"Gratitude & Humble Apology", giftHint:"On the same phone? Save this image, then scan it from your banking app's gallery.",
     toggleKm:"ខ្មែរ", toggleEn:"English" }
 };
 
 // Falling-effect toggle (🌸 ❄️ ✨) for guests. false = hidden and effects never start; set to true to bring it back.
-const FALLING_FX_ENABLED = false;
+const FALLING_FX_ENABLED = true;
 const EFFECTS = {
   none:{ label:"គ្មាន", icon:"–" },
   petals:{ label:"ផ្កាធ្លាក់", icon:"🌸" },
@@ -160,28 +160,28 @@ const GALLERY_STYLES = {
 // ---- Text animation when the guest scrolls (chosen separately from colour/font/theme) ----
 // ---- រូបតំណាង (Stand-in pictures) — បង្ហាញពេលគ្មានរូប Cover ឬគ្មានរូប Pre-wedding ----
 // ដាក់ឯកសាររូបទុកក្នុង GitHub តាម folder ដូចខាងក្រោម (ក្នុង images/) ហើយប្រើ ASSET_VERSION ដូចគ្នា។
-//   images/covers/   → cover1.jpg … cover5.jpg      (បង្ហាញជារូបគម្រប ពេញក្រោមឈ្មោះ — ណែនាំរូបបញ្ឈរ ឧ. 1080×1920 ឬ 1080×1620)
-//   images/gallery/  → gallery1.jpg … gallery6.jpg  (បង្ហាញក្នុងផ្នែក "រូបភាពនៃពួកយើង" — ណែនាំ 1200×1200 ឬ 1200×900)
+//   images/covers/   → cover1.webp … cover5.webp      (បង្ហាញជារូបគម្រប ពេញក្រោមឈ្មោះ — ណែនាំរូបបញ្ឈរ ឧ. 1080×1920 ឬ 1080×1620)
+//   images/gallery/  → gallery1.webp … gallery6.webp  (បង្ហាញក្នុងផ្នែក "រូបភាពនៃពួកយើង" — ណែនាំ 1200×1200 ឬ 1200×900)
 // ចង់ប្តូរឈ្មោះក្នុងបញ្ជី (label), ប្តូរប្រភេទឯកសារ (jpg / webp) ឬបន្ថែមជម្រើសថ្មី គ្រាន់តែកែ/ថែមបន្ទាត់ខាងក្រោម។
 // ជម្រើសបណ្ដុំរូបភាពអាចមានរូបច្រើនសន្លឹក (ម្ចាស់ធៀបជ្រើសបានច្រើនជម្រើស សរុបអតិបរមា ៦ សន្លឹក = MAX_ART) ដោយសរសេរ files:["a.png","b.png","c.png"] (បង្ហាញតាមទម្រង់ gallery ដែលបានជ្រើស)។
 const COVER_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  cover1:{ label:"រូបតំណាងទី១", file:"cover1.jpg" },
-  cover2:{ label:"រូបតំណាងទី២", file:"cover2.jpg" },
-  cover3:{ label:"រូបតំណាងទី៣", file:"cover3.jpg" },
-  cover4:{ label:"រូបតំណាងទី៤", file:"cover4.jpg" },
-  cover5:{ label:"រូបតំណាងទី៥", file:"cover5.jpg" }
+  cover1:{ label:"រូបតំណាងទី១", file:"cover1.webp" },
+  cover2:{ label:"រូបតំណាងទី២", file:"cover2.webp" },
+  cover3:{ label:"រូបតំណាងទី៣", file:"cover3.webp" },
+  cover4:{ label:"រូបតំណាងទី៤", file:"cover4.webp" },
+  cover5:{ label:"រូបតំណាងទី៥", file:"cover5.webp" }
 };
 const GALLERY_ART = {
   none:{ label:"មិនប្រើរូបតំណាង" },
-  gallery1:{ label:"រូបតំណាងទី១", files:["gallery1.jpg"] },
-  gallery2:{ label:"រូបតំណាងទី២", files:["gallery2.jpg"] },
-  gallery3:{ label:"រូបតំណាងទី៣", files:["gallery3.jpg"] },
-  gallery4:{ label:"រូបតំណាងទី៤", files:["gallery4.jpg"] },
-  gallery5:{ label:"រូបតំណាងទី៥", files:["gallery5.jpg"] },
-  gallery6:{ label:"រូបតំណាងទី៦", files:["gallery6.jpg"] }
+  gallery1:{ label:"រូបតំណាងទី១", files:["gallery1.webp"] },
+  gallery2:{ label:"រូបតំណាងទី២", files:["gallery2.webp"] },
+  gallery3:{ label:"រូបតំណាងទី៣", files:["gallery3.webp"] },
+  gallery4:{ label:"រូបតំណាងទី៤", files:["gallery4.webp"] },
+  gallery5:{ label:"រូបតំណាងទី៥", files:["gallery5.webp"] },
+  gallery6:{ label:"រូបតំណាងទី៦", files:["gallery6.webp"] }
 };
-function artUrl(file, kind){ return assetBase() + ASSET_DIRS[kind || "gallery"] + file + "?v=" + ASSET_VERSION; }   // kind: "cover" | "gallery"
+function artUrl(file, kind){ return (assetBase() + ASSET_DIRS[kind || "gallery"] + file + "?v=" + ASSET_VERSION).replace(/'/g, "%27"); }   // kind: "cover" | "gallery"
 function coverArtUrl(s){
   const k = s && s.coverArt;
   if(!k || !Object.prototype.hasOwnProperty.call(COVER_ART, k) || !COVER_ART[k].file) return "";
@@ -195,6 +195,20 @@ function galleryArtUrls(s){
   });
   return out.slice(0, MAX_ART);
 }
+// ឥទ្ធិពលអក្សរ (Text effect) — ប្រើលើចំណងជើងផ្នែក + ឈ្មោះកូនកម្លោះ-ក្រមុំ (ធ្វើរចនាក្នុង buildTextFxCss, wib-render.js)
+const TEXT_FX_STYLES = {
+  none:{ label:"គ្មាន" },
+  gradient:{ label:"ពណ៌ឆ្លាស់ (Gradient)" },
+  bevel:{ label:"ឆ្លាក់ផុស (Divot)" },
+  glow:{ label:"ពន្លឺមាសព័ទ្ធ (Glow)" },
+  shadow:{ label:"ស្រមោល + ការឆ្លុះ (Shadow + Reflection)" },
+  luxury:{ label:"ពេញលេញ (ទាំងអស់បញ្ចូលគ្នា)" },
+  gold3d:{ label:"មាសទំនើបចាំងពន្លឺ (Shiny Gold 3D)" },
+  neon:{ label:"នេអុងបំភាយពន្លឺ (Neon Glow)" },
+  glass:{ label:"កញ្ចក់ថ្លា (Glass)" },
+  popart:{ label:"ជ្រុងប៉បអាត (Pop Art)" },
+  chrome:{ label:"លោហៈប្រាក់ (Chrome)" }
+};
 const TEXT_ANIM_STYLES = {
   fadeup:{ label:"លេចឡើងពីក្រោម (Fade up)" },
   words:{ label:"ស្រាយម្តងមួយពាក្យ (Word by word)" },
@@ -206,7 +220,7 @@ const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square",
   sage:"grid", teal:"grid", sky:"grid", dustyblue:"classic", lavender:"polaroid", plum:"grid", charcoal:"square" };
 
 // ===== រូបស៊ុម / ផ្ទៃខាងក្រោយ ជាឯកសាររូបភាព (PNG) នៅលើ GitHub =====
-// ដាក់ឯកសារក្នុង  images/frames/  (frame1.png … frame5.png)  និង  images/backgrounds/  (bg1.webp … bg5.webp)
+// ដាក់ឯកសារក្នុង  images/frames/  (frame1.webp … frame5.webp)  និង  images/backgrounds/  (bg1.webp … bg5.webp)
 // FRAME (ត្រួតពីលើខ្លឹមសារ)៖ រូប PNG ថ្លា បញ្ឈរ ទំហំ 1024×1280 (4:5) ដែលកណ្ដាលទុកថ្លា។
 //   កន្លះលើនៃរូប (បន្ទាត់ 0–640) នៅដើមទំព័រ និងកន្លះក្រោម (640–1280) នៅចុងទំព័រ → រមូរចុះក្រោមទើបឃើញផ្កាខាងក្រោម ហើយមិនលាតខុសសមាមាត្រលើទូរស័ព្ទ។
 //   ដូច្នេះរូបតុបតែងត្រូវនៅក្នុងកន្លះលើ ឬកន្លះក្រោម កុំឱ្យឆ្លងកណ្ដាល។ លើកុំព្យូទ័រ ទទឹងអតិបរមាស្មើ 680px (ស្មើទទឹងធៀប)។
@@ -216,19 +230,28 @@ const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square",
 // បើរូបនៅកន្លែងផ្សេង ដាក់ URL ពេញ ឧ. "https://USERNAME.github.io/REPO/"  (ត្រូវបញ្ចប់ដោយ /)
 const ASSET_BASE_OVERRIDE = "";
 // folder រូបទាំងអស់ (ទាក់ទងនឹង ASSET_BASE) — ចង់ប្តូរឈ្មោះ folder សូមកែត្រង់នេះតែមួយកន្លែង
-const ASSET_DIRS = { frame:"images/frames/", bg:"images/backgrounds/", cover:"images/covers/", gallery:"images/gallery/" };
-const ASSET_VERSION = "3";   // ប្តូរលេខនេះ (2, 3 …) ពេលជំនួសរូបថ្មី ដើម្បីបំបាត់ cache
+const ASSET_DIRS = { frame:"images/frames/", bg:"images/backgrounds/", cover:"images/covers/", gallery:"images/gallery/", layout:"images/layouts/" };
+// ប៊ូតុងត្រា (Seal) សម្រាប់អេក្រង់បើកដំបូងទាំង ៦ បែបដើម — រូបដាក់ក្នុង images/layouts/open/ (PNG ថ្លា)
+const SEAL_BUTTONS = {
+  none:{ label:"ប៊ូតុងធម្មតា" },
+  s1:{ label:"ត្រាទី១", file:"open/goal_tamp.png" },
+  s2:{ label:"ត្រាទី២", file:"open/goal_tamp2.png" },
+  s3:{ label:"ត្រាទី៣", file:"open/goal_tamp3.png" },
+  s4:{ label:"ត្រាទី៤", file:"open/goal_tamp4.png" }
+};
+const SEAL_BTN_STYLES = ["door","curtain","lock","rings","lotus","heart"];   // អេក្រង់បើកដែលអាចប្រើប៊ូតុងត្រាបាន
+const ASSET_VERSION = "4";   // ប្តូរលេខនេះ (2, 3 …) ពេលជំនួសរូបថ្មី ដើម្បីបំបាត់ cache
 function assetBase(){
   if(ASSET_BASE_OVERRIDE) return ASSET_BASE_OVERRIDE;
   try{ return new URL("./", location.href).href; }catch(e){ return "./"; }
 }
 const KBACH_FRAME_STYLES = {   // FRAME: នៅពីលើខ្លឹមសារ ជាប់គែមអេក្រង់
   none:{ label:"គ្មាន" },
-  frame1:{ label:"ស៊ុមទី១", file:"frame1.png", full:true },
-  frame2:{ label:"ស៊ុមទី២", file:"frame2.png", full:true },
-  frame3:{ label:"ស៊ុមទី៣", file:"frame3.png", full:true },
-  frame4:{ label:"ស៊ុមទី៤", file:"frame4.png", full:true },   // full:true = one full-screen picture (like the custom frame) instead of top/bottom halves; supports auto-snap / spread / open
-  frame5:{ label:"ស៊ុមទី៥", file:"frame5.png", full:true },
+  frame1:{ label:"ស៊ុមទី១", file:"frame1.webp", full:true },
+  frame2:{ label:"ស៊ុមទី២", file:"frame2.webp", full:true },
+  frame3:{ label:"ស៊ុមទី៣", file:"frame3.webp", full:true },
+  frame4:{ label:"ស៊ុមទី៤", file:"frame4.webp", full:true },   // full:true = one full-screen picture (like the custom frame) instead of top/bottom halves; supports auto-snap / spread / open
+  frame5:{ label:"ស៊ុមទី៥", file:"frame5.webp", full:true },
   custom:{ label:"រូបភាពផ្ទាល់ខ្លួន (JPG / PNG / GIF)" }
 };
 // ចលនារបស់ស៊ុម (frame1–5) ពេលអូសចុះក្រោម៖ ស៊ុមបាត់បន្តិចម្ដងៗតាមចម្ងាយដែលអូស (ត្រឡប់មកវិញពេលអូសឡើងលើ)។
@@ -253,7 +276,7 @@ const KBACH_BG_STYLES = {      // BACKGROUND: នៅពីក្រោយខ្�
 function kbachPresetUrl(layer, key){
   const m = (layer === "bg") ? KBACH_BG_STYLES : KBACH_FRAME_STYLES;
   if(!Object.prototype.hasOwnProperty.call(m, key) || !m[key].file) return "";
-  return assetBase() + ASSET_DIRS[layer === "bg" ? "bg" : "frame"] + m[key].file + "?v=" + ASSET_VERSION;
+  return (assetBase() + ASSET_DIRS[layer === "bg" ? "bg" : "frame"] + m[key].file + "?v=" + ASSET_VERSION).replace(/'/g, "%27");
 }
 // ឈ្មោះចាស់ (កូដគូរ) → រូបថ្មី  ដើម្បីឱ្យ draft / backup ចាស់នៅតែដំណើរការ
 const KBACH_OLD_FRAME_MAP = { floralcorners:"frame1", leafborder:"frame2", goldline:"frame3", hangflowers:"frame4" };
@@ -450,6 +473,18 @@ const TEMPLATES = {
       "We are so happy to share this special chapter of our lives with you. Your presence would mean so much to us as we begin our journey together as husband and wife.",
       "Our story is just beginning, and we would love for you to be part of it. Please join us for a celebration of love, laughter, and new beginnings."
     ]
+  },
+  thanksText:{
+    km:[
+      "ក្នុងនាមក្រុមគ្រួសារទាំងសងខាង យើងខ្ញុំសូមគោរពថ្លែងអំណរគុណយ៉ាងជ្រាលជ្រៅ ចំពោះវត្តមាន និងពរជ័យដ៏មានតម្លៃរបស់លោក លោកស្រី អ្នកនាង កញ្ញា ក្នុងពិធីអាពាហ៍ពិពាហ៍នេះ។ យើងខ្ញុំសូមអភ័យទោស ប្រសិនបើមិនបានអញ្ជើញដោយផ្ទាល់ មានការខកខានក្នុងការទទួលរាក់ទាក់ ឬមានកំហុសឆ្គងក្នុងការសរសេរនាម និងងារ។ សូមមេត្តាទទួលនូវការគោរពដ៏ខ្ពង់ខ្ពស់ពីយើងខ្ញុំ។",
+      "អរគុណអ្នកទាំងអស់គ្នា ដែលបានចំណាយពេលមកចែករំលែកក្តីសុខក្នុងថ្ងៃពិសេសរបស់ពួកយើង។ វត្តមាន និងពាក្យជូនពររបស់អ្នក ធ្វើឲ្យថ្ងៃនេះកាន់តែមានន័យ។ ប្រសិនបើយើងមិនបានអញ្ជើញអ្នកដោយផ្ទាល់ ឬមានអ្វីខ្វះចន្លោះក្នុងការទទួលរាក់ទាក់ សូមអភ័យទោសពីពួកយើងអស់ពីចិត្ត។",
+      "សូមអរគុណចំពោះវត្តមាន និងពរជ័យរបស់លោកអ្នក។ សូមអភ័យទោស ប្រសិនបើមានការខកខាន ឬខ្វះចន្លោះណាមួយក្នុងពិធីនេះ។"
+    ],
+    en:[
+      "On behalf of both our families, we extend our deepest gratitude for your honoured presence and blessings at this wedding celebration. We humbly ask your forgiveness should our invitation not have reached you in person, or should any name or title have been written incorrectly. Please accept our highest respect.",
+      "Thank you from the bottom of our hearts for taking the time to celebrate with us. Your presence and warm wishes made our day truly special. If we were unable to invite you in person, or if anything fell short of your comfort, please forgive us.",
+      "Thank you for being part of our special day. We sincerely apologise for any oversight or inconvenience."
+    ]
   }
 };
 
@@ -521,38 +556,10 @@ const PRESET_DESIGN_BASE = {
   theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"grid", galleryArts:[], coverArt:"none",
   kbachFrame:"none", frameFit:"stretch", frameOpacity:100, frameFx:"fade", frameSpread:0, frameSpreadMore:6, frameSnap:true,
   kbachBg:"none", bgFit:"cover", bgOpacity:100, bgBlur:0,
-  textAnim:"fadeup", openStyle:"door",
+  textAnim:"fadeup", openStyle:"door", layout:"none",
   coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60, coverVeil:35
 };
-const INVITATION_PRESETS = {
-  classic:{ label:"ប្រពៃណីខ្មែរ (មាស)", desc:"បើកផ្កាឈូក · ស៊ុមទី៣ + ផ្ទៃទី២ · រូបធំ-តូចឆ្លាស់ · អក្សរលេចឡើង",
-    swatch:THEMES.gold.swatch, tpl:0, timeline:0, startTime:"16:00",
-    design:Object.assign({}, PRESET_DESIGN_BASE, {
-      theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"grid",
-      galleryArts:["gallery1","gallery2","gallery3","gallery4"], coverArt:"cover1",
-      kbachFrame:"frame3", frameFx:"fade", frameOpacity:100,
-      kbachBg:"bg2", bgOpacity:60, bgBlur:0,
-      textAnim:"fadeup", openStyle:"lotus",
-      coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60, coverVeil:35 }) },
-  romantic:{ label:"ស្នេហ៍ទន់ភ្លន់ (ផ្កាឈូក)", desc:"បើកបេះដូង · ស៊ុមទី១ + ផ្ទៃទី៤ (ព្រិលស្រាល) · រូបប៉ូឡារ៉ូអ៊ីត · អក្សរព្រិលទៅច្បាស់",
-    swatch:THEMES.blush.swatch, tpl:1, timeline:1, startTime:"06:30",
-    design:Object.assign({}, PRESET_DESIGN_BASE, {
-      theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"polaroid",
-      galleryArts:["gallery3","gallery4","gallery5","gallery6"], coverArt:"cover2",
-      kbachFrame:"frame1", frameFx:"drift", frameOpacity:90,
-      kbachBg:"bg4", bgOpacity:55, bgBlur:6,
-      textAnim:"blur", openStyle:"heart",
-      coverBlur:28, coverFocusX:50, coverFocusY:30, coverSharp:55, coverVeil:25 }) },
-  elegant:{ label:"ទំនើបថ្លៃថ្នូរ (ខៀវ-មាស)", desc:"បើកវាំងនន · ស៊ុមទី៤ (ពេញអេក្រង់) + ផ្ទៃទី៥ · រូបក្រឡាការ៉េ · អក្សរស្រាយម្តងមួយពាក្យ",
-    swatch:THEMES.royal.swatch, tpl:2, timeline:2, startTime:"06:30",
-    design:Object.assign({}, PRESET_DESIGN_BASE, {
-      theme:"royal", fontKm:"koulen", fontEn:"playfair", galleryStyle:"square",
-      galleryArts:["gallery1","gallery3","gallery5","gallery6"], coverArt:"cover3",
-      kbachFrame:"frame4", frameFx:"open", frameOpacity:100,
-      kbachBg:"bg5", bgOpacity:40, bgBlur:2,
-      textAnim:"words", openStyle:"curtain",
-      coverBlur:18, coverFocusX:50, coverFocusY:40, coverSharp:70, coverVeil:45 }) }
-};
+const INVITATION_PRESETS = {};   // filled by the layout files: wib-layout-l1.js, wib-layout-l2.js … (each adds INVITATION_PRESETS.lN)
 
 const defaultState = {
   theme:"gold",
@@ -565,8 +572,10 @@ const defaultState = {
   frameFit:"stretch", frameOpacity:100, frameFx:"fade", frameSpread:0, frameSpreadMore:6, frameSnap:true,
   bgFit:"cover", bgOpacity:100, bgBlur:0,
   textAnim:"fadeup",
+  textFx:"none",
   openStyle:"door",
   coverAlways:false,
+  sealBtn:"none",
   groomName:"", brideName:"",
   eyebrow:"",
   groomNameEn:"", brideNameEn:"",
@@ -576,6 +585,7 @@ const defaultState = {
   host1:"",
   host2:"",
   welcomeTextEn:"",
+  thanksText:"", thanksTextEn:"",
   host1En:"",
   host2En:"",
   timeline:[
@@ -643,7 +653,7 @@ function dressColorName(hex, lang){
   const p = DRESS_PALETTE.find(x => x.hex === String(hex).toLowerCase());
   return p ? (lang === "en" ? p.en : p.km) : String(hex).toUpperCase();   // custom colour -> show its code
 }
-const COVER_STYLE_KEYS = ["door","curtain","lock","rings","lotus","heart"];   // keep in sync with COVER_STYLES below
+const COVER_STYLE_KEYS = ["door","curtain","lock","rings","lotus","heart","seal","tap"];   // keep in sync with COVER_STYLES below
 
 // Background song (one per project, this device). Kept out of `state` — far too big for
 // localStorage — and stored in IndexedDB instead (see the Music block below).
@@ -692,6 +702,7 @@ function migrateStyle_(s){
   s.galleryArts = s.galleryArts.filter((k, i, a) => _ho(GALLERY_ART, k) && k !== "none" && a.indexOf(k) === i).slice(0, MAX_ART);
   if(!_ho(COVER_ART, s.coverArt)) s.coverArt = "none";
   if(!_ho(TEXT_ANIM_STYLES, s.textAnim)) s.textAnim = "fadeup";
+  if(!_ho(TEXT_FX_STYLES, s.textFx)) s.textFx = "none";
   if(KBACH_WM_KEYS.indexOf(s.kbachFrame) >= 0){ s.kbachBg = s.kbachFrame; s.kbachFrame = "none"; }
   if(KBACH_OLD_FRAME_MAP[s.kbachFrame]) s.kbachFrame = KBACH_OLD_FRAME_MAP[s.kbachFrame];
   if(KBACH_OLD_BG_MAP[s.kbachBg]) s.kbachBg = KBACH_OLD_BG_MAP[s.kbachBg];
@@ -699,6 +710,8 @@ function migrateStyle_(s){
   if(!_ho(KBACH_BG_STYLES, s.kbachBg)) s.kbachBg = "none";
   if(s.bgFit !== "cover" && s.bgFit !== "stretch") s.bgFit = "cover";
   if(!COVER_STYLE_KEYS.includes(s.openStyle)) s.openStyle = "door";
+  if(!_ho(SEAL_BUTTONS, s.sealBtn)) s.sealBtn = "none";
+  if(typeof s.layout !== "string") s.layout = "none";   // checked against LAYOUTS (wib-layouts.js) when drawing; unknown id = no layout
   if(s.frameFit !== "stretch" && s.frameFit !== "cover") s.frameFit = "stretch";
   if(!_ho(FRAME_FX, s.frameFx)) s.frameFx = "fade";
   const num = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
@@ -752,4 +765,3 @@ function escapeHtml(s){
   return (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 const hasOwn = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
-

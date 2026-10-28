@@ -3,6 +3,24 @@
    Load order in index.html:  wib-data.js → wib-render.js → wib-pickers.js → wib-ui.js
    (they share one global scope, so keep this order)
    ========================================================================== */
+// ---------- Seal button (ប៊ូតុងត្រា) for the 6 classic opening screens: the seal picture replaces the plain button ----------
+const SEAL_BTN_CSS = `
+.open-cover .oc-btn.oc-sealbtn{background:none !important;box-shadow:none !important;padding:0;border-radius:0;gap:8px;animation:none;color:var(--ink);}
+.open-cover.oc-s-door .oc-sealbtn,.open-cover.oc-s-curtain .oc-sealbtn,.open-cover.oc-s-lock .oc-sealbtn{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);}
+.oc-sealwrap{position:relative;display:block;width:128px;height:128px;animation:oc-sealpop 3.2s ease-in-out infinite;filter:drop-shadow(0 5px 7px rgba(0,0,0,.38));transition:transform .55s ease,opacity .45s ease;}
+.oc-sealwrap::before,.oc-sealwrap::after{content:"";position:absolute;inset:6%;border:2px solid color-mix(in srgb,var(--accent-2) 85%,transparent);border-radius:50%;pointer-events:none;opacity:0;animation:oc-sealring 4.2s ease-out infinite;}
+.oc-sealwrap::after{animation-delay:2.1s;}
+.oc-sealbtn-pic{display:block;width:100%;height:100%;object-fit:contain;}
+.oc-sealwrap.ly-missing{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23C9A227'/%3E%3Cpath d='M40 30v40l32-20z' fill='%23fff'/%3E%3C/svg%3E") center/62% no-repeat;}
+.oc-sealwrap.ly-missing .oc-sealbtn-pic{display:none;}
+.oc-sealbtn .oc-km{font-size:15px;font-weight:600;line-height:1.6;}
+.oc-sealbtn .oc-en{font-size:12.5px;opacity:.9;}
+@keyframes oc-sealpop{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+@keyframes oc-sealring{0%{transform:scale(.8);opacity:.9;}100%{transform:scale(1.7);opacity:0;}}
+.open-cover.opening .oc-sealwrap{animation:none;transform:scale(1.4) rotate(14deg);opacity:0;}
+.open-cover.opening .oc-sealwrap::before,.open-cover.opening .oc-sealwrap::after{animation:none;opacity:0;}
+@media(prefers-reduced-motion:reduce){.oc-sealwrap,.oc-sealwrap::before,.oc-sealwrap::after{animation:none !important;}}`;
+
 // ---------- Build the cover-opening + background-music markup for one rendered invitation ----------
 function buildMusicParts(s){
   const music = (musicAsset && musicAsset.dataUrl) ? musicAsset : null;
@@ -13,16 +31,21 @@ function buildMusicParts(s){
   const names = [s.groomName || s.groomNameEn, s.brideName || s.brideNameEn].filter(Boolean).map(escapeHtml).join(" & ");
   const g = s.__guestName ? escapeHtml(s.__guestName) : "";
   const previewAttr = s.__preview ? ' data-preview="1"' : "";
-  const p = cfg.parts({ names });
+  const p = cfg.parts({ names, s });
+  // seal button: only for the 6 classic screens, and never when a layout is on (a layout brings its own seal)
+  const sealKey = (!layoutOf_(s) && SEAL_BTN_STYLES.indexOf(key) >= 0 && hasOwn(SEAL_BUTTONS, s.sealBtn) && s.sealBtn !== "none") ? s.sealBtn : "";
 
   const namesHtml = (names && p.names !== false) ? `<p class="oc-names display oc-fade">${names}</p>` : "";
-  const btnHtml = g
-    ? `<button class="oc-btn oc-fade" id="openBtn" type="button"><span class="oc-km">ជូនចំពោះ ${g}</span><span class="oc-en">Dear ${g}</span></button>`
-    : `<button class="oc-btn oc-fade" id="openBtn" type="button"><span class="oc-km">ចុចដើម្បីបើកធៀបអញ្ជើញ</span><span class="oc-en">Tap to open your invitation</span></button>`;
-  const hintHtml = (g ? `<p class="oc-hint oc-fade">ចុចដើម្បីបើកធៀបអញ្ជើញ<span>Tap to open your invitation</span></p>` : "")
+  const capHtml = (g && !p.genericBtn)
+    ? `<span class="oc-km">ជូនចំពោះ ${g}</span><span class="oc-en">Dear ${g}</span>`
+    : `<span class="oc-km">ចុចដើម្បីបើកធៀបអញ្ជើញ</span><span class="oc-en">Tap to open your invitation</span>`;
+  const btnHtml = sealKey
+    ? `<button class="oc-btn oc-sealbtn oc-fade" id="openBtn" type="button"><span class="oc-sealwrap">${lySealImg_({ file: SEAL_BUTTONS[sealKey].file }, "oc-sealbtn-pic")}</span>${capHtml}</button>`
+    : `<button class="oc-btn oc-fade" id="openBtn" type="button">${capHtml}</button>`;
+  const hintHtml = ((g && !p.genericBtn) ? `<p class="oc-hint oc-fade">ចុចដើម្បីបើកធៀបអញ្ជើញ<span>Tap to open your invitation</span></p>` : "")
     + (music ? `<p class="oc-hint oc-fade">សូមបើកសំឡេងដើម្បីស្តាប់ចម្រៀង<span>Turn your sound on for the music</span></p>` : "");
 
-  const css = (music ? MUSIC_BTN_CSS : "") + OC_BASE_CSS + cfg.css;
+  const css = (music ? MUSIC_BTN_CSS : "") + OC_BASE_CSS + cfg.css + (sealKey ? SEAL_BTN_CSS : "");
 
   const musicHtml = music ? `
 <audio id="bgm" src="${music.dataUrl}" loop preload="metadata"></audio>
@@ -31,7 +54,7 @@ function buildMusicParts(s){
   <svg class="ico-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
 </button>` : "";
   const html = musicHtml + `
-<div class="open-cover oc-s-${key}" id="openCover" role="dialog" aria-modal="true" aria-label="Open invitation"${previewAttr}>${p.behind || ""}<div class="oc-inner">${p.top || ""}${namesHtml}${p.mid || ""}${btnHtml}${hintHtml}</div></div>`;
+<div class="open-cover oc-s-${key}" id="openCover" role="dialog" aria-modal="true" aria-label="Open invitation"${previewAttr}>${p.behind || ""}<div class="oc-inner">${p.top || ""}${namesHtml}${p.mid || ""}${btnHtml}${p.after || ""}${hintHtml}</div></div>`;
 
   const js = `
 var ocEl=document.getElementById('openCover');
@@ -204,6 +227,7 @@ function buildSection(s, t, lang){
   const bride = isKm ? s.brideName : (s.brideNameEn || s.brideName);
   const eyebrow = isKm ? s.eyebrow : (s.eyebrowEn || s.eyebrow);
   const welcome = isKm ? s.welcomeText : (s.welcomeTextEn || s.welcomeText);
+  const thanksNote = isKm ? s.thanksText : (s.thanksTextEn || s.thanksText);
   const host1 = isKm ? s.host1 : (s.host1En || s.host1);
   const host2 = isKm ? s.host2 : (s.host2En || s.host2);
   const venueName = isKm ? s.venueName : (s.venueNameEn || s.venueName);
@@ -237,7 +261,9 @@ function buildSection(s, t, lang){
   // couple stands out. The photo is passed once as a CSS variable and painted by three stacked layers.
   const cnum = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
   const cBlur = cnum(s.coverBlur, 0, 40, 22), cFx = cnum(s.coverFocusX, 0, 100, 50), cFy = cnum(s.coverFocusY, 0, 100, 35), cSharp = cnum(s.coverSharp, 30, 95, 60), cVeil = cnum(s.coverVeil, 0, 100, 35);
-  const coverSrc = s.coverPhoto || coverArtUrl(s);   // uploaded cover photo, otherwise the chosen stand-in picture from GitHub
+  const lyOn = layoutOf_(s);   // ready-made layout (wib-layouts.js) or null
+  const rawCover = s.coverPhoto || coverArtUrl(s);
+  const coverSrc = (lyOn && lyOn.kind !== "behind") ? "" : rawCover;   // uploaded cover photo, otherwise the chosen stand-in picture from GitHub
   const heroStyle = coverSrc ? ` style="--cover:url('${coverSrc}');--fx:${cFx}%;--fy:${cFy}%;--blur:${cBlur}px;--rx:${cSharp}%;--ry:${Math.round(cSharp * 0.93)}%;--veil:${(cVeil / 100).toFixed(2)};"` : "";
   const heroLayers = coverSrc ? `<span class="hb hb-blur"></span><span class="hb hb-sharp"></span><span class="hb hb-tint"></span>` : "";
   // stand-in picture (from GitHub) = shown clean: no blur, no colour veil. Uploaded photo: blur 0 = no blur at all.
@@ -325,14 +351,20 @@ ${mapPrev.openUrl ? `<a class="map-btn" href="${escapeHtml(mapPrev.openUrl)}" ta
 <p class="section-sub">${L.dressSub}</p>
 <div class="dress-card">${dressRows}</div>
 </div></section>` : "";
-  const bodySections = [secWelcome, secCountdown, secProgram, secDress, secGallery, secVideo, secVenue, secContacts, secGift].filter(Boolean).join(divider);
+  // Gratitude & humble apology: optional, shown only when the owner wrote something (last block before the footer)
+  const secThanks    = (thanksNote || "").trim() ? `<section><div class="wrap">
+<h2 class="section-title display">${L.thanksTitle}</h2>
+<div class="welcome thanks-note"><p>${escapeHtml(thanksNote)}</p></div>
+</div></section>` : "";
+  const bodySections = [secWelcome, secCountdown, secProgram, secDress, secGallery, secVideo, secVenue, secContacts, secGift, secThanks].filter(Boolean).join(divider);
 
+  const lyp = lyHeroParts_(s, lang, { rawCover, artUrls: galleryArtUrls(s) });
   return `<section id="section${suf}" class="lang-section lang-${lang}" style="display:${isKm ? "block" : "none"}">
 <p class="guest-line" id="guestLine${suf}"${guestLineAttrs}>${escapeHtml(guestLineText)}</p>
-<section class="${heroClass}"${heroStyle}>${heroLayers}
-<p class="eyebrow">${escapeHtml(eyebrow)}</p>
+<section class="${heroClass}${lyOn ? " ly-hero ly-" + lyOn.id : ""}"${heroStyle}>${heroLayers}${lyp.pre}
+<p class="eyebrow">${escapeHtml(eyebrow)}</p>${lyp.mid}
 <h1 class="names display">${escapeHtml(groom)}<span class="amp">${escapeHtml(L.and)}</span>${escapeHtml(bride)}</h1>
-<p class="hero-date">${displayDate}</p>
+<p class="hero-date">${displayDate}</p>${lyp.post}
 </section>
 ${bodySections}
 <footer><div class="thanks display">${L.thanks}</div><div>${escapeHtml(groom)} ${L.and} ${escapeHtml(bride)}</div></footer>
@@ -484,6 +516,80 @@ body.wa-on .hero .wa{transition:opacity 1.2s ease var(--wd,0ms),transform 1.3s c
 body.wa-on.wa-fadeup .hero .wa:not(.wa-in){transform:translateY(46px);}
 body.wa-on.wa-blur .hero .wa:not(.wa-in){filter:blur(18px);transform:scale(.9);}
 `;
+}
+// ---------- Text effect (ឥទ្ធិពលអក្សរ): gradient / bevel / glow / shadow + reflection on section titles and the groom-bride names ----------
+// Colours come from the theme (--accent-1 / --accent-2), so it matches every theme and layout. Drop-shadow filters are skipped
+// while the "blur" scroll animation is on (that animation also uses `filter`).
+function buildTextFxCss(fx, ta){
+  if(!fx || fx === "none") return "";
+  const TS = ".section-title,.hero:not(.has-cover) .names";                // titles + names without a photo
+  const TC = ".hero.has-cover .names";                                     // names over a photo
+  const WS = ".section-title .wa-w,.hero:not(.has-cover) .names .wa-w";    // words created by the scroll animation
+  const WC = ".hero.has-cover .names .wa-w";
+  const A = ".hero .names .amp,.hero.has-cover .names .amp";
+  const filt = v => (ta === "blur" ? "" : "filter:" + v + " !important;");
+  const CLIP = "-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;text-shadow:none;";
+  const GRAD  = "background:linear-gradient(180deg,color-mix(in srgb,var(--accent-2) 62%,#fff) 0%,var(--accent-2) 36%,var(--accent-1) 74%,color-mix(in srgb,var(--accent-1) 72%,#000) 100%);" + CLIP;
+  const GRADC = "background:linear-gradient(180deg,#fffbe8 0%,color-mix(in srgb,var(--accent-2) 50%,#fff) 42%,color-mix(in srgb,var(--accent-2) 88%,#fff) 100%);" + CLIP;   // lighter, for names over a photo
+  const RIM = "-webkit-text-stroke:.5px color-mix(in srgb,var(--accent-2) 50%,#000);paint-order:stroke fill;";
+  const DOME  = "background:linear-gradient(180deg,color-mix(in srgb,var(--accent-2) 42%,#fff) 0%,var(--accent-2) 46%,color-mix(in srgb,var(--accent-2) 70%,#000) 100%);" + CLIP + RIM;
+  const DOMEC = "background:linear-gradient(180deg,#fffbe8 0%,color-mix(in srgb,var(--accent-2) 48%,#fff) 46%,color-mix(in srgb,var(--accent-2) 82%,#fff) 100%);" + CLIP + "-webkit-text-stroke:.4px color-mix(in srgb,var(--accent-2) 60%,#000);";   // lighter, for names over a photo
+  const REFLECT = "-webkit-box-reflect:below -.05em linear-gradient(transparent 78%,rgba(255,255,255,.4));margin-bottom:.2em;";
+  const REFLECT_N = "-webkit-box-reflect:below -.05em linear-gradient(transparent 86%,rgba(255,255,255,.4));margin-bottom:.35em;";   // names are taller, so more room below
+  const grad = (fS, fC, rf, G = GRAD, GC = GRADC) => `${TS}{${G}${fS}${rf ? REFLECT : ""}}${rf ? ".hero:not(.has-cover) .names{margin-bottom:.35em;}" : ""}${TC}{${GC}${fC}${rf ? REFLECT_N : ""}}.hero.has-cover .names::before{display:none;}${WS}{${G}}${WC}{${GC}}${A}{color:transparent;-webkit-text-fill-color:transparent;text-shadow:none;}`;   // the dark blob behind photo names would paint OVER the gradient (filter makes a stacking context), so it is hidden and a stronger shadow is used instead
+  // ---- 5 looks, ALL built on the same "3-D gold" base (metal gradient + thickness + bevel edge) so they match each other;
+  //      each one then pushes ONE ingredient to the front: gradient = metal shine · bevel = thickness · glow = light · shadow = long shadow · luxury = everything + Khmer pattern
+  const M = (c, p, w) => `color-mix(in srgb,${c} ${p}%,${w})`;
+  const A1 = "var(--accent-1)", A2 = "var(--accent-2)";
+  const DK = M(A2, 45, "#000"), DK2 = M(A2, 28, "#000");
+  // o: hl = top edge highlight · depth = thickness layers · dx,dy = direction of the thickness · glow = [r1,c1,r2,c2] · sb,sa = soft shadow blur/alpha
+  const STACK = o => `drop-shadow(-.5px -.5px 0 rgba(255,255,255,${o.hl})) ` + Array(o.depth).fill(`drop-shadow(${o.dx || 0}px ${o.dy || 1}px 0 ${o.dk || DK})`).join(" ")
+    + (o.glow ? ` drop-shadow(0 0 ${o.glow[0]}px ${o.glow[1]}) drop-shadow(0 0 ${o.glow[2]}px ${o.glow[3]})` : "")
+    + ` drop-shadow(0 ${o.sb}px ${o.sb}px rgba(0,0,0,${o.sa}))`;
+  const FX = (o, oc) => [filt(STACK(o)), filt(STACK(Object.assign({}, o, oc || {}, { sa:.6, sb:(o.sb || 4) + 5 })))];   // [titles / names on plain page, names over a photo (stronger shadow)]
+  // fills
+  const FOIL  = `background:linear-gradient(180deg,${M(A1,42,"#fff")} 0%,${A1} 30%,${A2} 49%,${M(A2,58,"#000")} 52%,${M(A2,88,"#000")} 70%,${A1} 100%);` + CLIP;   // sharp "horizon" = reflection in polished metal
+  const FOILC = `background:linear-gradient(180deg,#fffbe8 0%,${M(A1,62,"#fff")} 38%,${A1} 52%,${M(A2,80,"#fff")} 100%);` + CLIP;
+  const SATIN  = `background:linear-gradient(100deg,${M(A1,45,"#fff")} 0%,${A1} 24%,${A2} 46%,${M(A2,66,"#000")} 60%,${A2} 76%,${M(A1,50,"#fff")} 100%);` + CLIP;
+  const SATINC = `background:linear-gradient(100deg,#fffbe8 0%,${M(A1,70,"#fff")} 32%,${A1} 58%,${M(A2,72,"#fff")} 100%);` + CLIP;
+  const PALE  = `background:linear-gradient(180deg,#fffef4 0%,${M(A1,35,"#fff")} 45%,${A1} 100%);` + CLIP;     // light fill so the halo shows
+  const SOLID = `background:linear-gradient(180deg,${M(A1,70,"#fff")} 0%,${A1} 55%,${A2} 100%);` + CLIP;       // calm fill so the thickness shows
+  // ---- 5 extra looks from the reference table (fixed colours on purpose, they do NOT follow the theme). Keys: gold3d · neon · glass · popart · chrome ----
+  if(fx === "gold3d") fx = "gradient";   // 1 modern shiny gold = the gradient look above
+  const HALOS = (c1, c2) => `0 0 3px #fff,0 0 8px ${c1},0 0 18px ${c1},0 0 34px ${c2},0 0 58px ${c2}`;
+  if(fx === "neon"){   // 2 neon glow: white-hot core, pink halo, cyan outer glow
+    const N = x => `color:#fff !important;-webkit-text-fill-color:#fff !important;text-shadow:${HALOS("#ff2bd6", "#22e6ff")}${x};`;
+    return `${TS}{${N("")}}${TC}{${N(",0 2px 8px rgba(0,0,0,.55)")}}`;
+  }
+  if(fx === "glass"){  // 3 glass: see-through letters, thin white edge, soft light from the top
+    const GL = `background:linear-gradient(180deg,rgba(255,255,255,.7) 0%,rgba(255,255,255,.22) 55%,rgba(255,255,255,.08) 100%);` + CLIP + `-webkit-text-stroke:1px rgba(255,255,255,.85);`;
+    return grad(filt("drop-shadow(0 2px 6px rgba(0,0,0,.28))"), filt("drop-shadow(0 2px 8px rgba(0,0,0,.6))"), false, GL, GL);
+  }
+  if(fx === "popart"){ // 4 pop art: bright fill, thick black outline, hard long red shadow
+    const LS = (c, n) => Array.from({ length:n }, (_, i) => `${i + 1}px ${i + 1}px 0 ${c}`).join(",");
+    const PA = `color:#ffd400 !important;-webkit-text-fill-color:#ffd400 !important;-webkit-text-stroke:2px #111;paint-order:stroke fill;text-shadow:${LS("#ff3d5a", 8)};`;
+    return `${TS}{${PA}}${TC}{${PA}}`;
+  }
+  if(fx === "chrome"){ // 5 chrome / liquid silver: sharp reflection bands, cool tones, hard bevel
+    const CH = `background:linear-gradient(180deg,#ffffff 0%,#d5dde8 26%,#6f7f95 47%,#f2f7ff 50%,#a5b6cc 66%,#3b4759 100%);` + CLIP;
+    const CHF = filt("drop-shadow(0 -.5px 0 rgba(255,255,255,.9)) drop-shadow(0 1px 0 #2c3646) drop-shadow(0 2px 0 #2c3646) drop-shadow(0 3px 0 #1d2531) drop-shadow(0 5px 5px rgba(0,0,0,.4))");
+    return grad(CHF, CHF, false, CH, CH);
+  }
+  // 1 gradient — polished 3-D gold (metal shine is the star; thin thickness + a hint of glow)
+  if(fx === "gradient"){ const f = FX({ hl:.7, depth:3, dy:1, glow:[3, M(A1,55,"transparent"), 9, M(A1,30,"transparent")], sb:4, sa:.3 }); return grad(f[0], f[1], false, FOIL, FOILC); }
+  // 2 bevel — chunky 3-D block (thickness is the star; calm gold fill + strong top edge)
+  if(fx === "bevel"){ const f = FX({ hl:.9, depth:6, dy:1, dx:.6, dk:DK, sb:5, sa:.38 }); return grad(f[0], f[1], false, SOLID, FOILC); }
+  // 3 glow — golden light (halo is the star; pale fill, a little thickness)
+  if(fx === "glow"){ const f = FX({ hl:.5, depth:1, dy:1, dk:DK2, glow:[5, A1, 16, M(A2,80,"transparent")], sb:2, sa:.12 }, { glow:[4, A1, 12, M(A2,80,"transparent")] }); return grad(f[0], f[1], false, PALE, PALE); }
+  // 4 shadow — long diagonal shadow (shadow is the star; satin gold fill)
+  if(fx === "shadow"){ const f = FX({ hl:.6, depth:9, dx:1, dy:1, dk:M(A2,50,"#000"), sb:5, sa:.28 }, { dk:"rgba(0,0,0,.8)" }); return grad(f[0], f[1], true, SATIN, SATINC); }
+  // 5 luxury — everything together: polished gold + Khmer lattice pattern inside the letters + thickness + glow + mirror reflection
+  if(fx !== "luxury") return "";
+  const TILE = "url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2728%27 height=%2728%27 viewBox=%270 0 28 28%27%3E%3Cg fill=%27none%27 stroke=%27%235E3E08%27 stroke-opacity=%27.5%27 stroke-width=%27.9%27%3E%3Cpath d=%27M0 14L14 0L28 14L14 28Z%27/%3E%3Cpath d=%27M14 5C17 8 17 11 14 14C11 11 11 8 14 5Z%27/%3E%3Cpath d=%27M14 14C18 13 21 11 21 7M14 14C10 13 7 11 7 7%27 /%3E%3Cpath d=%27M14 14C18 15 21 17 21 21M14 14C10 15 7 17 7 21%27/%3E%3C/g%3E%3Cg fill=%27%235E3E08%27 fill-opacity=%27.45%27%3E%3Ccircle cx=%2714%27 cy=%2714%27 r=%271.6%27/%3E%3Ccircle cx=%270%27 cy=%270%27 r=%271.4%27/%3E%3Ccircle cx=%2728%27 cy=%270%27 r=%271.4%27/%3E%3Ccircle cx=%270%27 cy=%2728%27 r=%271.4%27/%3E%3Ccircle cx=%2728%27 cy=%2728%27 r=%271.4%27/%3E%3C/g%3E%3Cg fill=%27none%27 stroke=%27%23FFF3C2%27 stroke-opacity=%27.45%27 stroke-width=%27.6%27%3E%3Cpath d=%27M14.6 5.6C17.4 8.4 17.4 11 14.8 13.4%27/%3E%3Cpath d=%27M1 14.6L14.6 1%27/%3E%3C/g%3E%3C/svg%3E')";
+  const LUX  = `background:${TILE} 0 0/18px 18px,linear-gradient(180deg,${M(A1,42,"#fff")} 0%,${A1} 30%,${A2} 49%,${M(A2,58,"#000")} 52%,${M(A2,88,"#000")} 70%,${A1} 100%);` + CLIP;
+  const LUXC = `background:${TILE} 0 0/18px 18px,linear-gradient(180deg,#fffbe8 0%,${M(A1,65,"#fff")} 45%,${A1} 100%);` + CLIP;
+  const f = FX({ hl:.7, depth:3, dy:1, glow:[4, M(A1,50,"transparent"), 12, M(A1,28,"transparent")], sb:4, sa:.35 });
+  return grad(f[0], f[1], true, LUX, LUXC);
 }
 function buildTextAnimJs(mode, isPreview){
   if(mode === "none") return { defs:"", init:"" };
@@ -711,7 +817,8 @@ function buildCalendarCfg(s, targetIso){
 }
 
 function renderInvitation(s){
-  const t = THEMES[s.theme];
+  const t = layoutTheme_(s);   // colour theme, or the layout's own palette
+  const ly = layoutOf_(s);
   const fk = FONT_KM[hasOwn(FONT_KM, s.fontKm) ? s.fontKm : (THEME_FONT_DEFAULTS[s.theme] || THEME_FONT_DEFAULTS.gold)[0]];
   const fe = FONT_EN[hasOwn(FONT_EN, s.fontEn) ? s.fontEn : (THEME_FONT_DEFAULTS[s.theme] || THEME_FONT_DEFAULTS.gold)[1]];
   const targetIso = (s.eventDate && s.startTime) ? `${s.eventDate}T${s.startTime}:00+07:00` : "";
@@ -719,10 +826,11 @@ function renderInvitation(s){
   const enSection = buildSection(s, t, "en");
   const LKM = LABELS.km, LEN = LABELS.en;
   const bodyClass = s.__guestName ? " class=\"guest-mode\"" : "";
-  const mp = buildMusicParts(s);
+  const mp = buildMusicParts(ly ? Object.assign({}, s, { openStyle: ly.openStyle }) : s);
   const ta = hasOwn(TEXT_ANIM_STYLES, s.textAnim) ? s.textAnim : "fadeup";
   const taJs = buildTextAnimJs(ta, !!s.__preview);
-  const frameFxJs = buildFrameSnapJs(s) + buildFrameFxJs(s);
+  const sFx = ly ? Object.assign({}, s, { kbachFrame:"none", kbachBg:"none" }) : s;   // a layout draws its own frame/background
+  const frameFxJs = buildFrameSnapJs(sFx) + buildFrameFxJs(sFx);
   const lbx = buildLightbox();
   const calJs = (targetIso && !isNaN(Date.parse(targetIso))) ? `try{(${wibCalendarRuntime.toString()})(${JSON.stringify(buildCalendarCfg(s, targetIso)).replace(/</g, "\\u003c")});}catch(e){}` : "";
 
@@ -901,8 +1009,8 @@ body.guest-mode .lang-toggle{top:62px;}
 .fx-toggle button.active{background:var(--accent-1);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);}
 body.guest-mode .fx-toggle{top:62px;}
 @media(max-width:480px){.hero{padding:40px 18px 30px;}.welcome{padding:22px 20px;}.lang-toggle{top:10px;right:10px;}.lang-toggle button{padding:7px 12px;font-size:12px;}body.guest-mode .lang-toggle{top:56px;}.fx-toggle{top:10px;left:10px;}.fx-toggle button{width:28px;height:28px;font-size:13px;}body.guest-mode .fx-toggle{top:56px;}}
-${mp.css}${buildTextAnimCss(ta)}${lbx.css}</style></head><body${bodyClass}>
-${buildKbachFrameOverlay(s.kbachBg, t, s, "bg")}${buildKbachFrameOverlay(s.kbachFrame, t, s, "frame")}
+${ly ? buildLayoutCss_(ly) : ""}${mp.css}${buildTextAnimCss(ta)}${buildTextFxCss(s.textFx, ta)}${lbx.css}</style></head><body${bodyClass}>
+${ly ? buildLayoutLayers_(ly, t) : buildKbachFrameOverlay(s.kbachBg, t, s, "bg") + buildKbachFrameOverlay(s.kbachFrame, t, s, "frame")}
 <div class="lang-toggle">
   <button id="btn-km" class="active" type="button">${LKM.toggleKm}</button>
   <button id="btn-en" type="button">${LEN.toggleEn}</button>
@@ -948,6 +1056,7 @@ try{
     document.body.classList.add('guest-mode');
   }
 }catch(e){}
+${ly ? lyGuestJs_() : ""}
 
 ${calJs}
 
@@ -1093,4 +1202,3 @@ ${lbx.js}
 })();<\/script>
 </body></html>`;
 }
-

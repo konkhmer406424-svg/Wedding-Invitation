@@ -188,17 +188,39 @@ function buildTextAnimSelect(){
       try{ sessionStorage.removeItem("wib-anim-seen"); }catch(e){}   // replay the animation in the preview straight away
       update();
     });
+  buildTextFxSelect();
+}
+function buildTextFxSelect(){
+  if(!hasOwn(TEXT_FX_STYLES, state.textFx)) state.textFx = "none";
+  renderPicker("pickTextFx", Object.keys(TEXT_FX_STYLES).map(k => ({ key:k, title:TEXT_FX_STYLES[k].label,
+    inner: '<span class="tfx tfx-' + k + '">កខ</span>' })),
+    state.textFx, k => { state.textFx = k; buildTextFxSelect(); update(); });
 }
 function buildCoverStyleSelect(){
   if(!hasOwn(COVER_STYLES, state.openStyle)) state.openStyle = "door";
-  renderPicker("pickCover", COVER_STYLE_KEYS.map(k => ({ key:k, title:COVER_STYLES[k].label, inner:COVER_ICONS[k] })),
+  renderPicker("pickCover", COVER_STYLE_KEYS.map(k => ({ key:k, title:COVER_STYLES[k].label, inner:COVER_ICONS[k] || COVER_STYLES[k].icon })),
     state.openStyle, k => {
       state.openStyle = k; buildCoverStyleSelect();
       try{ sessionStorage.removeItem("wib-cover-seen"); }catch(e){}   // show the new style in the preview straight away
       update();
     });
+  buildSealSelect();
   $("coverAlways").checked = !!state.coverAlways;
   refreshMusicUI();
+}
+// ប៊ូតុងត្រា — បង្ហាញតែពេលប្រើអេក្រង់បើកបែបដើម ហើយមិនមាន Layout (Layout មានត្រារបស់ខ្លួនរួចហើយ)
+function buildSealSelect(){
+  const g = $("sealBtnGroup"); if(!g) return;
+  if(!hasOwn(SEAL_BUTTONS, state.sealBtn)) state.sealBtn = "none";
+  const hasLy = (typeof layoutOf_ === "function") && !!layoutOf_(state);
+  g.style.display = (!hasLy && SEAL_BTN_STYLES.indexOf(state.openStyle) >= 0) ? "" : "none";
+  renderPicker("pickSeal", Object.keys(SEAL_BUTTONS).map(k => ({ key:k, title:SEAL_BUTTONS[k].label,
+    inner: k === "none" ? NONE_ICON : '<img class="seal-thumb" src="' + lyUrl_(SEAL_BUTTONS[k].file) + '" alt="" onerror="this.style.display=\'none\'">' })),
+    state.sealBtn, k => {
+      state.sealBtn = k; buildSealSelect();
+      try{ sessionStorage.removeItem("wib-cover-seen"); }catch(e){}   // show it in the preview straight away
+      update();
+    });
 }
 $("coverAlways").addEventListener("change", e => {
   state.coverAlways = e.target.checked;
@@ -518,4 +540,3 @@ function buildPhotos(){
     });
   });
 }
-
