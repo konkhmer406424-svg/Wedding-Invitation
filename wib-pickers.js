@@ -222,6 +222,23 @@ function buildSealSelect(){
       update();
     });
 }
+// ប្រភេទផ្កា — បង្ហាញតែពេល layout ដែលបានជ្រើសមាន sets (l5: កុលាបស · ផ្ការំដួល · លីលីឈូក)
+function buildFlowerSetSelect(){
+  const g = $("flowerSetGroup"); if(!g) return;
+  const ly = (typeof layoutOf_ === "function") ? layoutOf_(state) : null;
+  const sets = (ly && ly.sets) ? ly.sets : null;
+  g.style.display = sets ? "" : "none";
+  if(!sets) return;
+  const keys = Object.keys(sets);
+  if(!hasOwn(sets, state.flowerSet)) state.flowerSet = hasOwn(sets, ly.defaultSet) ? ly.defaultSet : keys[0];
+  renderPicker("pickFlowerSet", keys.map(k => ({ key:k, title:sets[k].label,
+    inner:'<img class="flower-thumb" src="' + lyUrl_(sets[k].thumb) + '" alt="" onerror="this.style.display=\'none\'"><span class="flower-cap">' + escapeHtml(sets[k].label) + '</span>' })),
+    state.flowerSet, k => {
+      state.flowerSet = k; buildFlowerSetSelect();
+      try{ sessionStorage.removeItem("wib-cover-seen"); }catch(e){}   // show the new flowers on the cover straight away
+      update();
+    });
+}
 $("coverAlways").addEventListener("change", e => {
   state.coverAlways = e.target.checked;
   try{ sessionStorage.removeItem("wib-cover-seen"); }catch(err){}

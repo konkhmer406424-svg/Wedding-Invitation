@@ -1376,7 +1376,7 @@ refreshMusicUI();
 // ---------------------------------------------------------------------
 function refreshAllBuildersFromState_(){
   buildThemeSelect(); buildFontSelects(); buildCoverStyleSelect(); buildGalleryStyleSelect(); buildGalleryArtSelect(); buildCoverArtSelect();
-  buildKbachFrameSelect(); buildTextAnimSelect(); buildTimeline(); buildTimelineTemplates(); buildContacts();
+  buildKbachFrameSelect(); buildFlowerSetSelect(); buildTextAnimSelect(); buildTimeline(); buildTimelineTemplates(); buildContacts();
   buildPhotos(); buildCoverPhoto(); buildKhqr(); buildDressColors(); buildTemplateChips(); bindSimpleFields(); update();
 }
 function buildPresetCards(){
@@ -1388,6 +1388,7 @@ function buildPresetCards(){
     return `<button type="button" class="preset-card${on}" data-id="${id}" title="${p.desc}"><span class="preset-swatch" style="background:${p.swatch}"></span><span class="preset-txt"><b>${p.label}</b><small>${p.desc}</small></span></button>`;
   }).join("") + `<button type="button" class="preset-card${(!state.layout || state.layout === "none") ? " on" : ""}" data-id="__none" title="ប្រើការរចនាធម្មតា"><span class="preset-swatch" style="background:repeating-linear-gradient(45deg,#e9e9e9,#e9e9e9 6px,#fff 6px,#fff 12px)"></span><span class="preset-txt"><b>គ្មានឈុត</b><small>រចនាធម្មតា — ជ្រើសពណ៌ ស៊ុម ផ្ទៃ និងការបើកដោយខ្លួនឯង</small></span></button>`;
   box.querySelectorAll(".preset-card").forEach(b => b.addEventListener("click", () => { if(b.dataset.id === "__none") clearLayout(); else applyPreset(b.dataset.id); }));
+  if(typeof buildFlowerSetSelect === "function") buildFlowerSetSelect();   // flower-type picker (only for a layout that has sets, e.g. l5)
 }
 function clearLayout(){
   state.layout = "none";
@@ -1453,7 +1454,7 @@ function normalizeImported(raw){
   s.venueMapLink = /^https?:\/\/\S+$/i.test(bkStr(r.venueMapLink, 2000).trim()) ? bkStr(r.venueMapLink, 2000).trim() : "";
   s.guestNamesFileRaw = bkStr(r.guestNamesFileRaw, 500000);
   s.theme = (typeof r.theme === "string" && hasOwn(THEMES, r.theme)) ? r.theme : defaultState.theme;
-  ["kbachFrame","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadMore","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","layout","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil","sealBtn","textFx"]
+  ["kbachFrame","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadMore","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","layout","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil","sealBtn","textFx","flowerSet"]
     .forEach(k => { if(r[k] !== undefined) s[k] = r[k]; });
   s.galleryArts = Array.isArray(r.galleryArts) ? r.galleryArts : (typeof r.galleryArt === "string" ? [r.galleryArt] : []);   // cleaned by migrateStyle_
   if(!hasOwn(COVER_ART, s.coverArt)) s.coverArt = "none";

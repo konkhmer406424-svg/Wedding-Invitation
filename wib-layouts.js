@@ -31,6 +31,15 @@ function layoutOf_(s){
   const id = s && s.layout;
   if(typeof id !== "string" || !Object.prototype.hasOwnProperty.call(LAYOUTS, id)) return null;
   const ly = LAYOUTS[id]; ly.id = id;
+  // A layout with  sets:{ key:{ label, thumb, palette, art, clips } }  (e.g. l5 = 3 flower types) gives back the set chosen in s.flowerSet
+  // (its own art / palette / clips merged over the layout). Everything else about the layout stays the same.
+  if(ly.sets){
+    const has = k => typeof k === "string" && Object.prototype.hasOwnProperty.call(ly.sets, k);
+    const key = has(s.flowerSet) ? s.flowerSet : (has(ly.defaultSet) ? ly.defaultSet : Object.keys(ly.sets)[0]);
+    ly.__v = ly.__v || {};
+    if(!ly.__v[key]) ly.__v[key] = Object.assign({}, ly, ly.sets[key], { id:id, setKey:key });
+    return ly.__v[key];
+  }
   return ly;
 }
 // Theme object actually used while rendering: the layout's own palette wins over the colour theme.
@@ -138,6 +147,13 @@ function lyFrameHtml_(F, noTrim){
         + `</div>`;
       return html;
     }
+    if(F.layout === "diag"){
+      // 2 corner pieces only — TOP-LEFT (file) and BOTTOM-RIGHT (file2), each its own picture, NOT mirrored (diagonal flower composition)
+      // width = size of one piece · offset = gap from the screen edge · z = layer (default 60) · opacity
+      const dg = (k, file) => file ? `<img class="dg-${k}" src="${lyUrl_(file)}" alt="" decoding="async" onerror="this.style.display='none'">` : "";
+      html += `<div class="ly-frame ly-dg" style="--dg-w:${F.width || "min(28vw,135px)"};--dg-off:${F.offset || "0px"};${F.z != null ? "z-index:" + F.z + ";" : ""}${F.opacity != null ? "opacity:" + F.opacity + ";" : ""}" aria-hidden="true">${dg("tl", F.file)}${dg("br", F.file2)}</div>`;
+      return html;
+    }
     if(F.layout === "corners"){
       // 4 small corner pieces at the screen corners (the picture has its ornament at the BOTTOM-LEFT, the others are mirrored copies, same as the cover corners)
       // width = size of one corner · offset = gap from the screen edge · z = layer (default 60) · opacity
@@ -185,6 +201,10 @@ body.guest-mode .lang-toggle,body.guest-mode .fx-toggle{top:16px !important;}
 .ly-cn .cn-tl{left:var(--cn-x);top:var(--cn-off);transform:scaleY(-1);}
 .ly-cn .cn-br{right:var(--cn-x);bottom:var(--cn-off);transform:scaleX(-1);}
 .ly-cn .cn-tr{right:var(--cn-x);top:var(--cn-off);transform:scale(-1,-1);}
+.ly-dg{left:0;right:0;width:auto;transform:none;}
+.ly-dg img{position:absolute;display:block;width:var(--dg-w);height:auto;}
+.ly-dg .dg-tl{left:var(--dg-off);top:var(--dg-off);}
+.ly-dg .dg-br{right:var(--dg-off);bottom:var(--dg-off);}
 .ly-slice{position:fixed;z-index:60;pointer-events:none;}
 .ly-slice i{position:absolute;width:var(--bw);height:var(--bh);}
 .ly-slice svg.e{position:absolute;overflow:hidden;}
@@ -237,6 +257,7 @@ ${ly.nameFx ? `
 @keyframes lyNameShine{from{background-position:0 0,0% 50%;}to{background-position:0 0,100% 50%;}}
 @media(prefers-reduced-motion:reduce){.oc-names,.oc-names *,.ly-nf-txt{animation:none !important;}}
 ` : ""}
+${typeof ly.css === "function" ? ly.css(ly) : (ly.css || "")}
 ${ly.dark ? ".eyebrow,.section-sub,.cd-label,.venue-addr,.gift-hint,footer{opacity:.95 !important;text-shadow:0 1px 4px rgba(0,0,0,.7);}" : ""}
 ${ly.dark ? ".ly-orn-wrap::before{content:'';position:absolute;inset:-12% -18%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,rgba(3,18,11,.28) 0%,rgba(3,18,11,.12) 45%,rgba(3,18,11,0) 70%);}.ly-orn{filter:drop-shadow(0 1px 3px rgba(0,0,0,.45));}" : ""}
 `;
@@ -259,7 +280,7 @@ function lyPhotoFrame_(spec, src, extraCls){
 }
 function lyNameFrame_(spec, text, isPlaceholder){
   const fill = spec && spec.fill ? ` ly-fill" style="--nf-fill:${spec.fill};` : `" style="`;
-  return `<div class="ly-nf${isPlaceholder ? " ly-ph" : ""}${fill}width:${spec && spec.width ? spec.width : "80%"};--nf-in:${spec && spec.inset ? spec.inset : "20% 15%"};">${lyImg_(spec, "ly-nf-img")}<span class="ly-nf-txt">${text}</span></div>`;
+  return `<div class="ly-nf${isPlaceholder ? " ly-ph" : ""}${(spec && spec.file) ? "" : " ly-missing"}${fill}width:${spec && spec.width ? spec.width : "80%"};--nf-in:${spec && spec.inset ? spec.inset : "20% 15%"};">${lyImg_(spec, "ly-nf-img")}<span class="ly-nf-txt">${text}</span></div>`;
 }
 function lyGuestBlock_(s, ly, lang){
   const T = LAYOUT_TEXT[lang === "en" ? "en" : "km"];
@@ -343,11 +364,15 @@ function lyCoverBits_(s){
   const bg = (A.bg && A.bg.file) ? `<div class="oc-lybg" style="background-image:${lyBgImages_(A.bg.file, A.bg)};${lyBgSize_(A.bg)}opacity:${A.bg.opacity == null ? 1 : A.bg.opacity};${lyFilter_(A.bg) ? "filter:" + lyFilter_(A.bg) + ";" : ""}"></div>` : "";
   const frame = (A.coverFrame && A.coverFrame.file) ? lyFrameHtml_(A.coverFrame, true) : "";   // art.coverFrame = frame of the tap-to-open cover (the opened invitation uses art.frame)
   const orn = A.orn ? `<div class="ly-orn-wrap oc-fade" style="width:${A.orn.width || "60%"}">${lyImg_(A.orn, "ly-orn")}</div>` : "";
-  const corners = (A.corners && A.corners.file) ? `<div class="oc-corners" style="--cn-w:${A.corners.width || "min(34vw,170px)"};--cn-off:${A.corners.offset || "6px"}" aria-hidden="true">` + ["bl","tl","br","tr"].map(k => `<div class="oc-corner oc-cn-${k}">${lyImg_(A.corners, "oc-cn-img")}</div>`).join("") + `</div>` : "";
-  const nf = showName ? `<div class="oc-fade ly-invite"><p class="ly-invite-t">${T.invite}</p>${lyNameFrame_(A.name, guest || T.guestPh, !guest)}</div>` : "";
+  const corners = (A.corners && A.corners.file && A.corners.file2)
+    // 2 own pictures (top-left + bottom-right, not mirrored): art.corners = { file:TL, file2:BR, width, offset }
+    ? `<div class="oc-corners" style="--cn-w:${A.corners.width || "min(40vw,200px)"};--cn-off:${A.corners.offset || "0px"}" aria-hidden="true"><div class="oc-cp oc-cp-tl">${lyImg_(A.corners, "oc-cn-img")}</div><div class="oc-cp oc-cp-br">${lyImg_(Object.assign({}, A.corners, { file:A.corners.file2 }), "oc-cn-img")}</div></div>`
+    : (A.corners && A.corners.file) ? `<div class="oc-corners" style="--cn-w:${A.corners.width || "min(34vw,170px)"};--cn-off:${A.corners.offset || "6px"}" aria-hidden="true">` + ["bl","tl","br","tr"].map(k => `<div class="oc-corner oc-cn-${k}">${lyImg_(A.corners, "oc-cn-img")}</div>`).join("") + `</div>` : "";
+  const CN = A.coverName || A.name;   // art.coverName = name tag used on the cover only (no picture = a plain outlined tag)
+  const nf = showName ? `<div class="oc-fade ly-invite"><p class="ly-invite-t">${T.invite}</p>${lyNameFrame_(CN, guest || T.guestPh, !guest)}</div>` : "";
   // title (សូមគោរពអញ្ជើញ) and name box separately — the picture envelope puts the title above its top edge
   const title = showName ? `<p class="ly-invite-t">${T.invite}</p>` : "";
-  const box = showName ? `<div class="oc-fade ly-invite">${lyNameFrame_(A.name, guest || T.guestPh, !guest)}</div>` : "";
+  const box = showName ? `<div class="oc-fade ly-invite">${lyNameFrame_(CN, guest || T.guestPh, !guest)}</div>` : "";
   return { bg, frame, orn, nf, title, box, corners, generic: showName };
 }
 function lyInitials_(s){
@@ -372,11 +397,25 @@ COVER_STYLES.seal = {
     const sealHtml = sp
       ? '<b class="oc-seal oc-seal-img" style="--seal-size:' + (Number(sp.size) || 84) + 'px">' + lySealImg_(sp, "oc-seal-pic") + '<span>' + lyInitials_(c.s || {}) + '</span></b>'
       : '<b class="oc-seal"><span>' + lyInitials_(c.s || {}) + '</span></b>';
+    // art.envFrame = a flower frame picture drawn around the envelope (the envelope sits in its opening):
+    //   { file, width:"min(94vw,560px)", ratio:width÷height of the picture, box:[x0,y0,x1,y1] opening of the frame (0–1), fill:0.9 }
+    const EF = (lyE && lyE.art && lyE.art.envFrame && lyE.art.envFrame.file) ? lyE.art.envFrame : null;
+    const efBox = (EF && Array.isArray(EF.box) && EF.box.length === 4) ? EF.box.map(Number) : [0.1, 0.12, 0.9, 0.88];
+    const efW = EF ? (typeof EF.width === "string" ? EF.width : (Number(EF.width) || 360) + "px") : "";
+    const envW = EF ? "calc(" + efW + " * " + ((efBox[2] - efBox[0]) * (Number(EF.fill) || 0.92)).toFixed(4) + ")"
+                    : (EV ? (typeof EV.width === "string" ? EV.width : (Number(EV.width) || 270) + "px") : "");
+    const evVars = EV ? ["vx", "vy", "ty", "fy", "fvy"].map(k => EV[k] == null ? "" : "--ev-" + k + ":" + Number(EV[k]) + "%;").join("") : "";   // flap shape of the picture (% of the picture)
+    const envHtml = EV
+      ? '<div class="oc-envi" style="--env-w:' + envW + ';--env-ar:' + (Number(EV.ratio) || 0.973) + ';' + evVars + '--env-img:url(\'' + lyUrl_(EV.file) + '\')"><i class="oc-ei-back"></i><i class="oc-ei-card"></i><i class="oc-ei-front"></i><div class="oc-ei-flap"><i class="oc-ei-ff"></i><i class="oc-ei-fb"></i></div>' + envSeal + '<div class="oc-ei-t oc-fade">' + (lb.title || '') + '</div><div class="oc-ei-nf">' + (lb.box || '') + '</div></div>'
+      : '';
+    const envWrapped = (EV && EF)
+      ? '<div class="oc-ef" style="--ef-w:' + efW + ';--ef-ar:' + (Number(EF.ratio) || 1.25) + ';--ef-img:url(\'' + lyUrl_(EF.file) + '\');--ef-cx:' + ((efBox[0] + efBox[2]) / 2).toFixed(4) + ';--ef-cy:' + (((efBox[1] + efBox[3]) / 2) + (Number(EF.dy) || 0)).toFixed(4) + '">' + envHtml + '</div>'
+      : envHtml;
     return {
       behind: lb.bg + lb.frame + lb.corners,
       top: lb.orn,
       mid: (EV
-        ? '<div class="oc-envi" style="--env-w:' + (typeof EV.width === "string" ? EV.width : (Number(EV.width) || 270) + 'px') + ';--env-ar:' + (Number(EV.ratio) || 0.973) + ';--env-img:url(\'' + lyUrl_(EV.file) + '\')"><i class="oc-ei-back"></i><i class="oc-ei-card"></i><i class="oc-ei-front"></i><div class="oc-ei-flap"><i class="oc-ei-ff"></i><i class="oc-ei-fb"></i></div>' + envSeal + '<div class="oc-ei-t oc-fade">' + (lb.title || '') + '</div><div class="oc-ei-nf">' + (lb.box || '') + '</div></div>'
+        ? envWrapped
         : '<div class="oc-env"><i class="oc-env-back"></i><i class="oc-env-card"></i><i class="oc-env-front"></i><i class="oc-env-flap"></i>' + sealHtml + '</div>' + lb.nf),
       genericBtn: lb.generic
     };
@@ -385,6 +424,11 @@ COVER_STYLES.seal = {
 .oc-corner{position:absolute;width:var(--cn-w);aspect-ratio:724/689;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45));}
 .oc-cn-img{display:block;width:100%;height:100%;object-fit:contain;}
 .oc-corner.ly-missing{display:none;}
+.oc-cp{position:absolute;width:var(--cn-w);}
+.oc-cp .oc-cn-img{height:auto;object-fit:initial;}
+.oc-cp.ly-missing{display:none;}
+.oc-cp-tl{left:var(--cn-off);top:var(--cn-off);}
+.oc-cp-br{right:var(--cn-off);bottom:var(--cn-off);}
 .oc-cn-bl{left:var(--cn-off);bottom:var(--cn-off);}
 .oc-cn-tl{left:var(--cn-off);top:var(--cn-off);transform:scaleY(-1);}
 .oc-cn-br{right:var(--cn-off);bottom:var(--cn-off);transform:scaleX(-1);}
@@ -422,9 +466,9 @@ COVER_STYLES.seal = {
 .oc-envi i,.oc-envi b{position:absolute;display:block;}
 .oc-ei-back{inset:0;z-index:0;background:linear-gradient(180deg,#bdb698,#d6cfb2 55%,#e6e0c9);box-shadow:0 14px 28px rgba(60,45,15,.36);}
 .oc-ei-card{left:8%;right:8%;top:9%;height:72%;z-index:2;background:linear-gradient(180deg,#fffef9,#fbf6e8);border:1px solid rgba(186,146,60,.6);box-shadow:0 1px 7px rgba(0,0,0,.2),inset 0 0 0 4px #fffef9,inset 0 0 0 5px rgba(186,146,60,.35);transition:transform .95s cubic-bezier(.3,.9,.3,1) .5s;}
-.oc-ei-front{inset:0;z-index:3;background:var(--env-img) 0 0/100% 100% no-repeat;clip-path:polygon(0 .85%,50.3% 54.2%,100% .85%,100% 100%,0 100%);}
+.oc-ei-front{inset:0;z-index:3;background:var(--env-img) 0 0/100% 100% no-repeat;clip-path:polygon(0 var(--ev-ty,.85%),var(--ev-vx,50.3%) var(--ev-vy,54.2%),100% var(--ev-ty,.85%),100% 100%,0 100%);}
 .oc-ei-flap{position:absolute;inset:0;z-index:4;transform-origin:50% 0;transform-style:preserve-3d;transition:transform .8s ease .1s;}
-.oc-ei-ff,.oc-ei-fb{inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;clip-path:polygon(0 0,100% 0,100% 1.2%,50.3% 54.6%,0 1.2%);}
+.oc-ei-ff,.oc-ei-fb{inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;clip-path:polygon(0 0,100% 0,100% var(--ev-fy,1.2%),var(--ev-vx,50.3%) var(--ev-fvy,54.6%),0 var(--ev-fy,1.2%));}
 .oc-ei-ff{background:var(--env-img) 0 0/100% 100% no-repeat;}
 .oc-ei-fb{transform:rotateY(180deg);background:linear-gradient(0deg,#cfc7a8,#e9e3cd 70%,#f1ecda);}
 .open-cover.opening .oc-ei-flap{transform:rotateX(180deg);z-index:1;}
@@ -435,6 +479,9 @@ COVER_STYLES.seal = {
 .oc-ei-t{position:absolute;left:0;right:0;bottom:100%;margin-bottom:6px;text-align:center;z-index:5;pointer-events:none;}   /* sits right on the top edge of the envelope */
 .oc-ei-t .ly-invite-t{margin:0;font-size:max(14px,calc(var(--env-w,270px) * .045));color:#7c5316;}
 .oc-ei-nf .ly-invite{margin:0;width:100%;}
+.oc-ef{position:relative;width:var(--ef-w);aspect-ratio:var(--ef-ar,1.25);margin:0 calc(50% - var(--ef-w) / 2) 18px;flex:none;background:var(--ef-img) center/100% 100% no-repeat;transition:opacity .6s ease 1.25s;}
+.oc-ef .oc-envi{position:absolute;margin:0;left:calc(var(--ef-cx,.5) * 100% - var(--env-w) / 2);top:calc(var(--ef-cy,.5) * 100% - var(--env-w) / var(--env-ar) / 2);}
+.open-cover.opening .oc-ef{opacity:0;}
 .oc-ei-nf .ly-nf{width:60% !important;}   /* keep the name frame inside the lower part of the envelope */
 .oc-ei-nf .ly-invite-t{margin:0 0 2px;font-size:calc(var(--env-w,270px) * .042);color:#7c5316;}
 .open-cover.opening .oc-ei-nf{opacity:0;}
@@ -480,6 +527,11 @@ COVER_STYLES.tap = {
 .oc-corner{position:absolute;width:var(--cn-w);aspect-ratio:724/689;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45));}
 .oc-cn-img{display:block;width:100%;height:100%;object-fit:contain;}
 .oc-corner.ly-missing{display:none;}
+.oc-cp{position:absolute;width:var(--cn-w);}
+.oc-cp .oc-cn-img{height:auto;object-fit:initial;}
+.oc-cp.ly-missing{display:none;}
+.oc-cp-tl{left:var(--cn-off);top:var(--cn-off);}
+.oc-cp-br{right:var(--cn-off);bottom:var(--cn-off);}
 .oc-cn-bl{left:var(--cn-off);bottom:var(--cn-off);}
 .oc-cn-tl{left:var(--cn-off);top:var(--cn-off);transform:scaleY(-1);}
 .oc-cn-br{right:var(--cn-off);bottom:var(--cn-off);transform:scaleX(-1);}

@@ -576,6 +576,7 @@ const defaultState = {
   openStyle:"door",
   coverAlways:false,
   sealBtn:"none",
+  flowerSet:"set1",   // ប្រភេទផ្កា របស់ layout ដែលមាន sets (l5): set1 | set2 | set3
   groomName:"", brideName:"",
   eyebrow:"",
   groomNameEn:"", brideNameEn:"",
@@ -711,6 +712,7 @@ function migrateStyle_(s){
   if(s.bgFit !== "cover" && s.bgFit !== "stretch") s.bgFit = "cover";
   if(!COVER_STYLE_KEYS.includes(s.openStyle)) s.openStyle = "door";
   if(!_ho(SEAL_BUTTONS, s.sealBtn)) s.sealBtn = "none";
+  if(typeof s.flowerSet !== "string") s.flowerSet = "set1";   // checked against the layout's sets when drawing (wib-layouts.js layoutOf_)
   if(typeof s.layout !== "string") s.layout = "none";   // checked against LAYOUTS (wib-layouts.js) when drawing; unknown id = no layout
   if(s.frameFit !== "stretch" && s.frameFit !== "cover") s.frameFit = "stretch";
   if(!_ho(FRAME_FX, s.frameFx)) s.frameFx = "fade";
