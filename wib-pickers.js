@@ -11,7 +11,7 @@
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzcaIg0U0p2kg1zdoq6TjPsD5so18-45qVpw9e4H4PEJlbcGtvDBO8rKGTpVWJ5JOKdWQ/exec";
 // Display-only default. The REAL price is fixed on the server (PRICE in
 // wedding-code.gs); the modal updates to the server's amount once the QR is made.
-const DOWNLOAD_PRICE_USD = 20;
+const DOWNLOAD_PRICE_USD = 19.99;
 
 const $ = id => document.getElementById(id);
 
