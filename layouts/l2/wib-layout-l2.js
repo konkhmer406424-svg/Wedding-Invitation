@@ -25,11 +25,14 @@ window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
     mid:(s, lang, ctx, A) => lyPhotoFrame_(A.photo, ctx.rawCover || "", ""),
     art:{
       bg:   { file:IMG+"background/bg.webp",       mode:"plain", opacity:1 },
-      frame:{ file:IMG+"frames/frame.webp", mode:"plain", layout:"corners", width:"min(36vw,180px)", offset:"0px", offsetX:"-8px" },   // width = ទំហំ · offset = ចន្លោះពីគែមលើ/ក្រោម · offsetX = ចន្លោះពីគែមឆ្វេង/ស្តាំ (អវិជ្ជមាន = ជាប់ចុងបំផុត)
+      // ស៊ុមតែមួយ frames/corner.webp (ក្បាច់ស្តើងជុំវិញ ៤ ជ្រុង) — ប្រើទាំងទំព័រធៀប (frame) និងទំព័រគម្រប Tap to Open (coverFrame)
+      //   layout:"border" = កាត់ជា ៩ ផ្នែក៖ ជ្រុងទាំង ៤ មិនខូចទ្រង់ទ្រាយ គែមលាតតាមអេក្រង់ · slice = ទំហំជ្រុងក្នុងរូប 1620×2880 (px) · width:"100%" = ពេញអេក្រង់ឆ្វេង-ស្តាំ
+      //   border = កម្រាស់ក្បាច់លើអេក្រង់ = ១០៥ × (១០០vw÷១៦២០ ឬ ១០០vh÷២៨៨០ តូចជាង) — ប្តូរលេខ ១០៥ (ធំជាង = ក្បាច់ក្រាស់ជាង)
+      frame:     { file:IMG+"frames/corner.webp", mode:"tint", color:"accent1", layout:"border", slice:105, border:"calc(min(100vw / 1620, 100vh / 2880) * 105)", width:"100%" },
+      coverFrame:{ file:IMG+"frames/corner.webp", mode:"tint", color:"accent1", layout:"border", slice:105, border:"calc(min(100vw / 1620, 100vh / 2880) * 105)", width:"100%" },
       orn:  { file:IMG+"cover/orn.webp",           mode:"plain", width:"min(62%,260px)" },
-      name: { file:IMG+"nameframes/name.webp",    mode:"plain", width:"min(82%,330px)", inset:"21% 10%" },
+      name: { file:IMG+"nameframes/name.webp", mode:"plain", width:"min(90%,400px)", inset:"32% 20% 30% 20%" },   // ស៊ុមឈ្មោះមាសរាងវែង · width = ទំហំស៊ុម · inset = ផ្ទៃអក្សរក្នុងរន្ធ [លើ ស្តាំ ក្រោម ឆ្វេង] (បង្កើន = អក្សរតូចចូលជ្រៅ)
       photo:{ file:IMG+"frames/photo.png",        mode:"keyG", clip:"l2-hole", width:"min(68vw,330px)", big:true, photoPos:"center 30%" },
-      corners:{ file:IMG+"frames/corner.webp", mode:"plain", width:"min(34vw,170px)", offset:"6px" },
       seal: { file:IMG+"open/seal.webp", size:108 }   // LT Media
     }
   };
