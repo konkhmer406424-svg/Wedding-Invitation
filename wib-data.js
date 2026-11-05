@@ -417,6 +417,158 @@ ${ocDarkText("lock")}`
   }
 };
 
+// ---------------------------------------------------------------------
+// PICTURE MODE for the opening screens (door · curtain · rings · lotus · heart).
+// Put the pictures in  images/open/<colour>/  (or images/open/ for pictures shared by all colours) — .webp or .png. When ALL required pictures of a screen are there, that screen is drawn from
+// the pictures (code only moves them: swing / slide / fade / zoom). Until then the old drawn version is used, so nothing breaks.
+//   door     door-left · door-right                      (two leaves, each fills half the screen, opaque)
+//   curtain  curtain-left · curtain-right  [+ curtain-top = valance, optional]
+//   rings    rings-a | rings-b                           (transparent)
+//   lotus    lotus-closed · lotus-open                   (transparent, SAME canvas size and position)
+//   heart    heart-a | heart-b                           (transparent)
+// ---------------------------------------------------------------------
+const COVER_IMG_DIR = "images/open/";
+// Two versions of the heart and of the rings were supplied — change the name here to switch ("heart-a" | "heart-b" , "rings-a" | "rings-b").
+const COVER_IMG_PICK = { heart:"heart-a", rings:"rings-a" };
+// COLOUR SETS: images/open/<colour>/<file>.webp  (a file that is missing in a colour folder is taken from images/open/ itself — e.g. the lotus and rings-b are the same for every colour).
+const COVER_VARIANTS = ["red", "green", "blue", "purple", "brown", "black"];
+// which colour set goes with which theme (a theme not listed here is matched by its accent colour; anything else falls back to red)
+const COVER_VARIANT_OF_THEME = {
+  rose:"red", ruby:"red", burgundy:"red", terracotta:"red", coral:"red", blush:"red", rosegold:"red",
+  emerald:"green", sage:"green", teal:"green",
+  royal:"blue", sky:"blue", dustyblue:"blue",
+  lavender:"purple", plum:"purple",
+  gold:"brown", mocha:"brown",
+  minimal:"black", charcoal:"black"
+};
+const COVER_VARIANT_HUE = { red:0, green:150, blue:220, purple:285, brown:28 };
+function coverVariantOf_(s){
+  const th = s && s.theme;
+  if(th && Object.prototype.hasOwnProperty.call(COVER_VARIANT_OF_THEME, th)) return COVER_VARIANT_OF_THEME[th];
+  try{
+    const hex = String((THEMES[th] || {}).accent1 || "").replace("#", "");
+    if(/^[0-9a-fA-F]{6}$/.test(hex)){
+      const r = parseInt(hex.slice(0,2),16)/255, g = parseInt(hex.slice(2,4),16)/255, b = parseInt(hex.slice(4,6),16)/255;
+      const mx = Math.max(r,g,b), mn = Math.min(r,g,b), df = mx - mn;
+      if(df < 0.08) return "black";
+      let h = mx === r ? ((g - b) / df) % 6 : (mx === g ? (b - r) / df + 2 : (r - g) / df + 4);
+      h = ((h * 60) + 360) % 360;
+      let best = "red", bd = 999;
+      Object.keys(COVER_VARIANT_HUE).forEach(k => { const dd = Math.min(Math.abs(h - COVER_VARIANT_HUE[k]), 360 - Math.abs(h - COVER_VARIANT_HUE[k])); if(dd < bd){ bd = dd; best = k; } });
+      return best;
+    }
+  }catch(e){}
+  return "red";
+}
+const COVER_IMG = {
+  door:   { req:{ left:"door-left", right:"door-right" }, opt:{} },
+  curtain:{ req:{ left:"curtain-left", right:"curtain-right" }, opt:{ top:"curtain-top" } },
+  rings:  { req:{ main:COVER_IMG_PICK.rings }, opt:{} },
+  lotus:  { req:{ closed:"lotus-closed", open:"lotus-open" }, opt:{} },
+  heart:  { req:{ main:COVER_IMG_PICK.heart }, opt:{} }
+};
+const coverImgUrls = {};   // style -> colour ("" = images/open/ itself) -> { left:url, right:url … } — only when every required picture exists
+const coverImgSeen_ = {};
+function coverImgUrl_(path, ext){ return (assetBase() + COVER_IMG_DIR + path + "." + ext + "?v=" + ASSET_VERSION).replace(/'/g, "%27"); }
+function coverImgExists_(url){   // a cheap HEAD request (the picture itself is not downloaded); falls back to loading it when HEAD is not possible (file://)
+  if(coverImgSeen_[url]) return coverImgSeen_[url];
+  return coverImgSeen_[url] = new Promise(resolve => {
+    const viaImage = () => { const im = new Image(); im.onload = () => resolve(true); im.onerror = () => resolve(false); im.src = url; };
+    if(typeof fetch !== "function" || /^file:/.test(location.protocol)){ viaImage(); return; }
+    fetch(url, { method:"HEAD", cache:"no-store" }).then(r => {
+      const ct = r.headers.get("content-type") || "";
+      resolve(!!r.ok && (!ct || /image/i.test(ct)));
+    }).catch(viaImage);
+  });
+}
+async function coverImgFind_(variant, name){   // url of  <variant>/<name>.webp|png , else  <name>.webp|png , else ""
+  const dirs = variant ? [variant + "/", ""] : [""];
+  for(const dir of dirs) for(const ext of ["webp", "png"]){
+    const u = coverImgUrl_(dir + name, ext);
+    if(await coverImgExists_(u)) return u;
+  }
+  return "";
+}
+function probeCoverImages(){   // promise: true when something changed (so the preview should be redrawn)
+  const jobs = [];
+  Object.keys(COVER_IMG).forEach(key => {
+    ["", ...COVER_VARIANTS].forEach(variant => jobs.push((async () => {
+      const c = COVER_IMG[key], urls = {}, ks = Object.keys(c.req);
+      const got = await Promise.all(ks.map(k => coverImgFind_(variant, c.req[k])));
+      const before = JSON.stringify((coverImgUrls[key] || {})[variant] || null);
+      if(got.some(u => !u)){ if(coverImgUrls[key]) delete coverImgUrls[key][variant]; return before !== "null"; }
+      ks.forEach((k, i) => { urls[k] = got[i]; });
+      for(const k of Object.keys(c.opt)){ const u = await coverImgFind_(variant, c.opt[k]); if(u) urls[k] = u; }
+      (coverImgUrls[key] = coverImgUrls[key] || {})[variant] = urls;
+      return before !== JSON.stringify(urls);
+    })()));
+  });
+  return Promise.all(jobs).then(r => r.some(Boolean)).catch(() => false);
+}
+function coverImgFor_(key, s){   // pictures for this screen in the colour of the theme (else red, else any colour, else images/open/)
+  const m = coverImgUrls[key]; if(!m) return null;
+  const order = [coverVariantOf_(s), "red", ""].concat(COVER_VARIANTS);
+  for(const v of order) if(m[v]) return m[v];
+  return null;
+}
+const COVER_IMG_STYLES = {
+  door:{
+    parts:(c, u) => ({ behind:'<div class="oc-leaf oc-leaf-l"></div><div class="oc-leaf oc-leaf-r"></div>' }),
+    css:(u) => `.oc-s-door{background:radial-gradient(ellipse at 50% 50%,color-mix(in srgb,var(--accent-2) 45%,var(--bg)) 0%,var(--bg) 75%);perspective:1800px;}
+.oc-leaf{position:absolute;top:0;bottom:0;width:50%;z-index:2;background-repeat:no-repeat;background-size:cover;background-position:center;will-change:transform;transition:transform 1.25s cubic-bezier(.66,0,.24,1);}
+.oc-leaf-l{left:0;transform-origin:0 50%;background-image:url('${u.left}');}
+.oc-leaf-r{right:0;transform-origin:100% 50%;background-image:url('${u.right}');}
+.open-cover.opening .oc-leaf-l{transform:rotateY(-112deg);}
+.open-cover.opening .oc-leaf-r{transform:rotateY(112deg);}
+${ocDarkText("door")}`
+  },
+  curtain:{
+    parts:(c, u) => ({ behind:'<div class="oc-drape oc-drape-l"></div><div class="oc-drape oc-drape-r"></div>' + (u.top ? '<img class="oc-valance-img" src="' + u.top + '" alt="" decoding="async">' : '') }),
+    css:(u) => `.oc-s-curtain{background:radial-gradient(ellipse at 50% 45%,color-mix(in srgb,var(--accent-2) 40%,var(--bg)) 0%,var(--bg) 72%);}
+.oc-drape{position:absolute;top:0;bottom:0;width:50.4%;z-index:2;background-repeat:no-repeat;background-size:100% 100%;will-change:transform;transition:transform 1.6s cubic-bezier(.62,0,.28,1);}
+.oc-drape-l{left:0;transform-origin:0 50%;background-image:url('${u.left}');}
+.oc-drape-r{right:0;transform-origin:100% 50%;background-image:url('${u.right}');}
+.open-cover.opening .oc-drape{transform:scaleX(.15);}
+.oc-valance-img{position:absolute;top:0;left:0;width:100%;height:auto;z-index:3;pointer-events:none;display:block;}
+${ocDarkText("curtain")}`
+  },
+  rings:{
+    parts:(c, u) => ({ mid:'<div class="oc-rimg"><img src="' + u.main + '" alt="" decoding="async"></div>' }),
+    css:(u) => `.oc-s-rings{background:radial-gradient(ellipse at 50% 42%,color-mix(in srgb,var(--accent-2) 22%,transparent) 0%,transparent 62%),var(--bg);}
+.oc-rimg{width:min(74vw,320px);margin:8px auto 30px;transition:transform .7s ease 1.15s,opacity .5s ease 1.3s;animation:oc-rimg-glow 2.6s ease-in-out infinite;}
+.oc-rimg img{display:block;width:100%;height:auto;}
+@keyframes oc-rimg-glow{0%,100%{filter:drop-shadow(0 6px 10px rgba(0,0,0,.22));}50%{filter:drop-shadow(0 6px 18px color-mix(in srgb,var(--accent-2) 55%,transparent));}}
+.open-cover.opening .oc-rimg{transform:scale(1.5);opacity:0;animation:none;}
+@media(max-height:640px){.oc-rimg{width:min(56vw,240px);margin-bottom:14px;}}
+@media(prefers-reduced-motion:reduce){.oc-rimg{animation:none;}}`
+  },
+  lotus:{
+    parts:(c, u) => ({ mid:'<div class="oc-limg"><img class="oc-limg-c" src="' + u.closed + '" alt="" decoding="async"><img class="oc-limg-o" src="' + u.open + '" alt="" decoding="async"></div>' }),
+    css:(u) => `.oc-s-lotus{background:radial-gradient(ellipse at 50% 46%,color-mix(in srgb,var(--accent-2) 24%,transparent) 0%,transparent 60%),var(--bg);}
+.oc-limg{position:relative;width:min(74vw,320px);margin:4px auto 24px;transition:transform 1s cubic-bezier(.6,0,.3,1) 1s,opacity .6s ease 1.5s;}
+.oc-limg img{display:block;width:100%;height:auto;}
+.oc-limg .oc-limg-o{position:absolute;left:0;top:0;opacity:0;transition:opacity .9s ease .25s;}
+.oc-limg .oc-limg-c{transition:opacity .9s ease .25s;}
+.open-cover.opening .oc-limg .oc-limg-c{opacity:0;}
+.open-cover.opening .oc-limg .oc-limg-o{opacity:1;}
+.open-cover.opening .oc-limg{transform:scale(7);opacity:0;}
+@media(max-height:640px){.oc-limg{width:min(56vw,240px);transform-origin:50% 100%;}}`
+  },
+  heart:{
+    parts:(c, u) => ({ mid:'<div class="oc-himg"><i class="oc-hglow"></i><img src="' + u.main + '" alt="" decoding="async"></div>' }),
+    css:(u) => `.oc-s-heart{background:radial-gradient(ellipse at 50% 42%,color-mix(in srgb,var(--accent-2) 20%,transparent) 0%,transparent 62%),var(--bg);}
+.oc-himg{position:relative;width:min(60vw,250px);margin:4px auto 28px;transition:transform .7s ease 1.15s,opacity .5s ease 1.3s;}
+.oc-himg img{position:relative;display:block;width:100%;height:auto;animation:oc-himg-beat 1.5s ease-in-out infinite;}
+@keyframes oc-himg-beat{0%,56%,100%{transform:scale(1);}14%{transform:scale(1.09);}28%{transform:scale(1);}42%{transform:scale(1.06);}}
+.oc-himg .oc-hglow{position:absolute;inset:-30%;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent-2) 45%,transparent) 0%,transparent 65%);opacity:0;transition:opacity .6s ease .35s;}
+.open-cover.opening .oc-himg .oc-hglow{opacity:1;}
+.open-cover.opening .oc-himg img{animation:none;}
+.open-cover.opening .oc-himg{transform:scale(1.4);opacity:0;}
+@media(max-height:640px){.oc-himg{width:min(46vw,190px);margin-bottom:6px;}}
+@media(prefers-reduced-motion:reduce){.oc-himg img{animation:none;}}`
+  }
+};
+
 const OC_BASE_CSS = `
 .open-cover{position:fixed;inset:0;z-index:300;overflow:hidden;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .open-cover.finish{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .6s ease,visibility .6s;}

@@ -1592,6 +1592,7 @@ $("backupImportFile").addEventListener("change", e => {
   if(file) importProject(file);
 });
 
+probeCoverImages().then(changed => { if(changed) update(); });   // opening screens drawn from pictures in images/open/ (if any)
 loadMusicOnStartup();
 loadFrameOnStartup();
 

@@ -31,7 +31,9 @@ function buildMusicParts(s){
   const names = [s.groomName || s.groomNameEn, s.brideName || s.brideNameEn].filter(Boolean).map(escapeHtml).join(" & ");
   const g = s.__guestName ? escapeHtml(s.__guestName) : "";
   const previewAttr = s.__preview ? ' data-preview="1"' : "";
-  const p = cfg.parts({ names, s });
+  // picture mode: when this screen's pictures exist in images/open/, draw it from the pictures (see COVER_IMG in wib-data.js)
+  const imgU = (s.__noCoverImg || !COVER_IMG_STYLES[key]) ? null : coverImgFor_(key, s);
+  const p = imgU ? COVER_IMG_STYLES[key].parts({ names, s }, imgU) : cfg.parts({ names, s });
   // seal button: only for the 6 classic screens, and never when a layout is on (a layout brings its own seal)
   const sealKey = (!layoutOf_(s) && SEAL_BTN_STYLES.indexOf(key) >= 0 && hasOwn(SEAL_BUTTONS, s.sealBtn) && s.sealBtn !== "none") ? s.sealBtn : "";
 
@@ -45,7 +47,7 @@ function buildMusicParts(s){
   const hintHtml = ((g && !p.genericBtn) ? `<p class="oc-hint oc-fade">ចុចដើម្បីបើកធៀបអញ្ជើញ<span>Tap to open your invitation</span></p>` : "")
     + (music ? `<p class="oc-hint oc-fade">សូមបើកសំឡេងដើម្បីស្តាប់ចម្រៀង<span>Turn your sound on for the music</span></p>` : "");
 
-  const css = (music ? MUSIC_BTN_CSS : "") + OC_BASE_CSS + cfg.css + (sealKey ? SEAL_BTN_CSS : "");
+  const css = (music ? MUSIC_BTN_CSS : "") + OC_BASE_CSS + (imgU ? COVER_IMG_STYLES[key].css(imgU) : cfg.css) + (sealKey ? SEAL_BTN_CSS : "");
 
   const musicHtml = music ? `
 <audio id="bgm" src="${music.dataUrl}" loop preload="metadata"></audio>
