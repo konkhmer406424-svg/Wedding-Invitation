@@ -22,6 +22,25 @@ const SEAL_BTN_CSS = `
 @media(prefers-reduced-motion:reduce){.oc-sealwrap,.oc-sealwrap::before,.oc-sealwrap::after{animation:none !important;}}`;
 
 // ---------- Build the cover-opening + background-music markup for one rendered invitation ----------
+// Frame + background of the cover for the screens that only show one small object (see COVER_DECO in wib-data.js).
+// Own pictures (images/open/<colour>/cover-frame|cover-bg) win; otherwise the frame / background picked for the invitation are reused (preset pictures only —
+// an uploaded custom picture is not copied a second time into the page).
+function coverDeco_(key, s){
+  const none = { bg:"", frame:"", css:"" };
+  if(COVER_DECO_STYLES.indexOf(key) < 0 || layoutOf_(s)) return none;
+  const pic = coverDecoFor_(s) || {};
+  const ok = id => id && id !== "none" && id !== "custom";
+  let bg = "", frame = "";
+  if(pic.bg) bg = `<div class="oc-deco-bg" style="background-image:url('${pic.bg}')" aria-hidden="true"></div>`;
+  else if(ok(s.kbachBg)) bg = buildKbachFrameOverlay(s.kbachBg, null, s, "bg");
+  if(pic.frame) frame = `<div class="oc-deco-frame" style="background-image:url('${pic.frame}')" aria-hidden="true"></div>`;
+  else if(ok(s.kbachFrame)) frame = buildKbachFrameOverlay(s.kbachFrame, null, s, "frame");
+  if(!bg && !frame) return none;
+  return { bg, frame, css:`.oc-deco-bg{position:absolute;inset:0;z-index:1;background-size:cover;background-position:center;background-repeat:no-repeat;pointer-events:none;}
+.oc-deco-frame{position:absolute;inset:0;z-index:6;background-size:100% 100%;background-position:center;background-repeat:no-repeat;pointer-events:none;}
+.open-cover .kb-frame,.open-cover .kb-ov,.open-cover .kbach-custom-frame{z-index:6;}
+` };
+}
 function buildMusicParts(s){
   const music = (musicAsset && musicAsset.dataUrl) ? musicAsset : null;
   if(!music && !s.coverAlways) return { css:"", html:"", js:"" };
@@ -34,6 +53,7 @@ function buildMusicParts(s){
   // picture mode: when this screen's pictures exist in images/open/, draw it from the pictures (see COVER_IMG in wib-data.js)
   const imgU = (s.__noCoverImg || !COVER_IMG_STYLES[key]) ? null : coverImgFor_(key, s);
   const p = imgU ? COVER_IMG_STYLES[key].parts({ names, s }, imgU) : cfg.parts({ names, s });
+  const deco = coverDeco_(key, s);
   // seal button: only for the 6 classic screens, and never when a layout is on (a layout brings its own seal)
   const sealKey = (!layoutOf_(s) && SEAL_BTN_STYLES.indexOf(key) >= 0 && hasOwn(SEAL_BUTTONS, s.sealBtn) && s.sealBtn !== "none") ? s.sealBtn : "";
 
@@ -47,7 +67,7 @@ function buildMusicParts(s){
   const hintHtml = ((g && !p.genericBtn) ? `<p class="oc-hint oc-fade">ចុចដើម្បីបើកធៀបអញ្ជើញ<span>Tap to open your invitation</span></p>` : "")
     + (music ? `<p class="oc-hint oc-fade">សូមបើកសំឡេងដើម្បីស្តាប់ចម្រៀង<span>Turn your sound on for the music</span></p>` : "");
 
-  const css = (music ? MUSIC_BTN_CSS : "") + OC_BASE_CSS + (imgU ? COVER_IMG_STYLES[key].css(imgU) : cfg.css) + (sealKey ? SEAL_BTN_CSS : "");
+  const css = (music ? MUSIC_BTN_CSS : "") + OC_BASE_CSS + (imgU ? COVER_IMG_STYLES[key].css(imgU) : cfg.css) + deco.css + (sealKey ? SEAL_BTN_CSS : "");
 
   const musicHtml = music ? `
 <audio id="bgm" src="${music.dataUrl}" loop preload="metadata"></audio>
@@ -56,7 +76,7 @@ function buildMusicParts(s){
   <svg class="ico-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
 </button>` : "";
   const html = musicHtml + `
-<div class="open-cover oc-s-${key}" id="openCover" role="dialog" aria-modal="true" aria-label="Open invitation"${previewAttr}>${p.behind || ""}<div class="oc-inner">${p.top || ""}${namesHtml}${p.mid || ""}${btnHtml}${p.after || ""}${hintHtml}</div></div>`;
+<div class="open-cover oc-s-${key}" id="openCover" role="dialog" aria-modal="true" aria-label="Open invitation"${previewAttr}>${deco.bg}${p.behind || ""}<div class="oc-inner">${p.top || ""}${namesHtml}${p.mid || ""}${btnHtml}${p.after || ""}${hintHtml}</div>${deco.frame}</div>`;
 
   const js = `
 var ocEl=document.getElementById('openCover');

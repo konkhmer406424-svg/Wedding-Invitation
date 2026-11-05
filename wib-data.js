@@ -503,6 +503,7 @@ function probeCoverImages(){   // promise: true when something changed (so the p
       return before !== JSON.stringify(urls);
     })()));
   });
+  jobs.push(probeCoverDeco_());
   return Promise.all(jobs).then(r => r.some(Boolean)).catch(() => false);
 }
 function coverImgFor_(key, s){   // pictures for this screen in the colour of the theme (else red, else any colour, else images/open/)
@@ -510,6 +511,27 @@ function coverImgFor_(key, s){   // pictures for this screen in the colour of th
   const order = [coverVariantOf_(s), "red", ""].concat(COVER_VARIANTS);
   for(const v of order) if(m[v]) return m[v];
   return null;
+}
+// ---- cover decoration (frame + background) for the screens that only show one small object: rings · lotus · heart · envelope (seal) · tap ----
+// images/open/<colour>/cover-frame.webp   full-screen frame, transparent centre (portrait ~1080x1920)
+// images/open/<colour>/cover-bg.webp      full-screen background (portrait ~1080x1920)
+// (or images/open/cover-frame.webp / cover-bg.webp for ALL colours). Without them the cover shows the frame / background chosen for the invitation (Style tab).
+const COVER_DECO_STYLES = ["rings", "lotus", "heart", "seal", "tap"];
+const COVER_DECO = { frame:"cover-frame", bg:"cover-bg" };
+const coverDecoUrls = {};   // colour ("" = images/open/ itself) -> { frame:url, bg:url }
+function coverDecoFor_(s){
+  const m = coverDecoUrls, v = coverVariantOf_(s);
+  const o = m[v] && (m[v].frame || m[v].bg) ? m[v] : (m[""] && (m[""].frame || m[""].bg) ? m[""] : null);
+  return o;
+}
+function probeCoverDeco_(){
+  return Promise.all(["", ...COVER_VARIANTS].map(async variant => {
+    const o = {};
+    for(const k of Object.keys(COVER_DECO)){ const u = await coverImgFind_(variant, COVER_DECO[k]); if(u) o[k] = u; }
+    const before = JSON.stringify(coverDecoUrls[variant] || null), after = JSON.stringify(Object.keys(o).length ? o : null);
+    if(after === "null") delete coverDecoUrls[variant]; else coverDecoUrls[variant] = o;
+    return before !== after;
+  })).then(r => r.some(Boolean));
 }
 const COVER_IMG_STYLES = {
   door:{
