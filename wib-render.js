@@ -57,7 +57,7 @@ function buildBlockFrameCss_(s){
   const f = BLOCK_FRAMES[k], u = blockFrameUrl_(k);
   const n = Number(s.blockFrameSize), size = (Number.isFinite(n) ? Math.max(50, Math.min(200, n)) : 100) / 100;
   const [t, r, b, l] = f.slice, q = v => (v / l).toFixed(4);
-  const SEL = ".welcome,.dress-card,.venue-card,.contact-card,.gift-card";
+  const SEL = ".welcome,.dress-card,.venue-card,.contact-card,.gift-card,.countdown,.timeline,.gallery,.vid-block";   // every information block: welcome · countdown (one frame for the whole row) · programme · pictures · video · dress colours · location · contact · gift
   const after = SEL.split(",").map(x => x + "::after").join(",");
   const pad = "max(22px,calc(" + f.pad + "px * " + size + ")) !important";
   const bw = "calc(var(--bf-px) * " + q(t) + ") calc(var(--bf-px) * " + q(r) + ") calc(var(--bf-px) * " + q(b) + ") var(--bf-px)";
@@ -382,7 +382,7 @@ function buildSection(s, t, lang){
   const secVideo     = videoInfo ? `<section><div class="wrap">
 <h2 class="section-title display">${L.videoTitle}</h2>
 <p class="section-sub">${L.videoSub}</p>
-${buildVideoHtml(videoInfo, lang)}
+<div class="vid-block">${buildVideoHtml(videoInfo, lang)}</div>
 </div></section>` : "";
   const secVenue     = (isPrev || hasVenue)     ? `<section><div class="wrap">
 <h2 class="section-title display">${L.venueTitle}</h2>

@@ -240,7 +240,7 @@ const SEAL_BUTTONS = {
   s4:{ label:"ត្រាទី៤", file:"open/goal_tamp4.png" }
 };
 const SEAL_BTN_STYLES = ["door","curtain","lock","rings","lotus","heart"];   // អេក្រង់បើកដែលអាចប្រើប៊ូតុងត្រាបាន
-const ASSET_VERSION = "4";   // ប្តូរលេខនេះ (2, 3 …) ពេលជំនួសរូបថ្មី ដើម្បីបំបាត់ cache
+const ASSET_VERSION = "5";   // ប្តូរលេខនេះ (2, 3 …) ពេលជំនួសរូបថ្មី ដើម្បីបំបាត់ cache
 function assetBase(){
   if(ASSET_BASE_OVERRIDE) return ASSET_BASE_OVERRIDE;
   try{ return new URL("./", location.href).href; }catch(e){ return "./"; }
