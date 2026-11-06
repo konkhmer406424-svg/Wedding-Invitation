@@ -533,6 +533,56 @@ function probeCoverDeco_(){
     return before !== after;
   })).then(r => r.some(Boolean));
 }
+// ---------------------------------------------------------------------
+// BLOCK FRAMES — a four-corner frame that goes around EACH information block (welcome message · dress colours · location · contact · gift/KHQR),
+// like the flower corners of l5, but from one ordinary frame picture (corners + edges, centre transparent).
+// The SAME picture is also the frame of the cover screen (before the invitation is opened) — one picture, two jobs. Only when no layout is chosen.
+// Pictures: images/blockframes/frame-lN.webp (or .png). A frame shows up in the Style tab by itself once its file exists.
+//   iw     = width of the picture file in pixels (used to draw the same frame full-screen on the cover)
+//   slice  = [top, right, bottom, left] — size in PICTURE pixels of the corner pieces (what is cut off each side; the rest of each side is the edge that is stretched/tiled)
+//   w      = width (CSS px, phone, at 100%) the LEFT corner piece is drawn at; the other sides keep the same proportion
+//   pad    = space (px) kept free inside the block so the text does not touch the frame
+//   repeat = "round" tiles the edge piece (patterns) | "stretch" stretches it (plain lines)
+// A block that is too small for its frame makes the whole frame shrink (the browser does this) so the corners never overlap.
+// ---------------------------------------------------------------------
+const BLOCK_FRAME_DIR = "images/blockframes/";
+const BLOCK_FRAMES = {
+  fl1:{ label:"ស៊ុម l1", file:"frame-l1", iw:648, slice:[198,198,198,198], w:54, pad:34, repeat:"round" },
+  fl2:{ label:"ស៊ុម l2", file:"frame-l2", iw:648, slice:[114,114,114,114], w:40, pad:26, repeat:"round" },
+  fl3:{ label:"ស៊ុម l3", file:"frame-l3", iw:648, slice:[144,144,144,144], w:38, pad:30, repeat:"round" },
+  fl4:{ label:"ស៊ុម l4", file:"frame-l4", iw:648, slice:[348,315,396,315], w:100, pad:36, repeat:"round" },
+  fl5:{ label:"ស៊ុម l5", file:"frame-l5", iw:648, slice:[324,105,345,105], w:34, pad:22, repeat:"stretch" },
+  fl6:{ label:"ស៊ុម l6", file:"frame-l6", iw:648, slice:[198,198,198,198], w:54, pad:34, repeat:"round" },   // no picture yet — these numbers are a guess, tune them when the picture is added
+  fl7:{ label:"ស៊ុម l7", file:"frame-l7", iw:648, slice:[120,120,120,120], w:42, pad:28, repeat:"round" },
+  fl8:{ label:"ស៊ុម l8", file:"frame-l8", iw:648, slice:[345,315,396,315], w:100, pad:36, repeat:"round" },
+  fl9:{ label:"ស៊ុម l9", file:"frame-l9", iw:648, slice:[204,204,204,204], w:58, pad:40, repeat:"round" },
+  fl10:{ label:"ស៊ុម l10", file:"frame-l10", iw:648, slice:[198,198,198,198], w:58, pad:40, repeat:"round" },
+  fl11:{ label:"ស៊ុម l11", file:"frame-l11", iw:648, slice:[198,198,198,198], w:54, pad:34, repeat:"round" },   // no picture yet — these numbers are a guess, tune them when the picture is added
+  fl12:{ label:"ស៊ុម l12", file:"frame-l12", iw:648, slice:[198,198,198,198], w:54, pad:34, repeat:"round" },   // no picture yet — these numbers are a guess, tune them when the picture is added
+  fl13:{ label:"ស៊ុម l13", file:"frame-l13", iw:1152, slice:[342,576,343,576], w:120, pad:40, repeat:"round" },
+  fl14:{ label:"ស៊ុម l14", file:"frame-l14", iw:1152, slice:[354,576,355,576], w:120, pad:40, repeat:"round" },
+  fl15:{ label:"ស៊ុម l15", file:"frame-l15", iw:1152, slice:[346,576,346,576], w:120, pad:40, repeat:"round" }
+};
+const blockFrameUrls = {};   // key -> url of the picture, only for the files that exist
+function blockFrameUrl_(k){
+  if(blockFrameUrls[k]) return blockFrameUrls[k];
+  return (assetBase() + BLOCK_FRAME_DIR + BLOCK_FRAMES[k].file + ".webp?v=" + ASSET_VERSION).replace(/'/g, "%27");
+}
+async function blockFrameFind_(name){
+  for(const ext of ["webp", "png"]){
+    const u = (assetBase() + BLOCK_FRAME_DIR + name + "." + ext + "?v=" + ASSET_VERSION).replace(/'/g, "%27");
+    if(await coverImgExists_(u)) return u;
+  }
+  return "";
+}
+function probeBlockFrames(){   // promise: true when the list of available frames changed
+  return Promise.all(Object.keys(BLOCK_FRAMES).map(async k => {
+    const u = await blockFrameFind_(BLOCK_FRAMES[k].file);
+    const before = blockFrameUrls[k] || "";
+    if(u) blockFrameUrls[k] = u; else delete blockFrameUrls[k];
+    return before !== u;
+  })).then(r => r.some(Boolean)).catch(() => false);
+}
 const COVER_IMG_STYLES = {
   door:{
     parts:(c, u) => ({ behind:'<div class="oc-leaf oc-leaf-l"></div><div class="oc-leaf oc-leaf-r"></div>' }),
@@ -730,6 +780,7 @@ const PRESET_DESIGN_BASE = {
   theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"grid", galleryArts:[], coverArt:"none",
   kbachFrame:"none", frameFit:"stretch", frameOpacity:100, frameFx:"fade", frameSpread:0, frameSpreadMore:6, frameSnap:true,
   kbachBg:"none", bgFit:"cover", bgOpacity:100, bgBlur:0,
+  blockFrame:"none", blockFrameSize:100,
   textAnim:"fadeup", openStyle:"door", layout:"none",
   coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60, coverVeil:35
 };
@@ -897,6 +948,8 @@ function migrateStyle_(s){
   s.frameSnap = s.frameSnap !== false;
   s.bgOpacity = num(s.bgOpacity, 10, 100, 100);
   s.bgBlur = num(s.bgBlur, 0, 40, 0);
+  if(typeof s.blockFrame !== "string" || (s.blockFrame !== "none" && !_ho(BLOCK_FRAMES, s.blockFrame))) s.blockFrame = "none";
+  s.blockFrameSize = num(s.blockFrameSize, 50, 200, 100);
   s.coverBlur = num(s.coverBlur, 0, 40, 22); s.coverFocusX = num(s.coverFocusX, 0, 100, 50);
   s.coverFocusY = num(s.coverFocusY, 0, 100, 35); s.coverSharp = num(s.coverSharp, 30, 95, 60);
   s.coverVeil = num(s.coverVeil, 0, 100, 35);

@@ -7,10 +7,10 @@
 const SEAL_BTN_CSS = `
 .open-cover .oc-btn.oc-sealbtn{background:none !important;box-shadow:none !important;padding:0;border-radius:0;gap:8px;animation:none;color:var(--ink);}
 .open-cover.oc-s-door .oc-sealbtn,.open-cover.oc-s-curtain .oc-sealbtn,.open-cover.oc-s-lock .oc-sealbtn{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);}
-.oc-sealwrap{position:relative;display:block;width:128px;height:128px;animation:oc-sealpop 3.2s ease-in-out infinite;filter:drop-shadow(0 5px 7px rgba(0,0,0,.38));transition:transform .55s ease,opacity .45s ease;}
-.oc-sealwrap::before,.oc-sealwrap::after{content:"";position:absolute;inset:6%;border:2px solid color-mix(in srgb,var(--accent-2) 85%,transparent);border-radius:50%;pointer-events:none;opacity:0;animation:oc-sealring 4.2s ease-out infinite;}
+.oc-sealwrap{position:relative;display:block;width:128px;height:128px;animation:oc-sealpop 3.2s ease-in-out infinite;will-change:transform;transition:transform .55s ease,opacity .45s ease;}
+.oc-sealwrap::before,.oc-sealwrap::after{content:"";position:absolute;inset:6%;border:2px solid color-mix(in srgb,var(--accent-2) 85%,transparent);border-radius:50%;pointer-events:none;opacity:0;will-change:transform,opacity;animation:oc-sealring 4.2s ease-out infinite;}
 .oc-sealwrap::after{animation-delay:2.1s;}
-.oc-sealbtn-pic{display:block;width:100%;height:100%;object-fit:contain;}
+.oc-sealbtn-pic{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 5px 7px rgba(0,0,0,.38));}   /* the shadow sits on the (still) picture, so only the cheap transform animates */
 .oc-sealwrap.ly-missing{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23C9A227'/%3E%3Cpath d='M40 30v40l32-20z' fill='%23fff'/%3E%3C/svg%3E") center/62% no-repeat;}
 .oc-sealwrap.ly-missing .oc-sealbtn-pic{display:none;}
 .oc-sealbtn .oc-km{font-size:15px;font-weight:600;line-height:1.6;}
@@ -30,16 +30,62 @@ function coverDeco_(key, s){
   if(COVER_DECO_STYLES.indexOf(key) < 0 || layoutOf_(s)) return none;
   const pic = coverDecoFor_(s) || {};
   const ok = id => id && id !== "none" && id !== "custom";
-  let bg = "", frame = "";
+  const bfk = (s.blockFrame && s.blockFrame !== "none" && hasOwn(BLOCK_FRAMES, s.blockFrame)) ? s.blockFrame : "";
+  let bg = "", frame = "", bfCss = "";
   if(pic.bg) bg = `<div class="oc-deco-bg" style="background-image:url('${pic.bg}')" aria-hidden="true"></div>`;
   else if(ok(s.kbachBg)) bg = buildKbachFrameOverlay(s.kbachBg, null, s, "bg");
-  if(pic.frame) frame = `<div class="oc-deco-frame" style="background-image:url('${pic.frame}')" aria-hidden="true"></div>`;
+  if(bfk){
+    // the frame chosen for the information blocks is ALSO the frame of the cover (same picture, drawn full-screen: corners keep their shape, edges stretch)
+    const f = BLOCK_FRAMES[bfk], [t, r, b, l] = f.slice, iw = f.iw || 648;
+    const w = [t, r, b, l].map(v => "calc(var(--cf-k) * " + v + ")").join(" ");
+    frame = `<div class="oc-deco-bf" aria-hidden="true"></div>`;
+    bfCss = `.oc-deco-bf{position:absolute;inset:0;z-index:6;pointer-events:none;box-sizing:border-box;--cf-k:calc(min(100vw,560px) / ${iw});border:solid transparent;border-width:${w};border-image:url('${blockFrameUrl_(bfk)}') ${t} ${r} ${b} ${l} / ${w} ${f.repeat};}
+`;
+  }
+  else if(pic.frame) frame = `<div class="oc-deco-frame" style="background-image:url('${pic.frame}')" aria-hidden="true"></div>`;
   else if(ok(s.kbachFrame)) frame = buildKbachFrameOverlay(s.kbachFrame, null, s, "frame");
   if(!bg && !frame) return none;
   return { bg, frame, css:`.oc-deco-bg{position:absolute;inset:0;z-index:1;background-size:cover;background-position:center;background-repeat:no-repeat;pointer-events:none;}
 .oc-deco-frame{position:absolute;inset:0;z-index:6;background-size:100% 100%;background-position:center;background-repeat:no-repeat;pointer-events:none;}
 .open-cover .kb-frame,.open-cover .kb-ov,.open-cover .kbach-custom-frame{z-index:6;}
-` };
+${bfCss}` };
+}
+// Four-corner frame around every information block (see BLOCK_FRAMES in wib-data.js). Not used when a layout is on (a layout draws its own).
+function buildBlockFrameCss_(s){
+  const k = s && s.blockFrame;
+  if(!k || k === "none" || !hasOwn(BLOCK_FRAMES, k)) return "";
+  const f = BLOCK_FRAMES[k], u = blockFrameUrl_(k);
+  const n = Number(s.blockFrameSize), size = (Number.isFinite(n) ? Math.max(50, Math.min(200, n)) : 100) / 100;
+  const [t, r, b, l] = f.slice, q = v => (v / l).toFixed(4);
+  const SEL = ".welcome,.dress-card,.venue-card,.contact-card,.gift-card";
+  const after = SEL.split(",").map(x => x + "::after").join(",");
+  const pad = "max(22px,calc(" + f.pad + "px * " + size + ")) !important";
+  const bw = "calc(var(--bf-px) * " + q(t) + ") calc(var(--bf-px) * " + q(r) + ") calc(var(--bf-px) * " + q(b) + ") var(--bf-px)";
+  return `
+${SEL}{position:relative;overflow:visible;--bf-px:calc(min(${f.w}px,${(f.w / 3.9).toFixed(2)}vw) * ${size});padding-left:${pad};padding-right:${pad};padding-top:${pad};padding-bottom:${pad};}
+${after}{content:"";position:absolute;inset:calc(-1 * min(var(--bf-px) * .3,14px));border:solid transparent;border-width:${bw};border-image:url('${u}') ${t} ${r} ${b} ${l} / ${bw} ${f.repeat};pointer-events:none;z-index:3;box-sizing:border-box;}
+`;
+}
+// <link rel="preload"> for the pictures of the opening screen (seal, door / curtain / … pictures, cover frame + background), placed at the very top of <head>
+// so they start downloading BEFORE the browser reads the big inline data (photos, song) further down the page.
+function coverPreloadLinks_(s){
+  const urls = [];
+  try{
+    const ly = layoutOf_(s);
+    if(ly){
+      const sp = ly.art && ly.art.seal;
+      if(sp && sp.file) urls.push(lySealUrls_(sp.file)[0]);
+    }else{
+      const key = hasOwn(COVER_STYLES, s.openStyle) ? s.openStyle : "door";
+      if(SEAL_BTN_STYLES.indexOf(key) >= 0 && hasOwn(SEAL_BUTTONS, s.sealBtn) && s.sealBtn !== "none") urls.push(lySealUrls_(SEAL_BUTTONS[s.sealBtn].file)[0]);
+      const iu = (COVER_IMG_STYLES[key] && !s.__noCoverImg) ? coverImgFor_(key, s) : null;
+      if(iu) Object.keys(iu).forEach(k => urls.push(iu[k]));
+      const bfk = (s.blockFrame && s.blockFrame !== "none" && hasOwn(BLOCK_FRAMES, s.blockFrame)) ? s.blockFrame : "";
+      if(bfk) urls.push(blockFrameUrl_(bfk));   // the same picture frames the cover and the information blocks
+      if(COVER_DECO_STYLES.indexOf(key) >= 0){ const dc = coverDecoFor_(s); if(dc){ if(dc.bg) urls.push(dc.bg); if(dc.frame && !bfk) urls.push(dc.frame); } }
+    }
+  }catch(e){}
+  return urls.filter((u, i) => u && urls.indexOf(u) === i).map(u => `<link rel="preload" as="image" fetchpriority="high" href="${escapeHtml(u)}">`).join("");
 }
 function buildMusicParts(s){
   const music = (musicAsset && musicAsset.dataUrl) ? musicAsset : null;
@@ -856,7 +902,7 @@ function renderInvitation(s){
   const lbx = buildLightbox();
   const calJs = (targetIso && !isNaN(Date.parse(targetIso))) ? `try{(${wibCalendarRuntime.toString()})(${JSON.stringify(buildCalendarCfg(s, targetIso)).replace(/</g, "\\u003c")});}catch(e){}` : "";
 
-  return `<!DOCTYPE html><html lang="km"><head><meta charset="UTF-8">
+  return `<!DOCTYPE html><html lang="km"><head><meta charset="UTF-8">${coverPreloadLinks_(s)}
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${escapeHtml(s.groomName)} & ${escapeHtml(s.brideName)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1031,7 +1077,7 @@ body.guest-mode .lang-toggle{top:62px;}
 .fx-toggle button.active{background:var(--accent-1);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);}
 body.guest-mode .fx-toggle{top:62px;}
 @media(max-width:480px){.hero{padding:40px 18px 30px;}.welcome{padding:22px 20px;}.lang-toggle{top:10px;right:10px;}.lang-toggle button{padding:7px 12px;font-size:12px;}body.guest-mode .lang-toggle{top:56px;}.fx-toggle{top:10px;left:10px;}.fx-toggle button{width:28px;height:28px;font-size:13px;}body.guest-mode .fx-toggle{top:56px;}}
-${ly ? buildLayoutCss_(ly) : ""}${mp.css}${buildTextAnimCss(ta)}${buildTextFxCss(s.textFx, ta)}${lbx.css}</style></head><body${bodyClass}>
+${ly ? buildLayoutCss_(ly) : buildBlockFrameCss_(s)}${mp.css}${buildTextAnimCss(ta)}${buildTextFxCss(s.textFx, ta)}${lbx.css}</style></head><body${bodyClass}>
 ${ly ? buildLayoutLayers_(ly, t) : buildKbachFrameOverlay(s.kbachBg, t, s, "bg") + buildKbachFrameOverlay(s.kbachFrame, t, s, "frame")}
 <div class="lang-toggle">
   <button id="btn-km" class="active" type="button">${LKM.toggleKm}</button>
