@@ -162,10 +162,12 @@ function lyFrameHtml_(F, noTrim){
     }
     if(F.layout === "border"){
       // 9-slice: the 4 corner pieces keep their shape, the 4 edges are TILED (not stretched) -> thin frame that reaches the screen edges on all sides, no distortion
-      // border = thickness of the frame (smaller = thinner) | slice = corner size in the picture (px): one number, or [top,right,bottom,left] when the 4 sides differ
+      // border = thickness of the frame (smaller = thinner) · borderY = thickness of the top edge, only if it must differ | slice = corner size in the picture (px): one number, or [top,right,bottom,left] when the 4 sides differ
       // width = how wide the frame is (default: the whole screen, max 680px)
       const bw = F.border || "min(12vw,60px)", S = Array.isArray(F.slice) ? F.slice : [F.slice || 155, F.slice || 155, F.slice || 155, F.slice || 155];
-      const ws = S.map(v => `calc(${bw} * ${(v / S[3]).toFixed(4)})`).join(" ");
+      // borderY (optional) = thickness of the TOP edge when it must scale differently from the sides (wide screens); default keeps the picture's proportions
+      const bwY = F.borderY || `calc(${bw} * ${(S[0] / S[3]).toFixed(4)})`;
+      const ws = [bwY, `calc(${bw} * ${(S[1] / S[3]).toFixed(4)})`, `calc(${bwY} * ${(S[2] / S[0]).toFixed(4)})`, bw].join(" ");
       html += `<div class="ly-frame ly-bdr" style="width:${F.width || "min(100vw,680px)"};box-sizing:border-box;border-style:solid;border-color:transparent;border-width:${ws};border-image:url('${lyUrl_(F.file)}') ${S.join(" ")} / ${ws} / 0 round;${f ? "filter:" + f + ";" : ""}" aria-hidden="true"></div>`;
       return html;
     }
@@ -350,7 +352,7 @@ function lySealUrls_(file){
 }
 function lySealImg_(sp, cls){
   const u = lySealUrls_(sp.file);
-  return `<img class="${cls}" src="${u[0]}" data-fb="${u.slice(1).join("|")}" alt="" decoding="async" onerror="var a=(this.getAttribute('data-fb')||'').split('|').filter(Boolean);if(a.length){this.setAttribute('data-fb',a.slice(1).join('|'));this.src=a[0];}else{this.parentNode.classList.add('ly-missing');}">`;
+  return `<img class="${cls}" src="${u[0]}" data-fb="${u.slice(1).join("|")}" alt="" decoding="async" fetchpriority="high" onerror="var a=(this.getAttribute('data-fb')||'').split('|').filter(Boolean);if(a.length){this.setAttribute('data-fb',a.slice(1).join('|'));this.src=a[0];}else{this.parentNode.classList.add('ly-missing');}">`;
 }
 function lyCoverBits_(s){
   const ly = layoutOf_(s);
@@ -445,11 +447,11 @@ COVER_STYLES.seal = {
 .oc-seal span{display:block;line-height:1;text-shadow:0 1px 1px rgba(0,0,0,.35);}
 .oc-seal i{display:inline;position:static;font-style:normal;font-size:.66em;margin:0 1px;opacity:.9;}
 .oc-seal-img{width:var(--seal-size,84px);height:var(--seal-size,84px);margin:calc(var(--seal-size,84px) / -2) 0 0 calc(var(--seal-size,84px) / -2);}
-.oc-seal-pic{display:block;width:100%;height:100%;object-fit:contain;}
-.oc-seal-img:not(.ly-missing){background:none;box-shadow:none;border-radius:0;filter:drop-shadow(0 5px 7px rgba(0,0,0,.4));}
+.oc-seal-pic{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 5px 7px rgba(0,0,0,.4));}
+.oc-seal-img:not(.ly-missing){background:none;box-shadow:none;border-radius:0;will-change:transform;}
 .oc-seal-img:not(.ly-missing) span{display:none;}
 .oc-seal-img:not(.ly-missing){animation:oc-sealpop 3.2s ease-in-out infinite;}
-.oc-seal-img:not(.ly-missing)::before,.oc-seal-img:not(.ly-missing)::after{content:"";position:absolute;inset:6%;border:2px solid color-mix(in srgb,var(--accent-2) 85%,transparent);border-radius:50%;pointer-events:none;opacity:0;animation:oc-sealring 4.2s ease-out infinite;}
+.oc-seal-img:not(.ly-missing)::before,.oc-seal-img:not(.ly-missing)::after{content:"";position:absolute;inset:6%;border:2px solid color-mix(in srgb,var(--accent-2) 85%,transparent);border-radius:50%;pointer-events:none;opacity:0;will-change:transform,opacity;animation:oc-sealring 4.2s ease-out infinite;}
 .oc-seal-img:not(.ly-missing)::after{animation-delay:2.1s;}
 @keyframes oc-sealpop{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
 @keyframes oc-sealring{0%{transform:scale(.8);opacity:.9;}100%{transform:scale(1.7);opacity:0;}}

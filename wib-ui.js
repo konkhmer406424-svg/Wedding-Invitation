@@ -393,6 +393,14 @@ function refreshBgBlurUI(){
   const v = Number(state.bgBlur) || 0;
   r.value = String(v); $("bgBlurStdVal").textContent = v ? v + " px" : "បិទ";
 }
+(function bindBlockFrameSize(){
+  const r = $("blockFrameSize"); if(!r) return;
+  r.addEventListener("input", ev => {
+    state.blockFrameSize = Math.max(50, Math.min(200, Number(ev.target.value) || 100));
+    $("blockFrameSizeVal").textContent = state.blockFrameSize + "%";
+    scheduleUpdate();
+  });
+})();
 (function bindBgBlur(){
   const r = $("bgBlurStd"); if(!r) return;
   r.addEventListener("input", ev => {
@@ -1376,7 +1384,7 @@ refreshMusicUI();
 // ---------------------------------------------------------------------
 function refreshAllBuildersFromState_(){
   buildThemeSelect(); buildFontSelects(); buildCoverStyleSelect(); buildGalleryStyleSelect(); buildGalleryArtSelect(); buildCoverArtSelect();
-  buildKbachFrameSelect(); buildFlowerSetSelect(); buildTextAnimSelect(); buildTimeline(); buildTimelineTemplates(); buildContacts();
+  buildKbachFrameSelect(); buildBlockFrameSelect(); buildFlowerSetSelect(); buildTextAnimSelect(); buildTimeline(); buildTimelineTemplates(); buildContacts();
   buildPhotos(); buildCoverPhoto(); buildKhqr(); buildDressColors(); buildTemplateChips(); bindSimpleFields(); update();
 }
 function buildPresetCards(){
@@ -1454,7 +1462,7 @@ function normalizeImported(raw){
   s.venueMapLink = /^https?:\/\/\S+$/i.test(bkStr(r.venueMapLink, 2000).trim()) ? bkStr(r.venueMapLink, 2000).trim() : "";
   s.guestNamesFileRaw = bkStr(r.guestNamesFileRaw, 500000);
   s.theme = (typeof r.theme === "string" && hasOwn(THEMES, r.theme)) ? r.theme : defaultState.theme;
-  ["kbachFrame","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadMore","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","layout","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil","sealBtn","textFx","flowerSet"]
+  ["kbachFrame","blockFrame","blockFrameSize","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadMore","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","layout","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil","sealBtn","textFx","flowerSet"]
     .forEach(k => { if(r[k] !== undefined) s[k] = r[k]; });
   s.galleryArts = Array.isArray(r.galleryArts) ? r.galleryArts : (typeof r.galleryArt === "string" ? [r.galleryArt] : []);   // cleaned by migrateStyle_
   if(!hasOwn(COVER_ART, s.coverArt)) s.coverArt = "none";
@@ -1592,7 +1600,8 @@ $("backupImportFile").addEventListener("change", e => {
   if(file) importProject(file);
 });
 
-probeCoverImages().then(changed => { if(changed) update(); });   // opening screens drawn from pictures in images/open/ (if any)
+probeCoverImages().then(changed => { if(changed) update(); });
+probeBlockFrames().then(() => buildBlockFrameSelect());   // four-corner frames for the information blocks (images/blockframes/)   // opening screens drawn from pictures in images/open/ (if any)
 loadMusicOnStartup();
 loadFrameOnStartup();
 

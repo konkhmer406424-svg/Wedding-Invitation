@@ -147,6 +147,21 @@ function kbachThumb(layer, k){
   if(!u) return NONE_ICON;
   return `<img class="kbach-thumb" src="${u}" alt="" loading="lazy" onerror="this.style.opacity=.25">`;
 }
+function buildBlockFrameSelect(){   // four-corner frames around each information block: only the frames whose picture exists are offered
+  const g = $("blockFrameGroup"); if(!g) return;
+  const keys = Object.keys(BLOCK_FRAMES).filter(k => blockFrameUrls[k]);
+  g.style.display = keys.length ? "" : "none";
+  if(!keys.length) return;
+  if(!state.blockFrame || (state.blockFrame !== "none" && !hasOwn(BLOCK_FRAMES, state.blockFrame))) state.blockFrame = "none";
+  const items = [{ key:"none", title:"គ្មាន", inner:NONE_ICON }].concat(keys.map(k => ({ key:k, title:BLOCK_FRAMES[k].label, inner:`<img class="kbach-thumb" src="${blockFrameUrls[k]}" alt="" loading="lazy" onerror="this.style.opacity=.25">` })));
+  renderPicker("pickBlockFrame", items, state.blockFrame, k => { state.blockFrame = k; buildBlockFrameSelect(); update(); });
+  const box = $("blockFrameSizeBox"), r = $("blockFrameSize");
+  if(box && r){
+    box.style.display = state.blockFrame !== "none" ? "" : "none";
+    const v = Number(state.blockFrameSize) || 100;
+    r.value = String(v); $("blockFrameSizeVal").textContent = v + "%";
+  }
+}
 function buildKbachFrameSelect(){
   if(!hasOwn(KBACH_FRAME_STYLES, state.kbachFrame)) state.kbachFrame = "none";
   renderPicker("pickKbach", Object.keys(KBACH_FRAME_STYLES).map(k => ({ key:k, title:KBACH_FRAME_STYLES[k].label, inner:kbachThumb("frame", k) })),
