@@ -92,6 +92,7 @@ function buildThemeSelect(){
     if(k === "__layout") state.lyColor = "layout"; else { state.theme = k; state.lyColor = "theme"; }
     buildThemeSelect(); update();
   });
+  buildTextFxSelect(true);   // swatches of the colour-mix text effects follow the colours
 }
 function buildFontSelects(){
   if(!hasOwn(FONT_KM, state.fontKm)) state.fontKm = Object.keys(FONT_KM)[0];
@@ -212,11 +213,16 @@ function buildTextAnimSelect(){
     });
   buildTextFxSelect();
 }
-function buildTextFxSelect(){
+function buildTextFxSelect(force){
   if(!hasOwn(TEXT_FX_STYLES, state.textFx)) state.textFx = "none";
-  renderPicker("pickTextFx", Object.keys(TEXT_FX_STYLES).map(k => ({ key:k, title:TEXT_FX_STYLES[k].label,
-    inner: '<span class="tfx tfx-' + k + '">កខ</span>' })),
-    state.textFx, k => { state.textFx = k; buildTextFxSelect(); update(); });
+  const th = (typeof layoutTheme_ === "function" && layoutTheme_(state)) || THEMES[state.theme] || THEMES.gold;   // layout palette or colour theme
+  const el = $("pickTextFx");
+  if(el && force) el._pkSig = null;   // new colour-mix swatches follow the theme colours
+  renderPicker("pickTextFx", Object.keys(TEXT_FX_STYLES).map(k => {
+    const sw = textFxSwatchCss(k, th.accent1, th.accent2);
+    return { key:k, title:TEXT_FX_STYLES[k].label,
+      inner: '<span class="tfx tfx-' + k + '"' + (sw ? ' style="' + sw + '"' : '') + '>កខ</span>' };
+  }), state.textFx, k => { state.textFx = k; buildTextFxSelect(); update(); });
 }
 function buildCoverStyleSelect(){
   if(!hasOwn(COVER_STYLES, state.openStyle)) state.openStyle = "door";
@@ -235,13 +241,25 @@ function buildCoverStyleSelect(){
   refreshMusicUI();
 }
 // ប៊ូតុងត្រា — បង្ហាញតែពេលប្រើអេក្រង់បើកបែបដើម ហើយមិនមាន Layout (Layout មានត្រារបស់ខ្លួនរួចហើយ)
-function buildSealSelect(){
+// thumbnail of one seal: its own possible addresses are tried in turn (the picture may sit in images/open/ or be a .webp)
+function sealThumbHtml_(file){
+  const u = lySealUrls_(file, true);
+  return '<img class="seal-thumb" src="' + u[0] + '" data-fb="' + u.slice(1).join("|") + '" alt="" decoding="async" '
+    + 'onerror="var a=(this.getAttribute(\'data-fb\')||\'\').split(\'|\').filter(Boolean);if(a.length){this.setAttribute(\'data-fb\',a.slice(1).join(\'|\'));this.src=a[0];}else{this.style.visibility=\'hidden\';}">';
+}
+function buildSealSelect(force){
   const g = $("sealBtnGroup"); if(!g) return;
   if(!hasOwn(SEAL_BUTTONS, state.sealBtn)) state.sealBtn = "none";
+  // find where each seal picture really is (once) → the picker and the cover use that address straight away
+  if(typeof lyProbeSeal_ === "function") Object.keys(SEAL_BUTTONS).forEach(k => {
+    const f = SEAL_BUTTONS[k].file;
+    if(f) lyProbeSeal_(f, () => { buildSealSelect(true); if(state.sealBtn === k) update(); });
+  });
+  const pk = $("pickSeal"); if(pk && force) pk._pkSig = null;
   const hasLy = (typeof layoutOf_ === "function") && !!layoutOf_(state);
   g.style.display = ((!hasLy || state.lyOpen === "classic") && SEAL_BTN_STYLES.indexOf(state.openStyle) >= 0) ? "" : "none";
   renderPicker("pickSeal", Object.keys(SEAL_BUTTONS).map(k => ({ key:k, title:SEAL_BUTTONS[k].label,
-    inner: k === "none" ? NONE_ICON : '<img class="seal-thumb" src="' + lyUrl_(SEAL_BUTTONS[k].file) + '" alt="" onerror="this.style.display=\'none\'">' })),
+    inner: k === "none" ? NONE_ICON : sealThumbHtml_(SEAL_BUTTONS[k].file) })),
     state.sealBtn, k => {
       state.sealBtn = k; buildSealSelect();
       try{ sessionStorage.removeItem("wib-cover-seen"); }catch(e){}   // show it in the preview straight away

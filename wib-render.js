@@ -5,7 +5,7 @@
    ========================================================================== */
 // ---------- Seal button (ប៊ូតុងត្រា) for the 6 classic opening screens: the seal picture replaces the plain button ----------
 const SEAL_BTN_CSS = `
-.open-cover .oc-btn.oc-sealbtn{background:none !important;box-shadow:none !important;padding:0;border-radius:0;gap:8px;animation:none;color:var(--ink);}
+.open-cover .oc-btn.oc-sealbtn{touch-action:manipulation;-webkit-tap-highlight-color:transparent;background:none !important;box-shadow:none !important;padding:0;border-radius:0;gap:8px;animation:none;color:var(--ink);}
 .open-cover.oc-s-door .oc-sealbtn,.open-cover.oc-s-curtain .oc-sealbtn,.open-cover.oc-s-lock .oc-sealbtn{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);}
 .oc-sealwrap{position:relative;display:block;width:128px;height:128px;animation:oc-sealpop 3.2s ease-in-out infinite;will-change:transform;transition:transform .55s ease,opacity .45s ease;}
 .oc-sealwrap::before,.oc-sealwrap::after{content:"";position:absolute;inset:6%;border:2px solid color-mix(in srgb,var(--accent-2) 85%,transparent);border-radius:50%;pointer-events:none;opacity:0;will-change:transform,opacity;animation:oc-sealring 4.2s ease-out infinite;}
@@ -627,6 +627,39 @@ function buildTextFxCss(fx, ta){
   const SATINC = `background:linear-gradient(100deg,#fffbe8 0%,${M(A1,70,"#fff")} 32%,${A1} 58%,${M(A2,72,"#fff")} 100%);` + CLIP;
   const PALE  = `background:linear-gradient(180deg,#fffef4 0%,${M(A1,35,"#fff")} 45%,${A1} 100%);` + CLIP;     // light fill so the halo shows
   const SOLID = `background:linear-gradient(180deg,${M(A1,70,"#fff")} 0%,${A1} 55%,${A2} 100%);` + CLIP;       // calm fill so the thickness shows
+  // ---- ម៉ូតថ្មី ៤ ក្រុម × (២ / ៣ / ៤ ពណ៌): ls = Long Shadow · wc = Watercolor · sn = Soft Neon · ol = Outline ----
+  // ពណ៌លាយពីពណ៌ធីម (accent-1, accent-2) ដូច្នេះត្រូវនឹងគ្រប់ធីម។ ចំនួនពណ៌ = ចំនួនពណ៌ដែលលាយក្នុងអក្សរ (២ = ស្រាល · ៤ = ហ៊ឺហា)
+  const mixKey = /^(ls|wc|sn|ol)([234])$/.exec(fx);
+  if(mixKey){
+    const n = +mixKey[2];
+    const HI = M(A2, 55, "#fff"), DEEP = M(A1, 70, "#000");
+    const ST = n === 2 ? [A2, A1] : (n === 3 ? [HI, A2, A1] : [HI, A2, A1, DEEP]);    // top → bottom
+    const LT = p => ST.map(c => M(c, p, "#fff"));                                     // lighter copy for names over a photo
+    const pos = arr => arr.map((c, i) => c + " " + Math.round(i * 100 / (arr.length - 1)) + "%").join(",");
+    const gs = (ang, arr, extra) => `background:linear-gradient(${ang},${pos(arr)});` + CLIP + (extra || "");
+    const ring = c => `drop-shadow(1px 0 0 ${c}) drop-shadow(-1px 0 0 ${c}) drop-shadow(0 1px 0 ${c}) drop-shadow(0 -1px 0 ${c})`;   // 1px thicker edge
+    if(mixKey[1] === "ls"){   // long shadow: thick edge + long diagonal shadow
+      const dk = n === 2 ? M(A1, 45, "#000") : (n === 3 ? M(A2, 40, "#000") : DEEP);
+      const LS = (c, sb, sa) => ring(c) + " " + Array(8).fill(`drop-shadow(1px 1px 0 ${c})`).join(" ") + ` drop-shadow(0 ${sb}px ${sb}px rgba(0,0,0,${sa}))`;
+      return grad(filt(LS(dk, 5, .28)), filt(LS("rgba(0,0,0,.75)", 10, .6)), false, gs("180deg", ST), gs("180deg", LT(60)));
+    }
+    if(mixKey[1] === "wc"){   // watercolour: colours bleed sideways, soft halo, thin translucent edge
+      const WG = gs("100deg", ST, `-webkit-text-stroke:.7px ${M(A1, 55, "transparent")};paint-order:stroke fill;`);
+      const WCC = gs("100deg", LT(55), "-webkit-text-stroke:.6px rgba(255,255,255,.55);paint-order:stroke fill;");
+      return grad(filt(`drop-shadow(0 1px 2px ${M(A1, 50, "transparent")}) drop-shadow(0 0 8px ${M(A2, 40, "transparent")})`),
+                  filt(`drop-shadow(0 1px 6px rgba(0,0,0,.5)) drop-shadow(0 0 8px ${M(A2, 45, "transparent")})`), false, WG, WCC);
+    }
+    if(mixKey[1] === "sn"){   // soft neon: one soft halo layer per colour (white-hot core → outer colour)
+      const GL = () => "drop-shadow(0 0 2px rgba(255,255,255,.95)) " + ST.map((c, i) => `drop-shadow(0 0 ${[5, 11, 20, 32][i]}px ${c})`).join(" ");
+      return grad(filt(GL()), filt(GL() + " drop-shadow(0 2px 6px rgba(0,0,0,.55))"), false, gs("180deg", LT(32)), gs("180deg", LT(70)));
+    }
+    // outline: translucent colour wash inside, solid outline, 3-4 colours add an offset second line
+    const OL = c => `-webkit-text-stroke:1.1px ${c};paint-order:stroke fill;`;
+    const wash = arr => arr.map(c => M(c, 38, "transparent"));
+    const g2 = n === 2 ? "" : (n === 3 ? `drop-shadow(1px 1px 0 ${A2})` : `drop-shadow(1px 1px 0 ${A2}) drop-shadow(2px 2px 0 ${HI})`);
+    return grad(filt(g2 + " drop-shadow(0 1px 2px rgba(0,0,0,.18))"), filt(g2 + " drop-shadow(0 2px 6px rgba(0,0,0,.6))"), false,
+                gs("180deg", wash(ST), OL(DEEP)), gs("180deg", wash(LT(60)), OL("#fff")));
+  }
   // ---- 5 extra looks from the reference table (fixed colours on purpose, they do NOT follow the theme). Keys: gold3d · neon · glass · popart · chrome ----
   if(fx === "gold3d") fx = "gradient";   // 1 modern shiny gold = the gradient look above
   const HALOS = (c1, c2) => `0 0 3px #fff,0 0 8px ${c1},0 0 18px ${c1},0 0 34px ${c2},0 0 58px ${c2}`;

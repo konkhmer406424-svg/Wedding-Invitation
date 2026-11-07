@@ -207,8 +207,51 @@ const TEXT_FX_STYLES = {
   neon:{ label:"នេអុងបំភាយពន្លឺ (Neon Glow)" },
   glass:{ label:"កញ្ចក់ថ្លា (Glass)" },
   popart:{ label:"ជ្រុងប៉បអាត (Pop Art)" },
-  chrome:{ label:"លោហៈប្រាក់ (Chrome)" }
+  chrome:{ label:"លោហៈប្រាក់ (Chrome)" },
+  // ម៉ូតថ្មី ៤ ក្រុម × (២ / ៣ / ៤ ពណ៌) — ពណ៌លាយពីពណ៌ធីម (accent1 + accent2)
+  ls2:{ label:"ស្រមោលវែង ២ ពណ៌ (Long Shadow)" },
+  ls3:{ label:"ស្រមោលវែង ៣ ពណ៌ (Long Shadow)" },
+  ls4:{ label:"ស្រមោលវែង ៤ ពណ៌ (Long Shadow)" },
+  wc2:{ label:"ទឹកពណ៌ ២ ពណ៌ (Watercolor)" },
+  wc3:{ label:"ទឹកពណ៌ ៣ ពណ៌ (Watercolor)" },
+  wc4:{ label:"ទឹកពណ៌ ៤ ពណ៌ (Watercolor)" },
+  sn2:{ label:"នេអុងទន់ ២ ពណ៌ (Soft Neon)" },
+  sn3:{ label:"នេអុងទន់ ៣ ពណ៌ (Soft Neon)" },
+  sn4:{ label:"នេអុងទន់ ៤ ពណ៌ (Soft Neon)" },
+  ol2:{ label:"គ្រោងអក្សរ ២ ពណ៌ (Outline)" },
+  ol3:{ label:"គ្រោងអក្សរ ៣ ពណ៌ (Outline)" },
+  ol4:{ label:"គ្រោងអក្សរ ៤ ពណ៌ (Outline)" }
 };
+// swatch របស់ម៉ូតថ្មីក្នុង picker (style ក្នុងខ្លួន ព្រោះគ្មាន CSS .tfx-ls2 ...) — ប្រើពណ៌ពិតរបស់ធីមដែលកំពុងជ្រើស
+function textFxMixHex_(a, b, p){
+  const f = c => { const m = /^#?([0-9a-f]{6})$/i.exec(String(c || "").trim()); return m ? [0, 2, 4].map(i => parseInt(m[1].substr(i, 2), 16)) : null; };
+  const x = f(a), y = f(b);
+  if(!x || !y) return a;
+  return "#" + x.map((v, i) => Math.max(0, Math.min(255, Math.round(v * p / 100 + y[i] * (100 - p) / 100))).toString(16).padStart(2, "0")).join("");
+}
+function textFxSwatchCss(k, a1, a2){
+  const m = /^(ls|wc|sn|ol)([234])$/.exec(k);
+  if(!m) return "";
+  const n = +m[2], H = textFxMixHex_, hi = H(a2, "#ffffff", 55), deep = H(a1, "#000000", 70);
+  const st = n === 2 ? [a2, a1] : (n === 3 ? [hi, a2, a1] : [hi, a2, a1, deep]);
+  const lt = p => st.map(c => H(c, "#ffffff", p));
+  const rgba = (c, al) => { const v = H(c, "#000000", 100); return "rgba(" + [1, 3, 5].map(i => parseInt(v.substr(i, 2), 16)).join(",") + "," + al + ")"; };
+  const clip = arr => "background:linear-gradient(180deg," + arr.join(",") + ");-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;";
+  const base = "display:inline-block;";
+  if(m[1] === "ls"){
+    const dk = n === 2 ? H(a1, "#000000", 45) : (n === 3 ? H(a2, "#000000", 40) : deep);
+    const ring = ["1px 0", "-1px 0", "0 1px", "0 -1px"].map(o => "drop-shadow(" + o + " 0 " + dk + ")").join(" ");
+    return base + clip(st) + "filter:" + ring + " " + Array(5).fill("drop-shadow(1px 1px 0 " + dk + ")").join(" ") + ";";
+  }
+  if(m[1] === "wc")
+    return base + clip(st).replace("180deg", "100deg") + "-webkit-text-stroke:.6px " + rgba(a1, .55) + ";filter:drop-shadow(0 1px 2px " + rgba(a1, .5) + ") drop-shadow(0 0 6px " + rgba(a2, .4) + ");";
+  if(m[1] === "sn"){
+    const sizes = [4, 9, 16, 26];
+    return base + clip(lt(32)) + "filter:drop-shadow(0 0 2px rgba(255,255,255,.95)) " + st.map((c, i) => "drop-shadow(0 0 " + sizes[i] + "px " + c + ")").join(" ") + ";";
+  }
+  const g2 = n === 2 ? "" : (n === 3 ? "drop-shadow(1px 1px 0 " + a2 + ")" : "drop-shadow(1px 1px 0 " + a2 + ") drop-shadow(2px 2px 0 " + hi + ")");
+  return base + clip(st.map(c => rgba(c, .38))) + "-webkit-text-stroke:1.1px " + deep + ";paint-order:stroke fill;" + (g2 ? "filter:" + g2 + ";" : "");
+}
 const TEXT_ANIM_STYLES = {
   fadeup:{ label:"លេចឡើងពីក្រោម (Fade up)" },
   words:{ label:"ស្រាយម្តងមួយពាក្យ (Word by word)" },
