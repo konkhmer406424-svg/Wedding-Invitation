@@ -84,8 +84,14 @@ function renderPicker(id, items, current, onPick){
 
 function buildThemeSelect(){
   if(!hasOwn(THEMES, state.theme)) state.theme = "gold";
-  renderPicker("pickTheme", Object.keys(THEMES).map(k => ({ key:k, title:THEMES[k].label, inner:`<span class="pick-swatch" style="background:${THEMES[k].swatch}"></span>` })),
-    state.theme, k => { state.theme = k; buildThemeSelect(); update(); });
+  const ly = (typeof layoutOf_ === "function") ? layoutOf_(state) : null;
+  const items = Object.keys(THEMES).map(k => ({ key:k, title:THEMES[k].label, inner:`<span class="pick-swatch" style="background:${THEMES[k].swatch}"></span>` }));
+  // with a layout on, the first choice is "តាមឈុត" = the layout's own colours (the default); any other choice replaces them
+  if(ly) items.unshift({ key:"__layout", title:"តាមឈុត", inner:`<span class="pick-swatch" style="background:${ly.swatch || "#ddd"}"></span>` });
+  renderPicker("pickTheme", items, (ly && state.lyColor !== "theme") ? "__layout" : state.theme, k => {
+    if(k === "__layout") state.lyColor = "layout"; else { state.theme = k; state.lyColor = "theme"; }
+    buildThemeSelect(); update();
+  });
 }
 function buildFontSelects(){
   if(!hasOwn(FONT_KM, state.fontKm)) state.fontKm = Object.keys(FONT_KM)[0];
@@ -153,7 +159,8 @@ function buildBlockFrameSelect(){   // four-corner frames around each informatio
   g.style.display = keys.length ? "" : "none";
   if(!keys.length) return;
   if(!state.blockFrame || (state.blockFrame !== "none" && !hasOwn(BLOCK_FRAMES, state.blockFrame))) state.blockFrame = "none";
-  const items = [{ key:"none", title:"គ្មាន", inner:NONE_ICON }].concat(keys.map(k => ({ key:k, title:BLOCK_FRAMES[k].label, inner:`<img class="kbach-thumb" src="${blockFrameUrls[k]}" alt="" loading="lazy" onerror="this.style.opacity=.25">` })));
+  const hasLy = (typeof layoutOf_ === "function") && !!layoutOf_(state);
+  const items = [{ key:"none", title:hasLy ? "តាមឈុត" : "គ្មាន", inner:NONE_ICON }].concat(keys.map(k => ({ key:k, title:BLOCK_FRAMES[k].label, inner:`<img class="kbach-thumb" src="${blockFrameUrls[k]}" alt="" loading="lazy" onerror="this.style.opacity=.25">` })));
   renderPicker("pickBlockFrame", items, state.blockFrame, k => { state.blockFrame = k; buildBlockFrameSelect(); update(); });
   const box = $("blockFrameSizeBox"), r = $("blockFrameSize");
   if(box && r){
@@ -213,9 +220,13 @@ function buildTextFxSelect(){
 }
 function buildCoverStyleSelect(){
   if(!hasOwn(COVER_STYLES, state.openStyle)) state.openStyle = "door";
-  renderPicker("pickCover", COVER_STYLE_KEYS.map(k => ({ key:k, title:COVER_STYLES[k].label, inner:COVER_ICONS[k] || COVER_STYLES[k].icon })),
-    state.openStyle, k => {
-      state.openStyle = k; buildCoverStyleSelect();
+  const ly = (typeof layoutOf_ === "function") ? layoutOf_(state) : null;
+  const items = COVER_STYLE_KEYS.map(k => ({ key:k, title:COVER_STYLES[k].label, inner:COVER_ICONS[k] || COVER_STYLES[k].icon }));
+  // with a layout on, the first choice is "តាមឈុត" = the layout's own opening screen (the default)
+  if(ly) items.unshift({ key:"__layout", title:"តាមឈុត", inner:`<span class="pick-swatch" style="background:${ly.swatch || "#ddd"}"></span>` });
+  renderPicker("pickCover", items, (ly && state.lyOpen !== "classic") ? "__layout" : state.openStyle, k => {
+      if(k === "__layout") state.lyOpen = "layout"; else { state.openStyle = k; state.lyOpen = "classic"; }
+      buildCoverStyleSelect();
       try{ sessionStorage.removeItem("wib-cover-seen"); }catch(e){}   // show the new style in the preview straight away
       update();
     });
@@ -228,7 +239,7 @@ function buildSealSelect(){
   const g = $("sealBtnGroup"); if(!g) return;
   if(!hasOwn(SEAL_BUTTONS, state.sealBtn)) state.sealBtn = "none";
   const hasLy = (typeof layoutOf_ === "function") && !!layoutOf_(state);
-  g.style.display = (!hasLy && SEAL_BTN_STYLES.indexOf(state.openStyle) >= 0) ? "" : "none";
+  g.style.display = ((!hasLy || state.lyOpen === "classic") && SEAL_BTN_STYLES.indexOf(state.openStyle) >= 0) ? "" : "none";
   renderPicker("pickSeal", Object.keys(SEAL_BUTTONS).map(k => ({ key:k, title:SEAL_BUTTONS[k].label,
     inner: k === "none" ? NONE_ICON : '<img class="seal-thumb" src="' + lyUrl_(SEAL_BUTTONS[k].file) + '" alt="" onerror="this.style.display=\'none\'">' })),
     state.sealBtn, k => {

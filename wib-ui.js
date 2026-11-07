@@ -1462,7 +1462,7 @@ function normalizeImported(raw){
   s.venueMapLink = /^https?:\/\/\S+$/i.test(bkStr(r.venueMapLink, 2000).trim()) ? bkStr(r.venueMapLink, 2000).trim() : "";
   s.guestNamesFileRaw = bkStr(r.guestNamesFileRaw, 500000);
   s.theme = (typeof r.theme === "string" && hasOwn(THEMES, r.theme)) ? r.theme : defaultState.theme;
-  ["kbachFrame","blockFrame","blockFrameSize","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadMore","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","layout","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil","sealBtn","textFx","flowerSet"]
+  ["kbachFrame","blockFrame","blockFrameSize","lyColor","lyOpen","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadMore","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","layout","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil","sealBtn","textFx","flowerSet"]
     .forEach(k => { if(r[k] !== undefined) s[k] = r[k]; });
   s.galleryArts = Array.isArray(r.galleryArts) ? r.galleryArts : (typeof r.galleryArt === "string" ? [r.galleryArt] : []);   // cleaned by migrateStyle_
   if(!hasOwn(COVER_ART, s.coverArt)) s.coverArt = "none";

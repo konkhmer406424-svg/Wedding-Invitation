@@ -27,13 +27,17 @@ const SEAL_BTN_CSS = `
 // an uploaded custom picture is not copied a second time into the page).
 function coverDeco_(key, s){
   const none = { bg:"", frame:"", css:"" };
-  if(COVER_DECO_STYLES.indexOf(key) < 0 || layoutOf_(s)) return none;
-  const pic = coverDecoFor_(s) || {};
-  const ok = id => id && id !== "none" && id !== "custom";
+  if(COVER_DECO_STYLES.indexOf(key) < 0) return none;
+  const lyOnS = !!layoutOf_(s);
   const bfk = (s.blockFrame && s.blockFrame !== "none" && hasOwn(BLOCK_FRAMES, s.blockFrame)) ? s.blockFrame : "";
+  if(lyOnS && !bfk) return none;   // a layout draws its own cover; only a frame chosen by the staff is added on top
+  const pic = lyOnS ? {} : (coverDecoFor_(s) || {});
+  const ok = id => id && id !== "none" && id !== "custom";
   let bg = "", frame = "", bfCss = "";
-  if(pic.bg) bg = `<div class="oc-deco-bg" style="background-image:url('${pic.bg}')" aria-hidden="true"></div>`;
-  else if(ok(s.kbachBg)) bg = buildKbachFrameOverlay(s.kbachBg, null, s, "bg");
+  if(!lyOnS){
+    if(pic.bg) bg = `<div class="oc-deco-bg" style="background-image:url('${pic.bg}')" aria-hidden="true"></div>`;
+    else if(ok(s.kbachBg)) bg = buildKbachFrameOverlay(s.kbachBg, null, s, "bg");
+  }
   if(bfk){
     // the frame chosen for the information blocks is ALSO the frame of the cover (same picture, drawn full-screen: corners keep their shape, edges stretch)
     const f = BLOCK_FRAMES[bfk], [t, r, b, l] = f.slice, iw = f.iw || 648;
@@ -75,6 +79,7 @@ function coverPreloadLinks_(s){
     if(ly){
       const sp = ly.art && ly.art.seal;
       if(sp && sp.file) urls.push(lySealUrls_(sp.file)[0]);
+      if(s.blockFrame && s.blockFrame !== "none" && hasOwn(BLOCK_FRAMES, s.blockFrame)) urls.push(blockFrameUrl_(s.blockFrame));
     }else{
       const key = hasOwn(COVER_STYLES, s.openStyle) ? s.openStyle : "door";
       if(SEAL_BTN_STYLES.indexOf(key) >= 0 && hasOwn(SEAL_BUTTONS, s.sealBtn) && s.sealBtn !== "none") urls.push(lySealUrls_(SEAL_BUTTONS[s.sealBtn].file)[0]);
@@ -894,7 +899,8 @@ function renderInvitation(s){
   const enSection = buildSection(s, t, "en");
   const LKM = LABELS.km, LEN = LABELS.en;
   const bodyClass = s.__guestName ? " class=\"guest-mode\"" : "";
-  const mp = buildMusicParts(ly ? Object.assign({}, s, { openStyle: ly.openStyle }) : s);
+  const sCover = !ly ? s : (s.lyOpen === "classic" ? Object.assign({}, s, { layout:"none" }) : Object.assign({}, s, { openStyle: ly.openStyle }));   // classic: the opening screen chosen in the Style tab replaces the layout's own
+  const mp = buildMusicParts(sCover);
   const ta = hasOwn(TEXT_ANIM_STYLES, s.textAnim) ? s.textAnim : "fadeup";
   const taJs = buildTextAnimJs(ta, !!s.__preview);
   const sFx = ly ? Object.assign({}, s, { kbachFrame:"none", kbachBg:"none" }) : s;   // a layout draws its own frame/background
@@ -902,7 +908,7 @@ function renderInvitation(s){
   const lbx = buildLightbox();
   const calJs = (targetIso && !isNaN(Date.parse(targetIso))) ? `try{(${wibCalendarRuntime.toString()})(${JSON.stringify(buildCalendarCfg(s, targetIso)).replace(/</g, "\\u003c")});}catch(e){}` : "";
 
-  return `<!DOCTYPE html><html lang="km"><head><meta charset="UTF-8">${coverPreloadLinks_(s)}
+  return `<!DOCTYPE html><html lang="km"><head><meta charset="UTF-8">${coverPreloadLinks_(sCover)}
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${escapeHtml(s.groomName)} & ${escapeHtml(s.brideName)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1077,7 +1083,7 @@ body.guest-mode .lang-toggle{top:62px;}
 .fx-toggle button.active{background:var(--accent-1);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);}
 body.guest-mode .fx-toggle{top:62px;}
 @media(max-width:480px){.hero{padding:40px 18px 30px;}.welcome{padding:22px 20px;}.lang-toggle{top:10px;right:10px;}.lang-toggle button{padding:7px 12px;font-size:12px;}body.guest-mode .lang-toggle{top:56px;}.fx-toggle{top:10px;left:10px;}.fx-toggle button{width:28px;height:28px;font-size:13px;}body.guest-mode .fx-toggle{top:56px;}}
-${ly ? buildLayoutCss_(ly) : buildBlockFrameCss_(s)}${mp.css}${buildTextAnimCss(ta)}${buildTextFxCss(s.textFx, ta)}${lbx.css}</style></head><body${bodyClass}>
+${ly ? buildLayoutCss_(ly) : ""}${buildBlockFrameCss_(s)}${mp.css}${buildTextAnimCss(ta)}${buildTextFxCss(s.textFx, ta)}${lbx.css}</style></head><body${bodyClass}>
 ${ly ? buildLayoutLayers_(ly, t) : buildKbachFrameOverlay(s.kbachBg, t, s, "bg") + buildKbachFrameOverlay(s.kbachFrame, t, s, "frame")}
 <div class="lang-toggle">
   <button id="btn-km" class="active" type="button">${LKM.toggleKm}</button>

@@ -38,15 +38,38 @@ function layoutOf_(s){
     const key = has(s.flowerSet) ? s.flowerSet : (has(ly.defaultSet) ? ly.defaultSet : Object.keys(ly.sets)[0]);
     ly.__v = ly.__v || {};
     if(!ly.__v[key]) ly.__v[key] = Object.assign({}, ly, ly.sets[key], { id:id, setKey:key });
-    return ly.__v[key];
+    return layoutVariant_(ly.__v[key], s);
   }
-  return ly;
+  return layoutVariant_(ly, s);
+}
+// A layout is a STARTING POINT: the colour, the opening screen and the frame can be replaced by the staff.
+//   s.lyColor === "theme"  → the colour theme chosen in the Style tab is used instead of the layout's own palette
+//   s.lyOpen  === "classic" → the opening screen chosen in the Style tab (door, rings, …) is used instead of the layout's envelope / tap  (see renderInvitation)
+//   s.blockFrame ≠ "none"   → the frame picture chosen in the Style tab replaces the layout's own frame pictures (frame, coverFrame, corners and l5's flower
+//                             blocks) and frames every information block + the cover instead
+// Everything not touched stays exactly as the layout made it.
+function layoutVariant_(ly, s){
+  const nf = !!(s && s.blockFrame && s.blockFrame !== "none" && hasOwn(BLOCK_FRAMES, s.blockFrame));
+  const tc = !!(s && s.lyColor === "theme");
+  if(!nf && !tc) return ly;
+  const k = (nf ? "f" : "") + (tc ? "c" : "");
+  ly.__x = ly.__x || {};
+  if(!ly.__x[k]){
+    const v = Object.assign({}, ly); delete v.__x;
+    if(nf){
+      const a = Object.assign({}, ly.art); delete a.frame; delete a.coverFrame; delete a.corners; v.art = a;
+      if(typeof ly.css === "function") v.css = null;   // l5: its css draws the flower blocks / oval countdown that the chosen frame replaces
+    }
+    if(tc) v.dark = false;                              // the dark text-shadows are made for the layout's own dark palette
+    ly.__x[k] = v;
+  }
+  return ly.__x[k];
 }
 // Theme object actually used while rendering: the layout's own palette wins over the colour theme.
 function layoutTheme_(s){
   const base = THEMES[hasOwn(THEMES, s.theme) ? s.theme : "gold"];
   const ly = layoutOf_(s);
-  return ly ? Object.assign({}, base, ly.palette, { ornate:true }) : base;
+  return ly ? Object.assign({}, base, (s.lyColor === "theme" ? null : ly.palette), { ornate:true }) : base;
 }
 
 // ---------- pictures + colour filters ----------

@@ -780,7 +780,7 @@ const PRESET_DESIGN_BASE = {
   theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"grid", galleryArts:[], coverArt:"none",
   kbachFrame:"none", frameFit:"stretch", frameOpacity:100, frameFx:"fade", frameSpread:0, frameSpreadMore:6, frameSnap:true,
   kbachBg:"none", bgFit:"cover", bgOpacity:100, bgBlur:0,
-  blockFrame:"none", blockFrameSize:100,
+  blockFrame:"none", blockFrameSize:100, lyColor:"layout", lyOpen:"layout",
   textAnim:"fadeup", openStyle:"door", layout:"none",
   coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60, coverVeil:35
 };
@@ -796,6 +796,7 @@ const defaultState = {
   kbachFrame:"none", kbachBg:"bg1",
   frameFit:"stretch", frameOpacity:100, frameFx:"fade", frameSpread:0, frameSpreadMore:6, frameSnap:true,
   bgFit:"cover", bgOpacity:100, bgBlur:0,
+  blockFrame:"none", blockFrameSize:100, lyColor:"layout", lyOpen:"layout",
   textAnim:"fadeup",
   textFx:"none",
   openStyle:"door",
@@ -950,6 +951,8 @@ function migrateStyle_(s){
   s.bgBlur = num(s.bgBlur, 0, 40, 0);
   if(typeof s.blockFrame !== "string" || (s.blockFrame !== "none" && !_ho(BLOCK_FRAMES, s.blockFrame))) s.blockFrame = "none";
   s.blockFrameSize = num(s.blockFrameSize, 50, 200, 100);
+  s.lyColor = s.lyColor === "theme" ? "theme" : "layout";      // layout: the layout's own colours · theme: the colour chosen in the Style tab
+  s.lyOpen = s.lyOpen === "classic" ? "classic" : "layout";    // layout: the layout's own opening screen · classic: the one chosen in the Style tab
   s.coverBlur = num(s.coverBlur, 0, 40, 22); s.coverFocusX = num(s.coverFocusX, 0, 100, 50);
   s.coverFocusY = num(s.coverFocusY, 0, 100, 35); s.coverSharp = num(s.coverSharp, 30, 95, 60);
   s.coverVeil = num(s.coverVeil, 0, 100, 35);
