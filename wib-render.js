@@ -5,7 +5,7 @@
    ========================================================================== */
 // ---------- Seal button (ប៊ូតុងត្រា) for the 6 classic opening screens: the seal picture replaces the plain button ----------
 const SEAL_BTN_CSS = `
-.open-cover .oc-btn.oc-sealbtn{touch-action:manipulation;-webkit-tap-highlight-color:transparent;background:none !important;box-shadow:none !important;padding:0;border-radius:0;gap:8px;animation:none;color:var(--ink);}
+.open-cover .oc-btn.oc-sealbtn{background:none !important;box-shadow:none !important;padding:0;border-radius:0;gap:8px;animation:none;color:var(--ink);}
 .open-cover.oc-s-door .oc-sealbtn,.open-cover.oc-s-curtain .oc-sealbtn,.open-cover.oc-s-lock .oc-sealbtn{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);}
 .oc-sealwrap{position:relative;display:block;width:128px;height:128px;animation:oc-sealpop 3.2s ease-in-out infinite;will-change:transform;transition:transform .55s ease,opacity .45s ease;}
 .oc-sealwrap::before,.oc-sealwrap::after{content:"";position:absolute;inset:6%;border:2px solid color-mix(in srgb,var(--accent-2) 85%,transparent);border-radius:50%;pointer-events:none;opacity:0;will-change:transform,opacity;animation:oc-sealring 4.2s ease-out infinite;}

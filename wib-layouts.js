@@ -365,39 +365,13 @@ function lySealSpec_(s){
 }
 // Seal picture addresses: the exact path first, then a few other places (a seal put in the wrong folder still shows).
 // NOTE: GitHub Pages is case-sensitive — "goal_tamp4.png" ≠ "Goal_tamp4.PNG".
-// SEAL_OK_[file] = the address that REALLY loads (found once by lyProbeSeal_). It is put first, so the cover / the picker do not
-// wait through a chain of 404 requests (one slow round-trip per wrong folder) before the seal appears.
-const SEAL_OK_ = {}, SEAL_TRIED_ = {};
-// ownOnly = true → only this seal's own possible addresses (no other layout's seal) — used for probing and for the picker thumbnails
-function lySealUrls_(file, ownOnly){
+function lySealUrls_(file){
   const base = String(file).split("/").pop(), v = "?v=" + ASSET_VERSION, root = assetBase(), list = [lyUrl_(file)];
-  const addRaw = u => { u = String(u).replace(/'/g, "%27"); if(list.indexOf(u) < 0) list.push(u); };
-  const add = u => addRaw(u + v);
-  const swap = f => /\.png$/i.test(f) ? f.replace(/\.png$/i, ".webp") : (/\.webp$/i.test(f) ? f.replace(/\.webp$/i, ".png") : f);   // the same picture saved as .webp (or .png)
-  const dirs = [root + "images/layouts/", root + "images/layouts/open/", root + "images/open/", root + "images/"];
-  dirs.forEach(d => add(d + base));
-  if(swap(base) !== base){ addRaw(lyUrl_(swap(String(file)))); dirs.forEach(d => add(d + swap(base))); }
-  if(!ownOnly){
-    // last resort: another layout's seal (so a seal still shows; tells you this layout's own file is not found)
-    Object.keys(LAYOUTS).forEach(k => { const a = LAYOUTS[k].art && LAYOUTS[k].art.seal; if(a && a.file) add(lyUrl_(a.file).split("?")[0]); });
-  }
-  const ok = SEAL_OK_[file];
-  if(ok){ const i = list.indexOf(ok); if(i > 0) list.splice(i, 1); if(i !== 0) list.unshift(ok); }
+  const add = u => { u = (u + v).replace(/'/g, "%27"); if(list.indexOf(u) < 0) list.push(u); };
+  [root + "images/layouts/" + base, root + "images/layouts/open/" + base, root + "images/open/" + base, root + "images/" + base].forEach(add);
+  // last resort: another layout's seal (so a seal still shows; tells you this layout's own file is not found)
+  Object.keys(LAYOUTS).forEach(k => { const a = LAYOUTS[k].art && LAYOUTS[k].art.seal; if(a && a.file) add(lyUrl_(a.file).split("?")[0]); });
   return list;
-}
-// Tries every possible address of a seal at the same time, once; the first one (in list order) that loads is remembered.
-// done(url) runs only when something new was found.
-function lyProbeSeal_(file, done){
-  if(!file || SEAL_OK_[file] || SEAL_TRIED_[file]) return;
-  SEAL_TRIED_[file] = true;
-  const list = lySealUrls_(file, true), res = new Array(list.length);
-  let left = list.length;
-  list.forEach((u, i) => {
-    const im = new Image();
-    const fin = ok => { res[i] = ok; if(--left > 0) return; const j = res.indexOf(true); if(j >= 0){ SEAL_OK_[file] = list[j]; if(done) done(list[j]); } };
-    im.onload = () => fin(true); im.onerror = () => fin(false);
-    im.src = u;
-  });
 }
 function lySealImg_(sp, cls){
   const u = lySealUrls_(sp.file);
