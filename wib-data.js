@@ -93,7 +93,7 @@ const LABELS = {
     programTitle:"កម្មវិធីនៃពិធីមង្គលការ", galleryTitle:"រូបភាពនៃពួកយើង",
     gallerySub:"ដាក់រូបភាព pre-wedding របស់អ្នកជំនួសកន្លែងទាំងនេះ", videoTitle:"វិឌីអូនៃពួកយើង", videoSub:"សូមចុចលេងដើម្បីទស្សនា", venueTitle:"ទីតាំងកម្មវិធី",
     mapBtn:"មើលទីតាំងលើ Google Maps", calBtn:"📅 រក្សាទុកក្នុង Calendar", contactsTitle:"ទំនាក់ទំនង",
-    contactsSub:"សម្រាប់ព័ត៌មានលម្អិត សូមទាក់ទងមកកាន់", thanks:"អរគុណ", and:"និង",
+    contactsSub:"សម្រាប់ព័ត៌មានលម្អិត សូមទាក់ទងមកកាន់", thanks:"អរគុណ", and:"និង", hostG:"ខាងកូនកម្លោះ", hostB:"ខាងកូនក្រមុំ",
     giftTitle:"ចំណងដៃ", giftSub:"ស្កេន KHQR ដោយកម្មវិធីធនាគារ ដើម្បីផ្ញើចំណងដៃជូនគូស្វាមីភរិយា", giftGroom:"ខាងកូនកម្លោះ", giftBride:"ខាងកូនក្រមុំ",
     dressTitle:"ពណ៌សម្លៀកបំពាក់", dressSub:"ភ្ញៀវអាចរៀបចំសម្លៀកបំពាក់តាមពណ៌ខាងក្រោម",
     giftSave:"⬇ រក្សាទុករូប KHQR", thanksTitle:"សេចក្ដីថ្លែងអំណរគុណ និងសូមអភ័យទោស", giftHint:"ប្រើទូរស័ព្ទតែមួយ? រក្សាទុករូបនេះ រួចបើកក្នុងកម្មវិធីធនាគារ ដើម្បីស្កេនពីរូបភាព",
@@ -103,7 +103,7 @@ const LABELS = {
     programTitle:"Wedding Program", galleryTitle:"Our Moments Together",
     gallerySub:"Your pre-wedding photos will appear here", videoTitle:"Our Video", videoSub:"Tap play to watch", venueTitle:"Event Location",
     mapBtn:"View on Google Maps", calBtn:"📅 Save to Calendar", contactsTitle:"Contact Us",
-    contactsSub:"For more details, please reach out to", thanks:"Thank You", and:"&",
+    contactsSub:"For more details, please reach out to", thanks:"Thank You", and:"&", hostG:"Groom's side", hostB:"Bride's side",
     giftTitle:"Wedding Gift", giftSub:"Scan the KHQR with your banking app to send a gift to the couple", giftGroom:"Groom's Side", giftBride:"Bride's Side",
     dressTitle:"Dress Colours", dressSub:"Guests are warmly invited to dress in these colours",
     giftSave:"⬇ Save KHQR image", thanksTitle:"Gratitude & Humble Apology", giftHint:"On the same phone? Save this image, then scan it from your banking app's gallery.",
@@ -839,7 +839,7 @@ const defaultState = {
   kbachFrame:"none", kbachBg:"bg1",
   frameFit:"stretch", frameOpacity:100, frameFx:"fade", frameSpread:0, frameSpreadMore:6, frameSnap:true,
   bgFit:"cover", bgOpacity:100, bgBlur:0,
-  blockFrame:"none", blockFrameSize:100, lyColor:"layout", lyOpen:"layout",
+  blockFrame:"none", blockFrameSize:100, lyColor:"layout", lyOpen:"layout", nameSplit:true, hostsSplit:true,
   textAnim:"fadeup",
   textFx:"none",
   openStyle:"door",
@@ -995,6 +995,8 @@ function migrateStyle_(s){
   if(typeof s.blockFrame !== "string" || (s.blockFrame !== "none" && !_ho(BLOCK_FRAMES, s.blockFrame))) s.blockFrame = "none";
   s.blockFrameSize = num(s.blockFrameSize, 50, 200, 100);
   s.lyColor = s.lyColor === "theme" ? "theme" : "layout";      // layout: the layout's own colours · theme: the colour chosen in the Style tab
+  s.nameSplit = s.nameSplit !== false;     // groom and bride names in two colours
+  s.hostsSplit = s.hostsSplit !== false;   // parents in two blocks (groom's side | bride's side)
   s.lyOpen = s.lyOpen === "classic" ? "classic" : "layout";    // layout: the layout's own opening screen · classic: the one chosen in the Style tab
   s.coverBlur = num(s.coverBlur, 0, 40, 22); s.coverFocusX = num(s.coverFocusX, 0, 100, 50);
   s.coverFocusY = num(s.coverFocusY, 0, 100, 35); s.coverSharp = num(s.coverSharp, 30, 95, 60);

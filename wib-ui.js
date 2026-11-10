@@ -1270,6 +1270,11 @@ function bindSimpleFields(){
     venueCoords:"venueCoords",
     videoUrl:"videoUrl"
   };
+  ["nameSplit", "hostsSplit"].forEach(id => {   // tick-boxes: names in two colours · parents in two blocks (on unless turned off)
+    const cb = $(id); if(!cb) return;
+    cb.checked = state[id] !== false;
+    cb.onchange = () => { state[id] = cb.checked; update(); };
+  });
   Object.entries(map).forEach(([id,key]) => {
     const el = $(id);
     el.value = state[key] || "";
@@ -1469,6 +1474,7 @@ function normalizeImported(raw){
   if(r.kbachFrame === undefined && typeof r.frameStyle === "string") s.kbachFrame = r.frameStyle;
   s.openStyle = r.openStyle === "envelope" ? "rings" : (r.openStyle === "book" ? "heart" : r.openStyle);
   s.coverAlways = !!r.coverAlways;
+  s.nameSplit = r.nameSplit !== false; s.hostsSplit = r.hostsSplit !== false;
   s.eventDate = /^\d{4}-\d{2}-\d{2}$/.test(r.eventDate || "") ? r.eventDate : "";
   s.startTime = /^\d{2}:\d{2}$/.test(r.startTime || "") ? r.startTime : "";
   const list = (v, keys) => (Array.isArray(v) ? v : []).filter(x => x && typeof x === "object").slice(0, 200)

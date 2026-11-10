@@ -361,9 +361,14 @@ function buildSection(s, t, lang){
   const videoInfo = parseVideo(s.videoUrl);
   const mapPrev = buildMapPreview(s, lang, mapsUrl, venueName, venueAddr);
   const hasVenue = !!((venueName || "").trim() || (venueAddr || "").trim() || mapsUrl);
+  // parents: two blocks (groom's side | bride's side) — or the old single block when the staff turned it off
+  const h1t = String(host1 || "").trim(), h2t = String(host2 || "").trim();
+  const hostsHtml = (s.hostsSplit !== false && (h1t || h2t))
+    ? `<div class="hosts hosts-split${(h1t && h2t) ? "" : " one"}">${h1t ? `<div class="host-side host-g"><div class="host-label">${L.hostG}</div><div class="host-names">${escapeHtml(host1)}</div></div>` : ""}${h2t ? `<div class="host-side host-b"><div class="host-label">${L.hostB}</div><div class="host-names">${escapeHtml(host2)}</div></div>` : ""}</div>`
+    : `<div class="hosts">${escapeHtml(host1)}<br>${escapeHtml(host2)}</div>`;
   const secWelcome   = (isPrev || hasWelcome)   ? `<section><div class="wrap"><div class="welcome">
 <p>${escapeHtml(welcome)}</p>
-<div class="hosts">${escapeHtml(host1)}<br>${escapeHtml(host2)}</div>
+${hostsHtml}
 </div></div></section>` : "";
   const secCountdown = (isPrev || hasCountdown) ? `<section><div class="wrap">
 <h2 class="section-title display">${L.countdownTitle}</h2>
@@ -431,12 +436,16 @@ ${mapPrev.openUrl ? `<a class="map-btn" href="${escapeHtml(mapPrev.openUrl)}" ta
 </div></section>` : "";
   const bodySections = [secWelcome, secCountdown, secProgram, secDress, secGallery, secVideo, secVenue, secContacts, secGift, secThanks].filter(Boolean).join(divider);
 
+  // the two names are two elements, so each gets the text effect on its own, and the bride's is drawn with the accent colours swapped (see .names-b)
+  const namesHtml = (s.nameSplit !== false && String(groom || "").trim() && String(bride || "").trim())
+    ? `<h1 class="names-wrap"><span class="names display names-g">${escapeHtml(groom)}<span class="amp">${escapeHtml(L.and)}</span></span><span class="names display names-b">${escapeHtml(bride)}</span></h1>`
+    : `<h1 class="names display">${escapeHtml(groom)}<span class="amp">${escapeHtml(L.and)}</span>${escapeHtml(bride)}</h1>`;
   const lyp = lyHeroParts_(s, lang, { rawCover, artUrls: galleryArtUrls(s) });
   return `<section id="section${suf}" class="lang-section lang-${lang}" style="display:${isKm ? "block" : "none"}">
 <p class="guest-line" id="guestLine${suf}"${guestLineAttrs}>${escapeHtml(guestLineText)}</p>
 <section class="${heroClass}${lyOn ? " ly-hero ly-" + lyOn.id : ""}"${heroStyle}>${heroLayers}${lyp.pre}
 <p class="eyebrow">${escapeHtml(eyebrow)}</p>${lyp.mid}
-<h1 class="names display">${escapeHtml(groom)}<span class="amp">${escapeHtml(L.and)}</span>${escapeHtml(bride)}</h1>
+${namesHtml}
 <p class="hero-date">${displayDate}</p>${lyp.post}
 </section>
 ${bodySections}
@@ -948,7 +957,7 @@ function renderInvitation(s){
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Koulen&family=Odor+Mean+Chey&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
 <style>
-:root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--card:${t.card};--ctl-bg:color-mix(in srgb, ${t.card} 26%, transparent);--border:${t.border};--radius:${t.radius};--display-font:${fk.display};--body-font:${fk.body};--display-font-en:${fe.display};--body-font-en:${fe.body};}
+:root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--ac1:${t.accent1};--ac2:${t.accent2};--card:${t.card};--ctl-bg:color-mix(in srgb, ${t.card} 26%, transparent);--border:${t.border};--radius:${t.radius};--display-font:${fk.display};--body-font:${fk.body};--display-font-en:${fe.display};--body-font-en:${fe.body};}
 *{box-sizing:border-box}
 html{background:var(--bg);}
 body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
@@ -1003,6 +1012,22 @@ section{padding:30px 0;}
 .welcome{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:26px 32px;text-align:center;}
 .welcome p{font-size:18px;margin:0;}
 .hosts{margin-top:14px;font-size:18px;color:var(--accent-1);font-weight:600;}
+/* ---- groom / bride names in two colours: the bride's name is drawn with the accent colours swapped (every text effect follows) ---- */
+.names-wrap{margin:0;font:inherit;line-height:inherit;color:inherit;font-weight:inherit;}
+.names-wrap .names{display:block;}
+.names-wrap .names-b{--accent-1:var(--ac2);--accent-2:var(--ac1);}
+.names-wrap .names-g{-webkit-box-reflect:none !important;margin-bottom:0 !important;}   /* the reflection of the effects that have one is only drawn under the last name */
+/* ---- parents: two blocks, groom's side | bride's side ---- */
+.hosts-split{display:grid;grid-template-columns:1fr 1fr;margin-top:18px;text-align:center;}
+.hosts-split.one{grid-template-columns:1fr;}
+.hosts-split .host-side{padding:2px 12px;min-width:0;overflow-wrap:anywhere;}
+.hosts-split .host-side + .host-side{border-left:1px solid color-mix(in srgb,var(--accent-2) 55%,transparent);}
+.host-label{font-size:.7em;font-weight:500;letter-spacing:.03em;color:var(--ink);opacity:.72;margin-bottom:6px;}
+.host-g .host-names{color:var(--accent-1);}
+.host-b .host-names{color:color-mix(in srgb,var(--accent-2) 62%,var(--ink));}
+.hosts-split .host-names{font-weight:600;line-height:1.55;}
+@media(max-width:330px){.hosts-split{grid-template-columns:1fr;}.hosts-split .host-side + .host-side{border-left:0;border-top:1px solid color-mix(in srgb,var(--accent-2) 55%,transparent);margin-top:12px;padding-top:12px;}}
+
 .countdown{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
 .cd-unit{width:76px;padding:16px 0;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);}
 .cd-num{font-size:40px;font-weight:800;line-height:1.1;letter-spacing:.5px;font-variant-numeric:tabular-nums;background:none;-webkit-background-clip:border-box;background-clip:border-box;filter:none;color:#fff;-webkit-text-fill-color:#fff;text-shadow:0 1px 0 color-mix(in srgb,var(--accent-1) 45%,#000),0 2px 0 color-mix(in srgb,var(--accent-1) 38%,#000),0 3px 0 color-mix(in srgb,var(--accent-1) 30%,#000),0 4px 0 color-mix(in srgb,var(--accent-1) 22%,#000),0 8px 12px rgba(0,0,0,.45);}
