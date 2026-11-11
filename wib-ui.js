@@ -3,7 +3,6 @@
    Load order in index.html:  wib-data.js → wib-render.js → wib-pickers.js → wib-ui.js
    (they share one global scope, so keep this order)
    ========================================================================== */
-const MAX_GUESTS_PER_DOWNLOAD = 30;           // guests per ZIP download
 const IMG_COVER   = { maxDim:1600, quality:0.78 }; // cover photo compression
 const IMG_GALLERY = { maxDim:1200, quality:0.72 }; // pre-wedding photos compression
 
@@ -393,6 +392,20 @@ function refreshBgBlurUI(){
   const v = Number(state.bgBlur) || 0;
   r.value = String(v); $("bgBlurStdVal").textContent = v ? v + " px" : "បិទ";
 }
+(function bindSealSize(){
+  const r = $("sealSize"), a = $("sealSizeAuto"); if(!r) return;
+  r.addEventListener("input", ev => {
+    state.sealSize = Math.max(40, Math.min(220, Math.round(Number(ev.target.value)) || 40));
+    $("sealSizeVal").textContent = state.sealSize + " px";
+    try{ sessionStorage.removeItem("wib-cover-seen"); }catch(e){}
+    scheduleUpdate();
+  });
+  if(a) a.addEventListener("click", () => {
+    state.sealSize = 0; buildSealSelect();
+    try{ sessionStorage.removeItem("wib-cover-seen"); }catch(e){}
+    update();
+  });
+})();
 (function bindBlockFrameSize(){
   const r = $("blockFrameSize"); if(!r) return;
   r.addEventListener("input", ev => {
@@ -567,64 +580,11 @@ function updateGuestCount(){
   el.style.color = "";
   el.style.fontWeight = "";
 }
-function checkGuestLimit(names){
-  if(names.length > MAX_GUESTS_PER_DOWNLOAD){
-    $("genFilesStatus").textContent =
-      "ទាញយកបានតែ " + MAX_GUESTS_PER_DOWNLOAD + " នាក់ក្នុងមួយដងប៉ុណ្ណោះ (អ្នកបានបញ្ចូល " + names.length +
-      " នាក់)។ សូមកាត់ឈ្មោះលើស " + (names.length - MAX_GUESTS_PER_DOWNLOAD) +
-      " ចេញ ទាញយកក្រុមនេះសិន រួចបិទភ្ជាប់ឈ្មោះក្រុមបន្ទាប់ដើម្បីទាញយកម្តងទៀត";
-    return false;
-  }
-  return true;
-}
 
 function safeFileName(name){
   return (name || "guest").trim().replace(/[^\w\u1780-\u17FF]+/g, "_").replace(/^_+|_+$/g, "") || "guest";
 }
 
-// ---- Personalized guest files: baked-in, zipped, no hosting needed ----
-async function generateGuestFiles(){
-  const statusEl = $("genFilesStatus");
-  const names = $("guestNamesFile").value.split("\n").map(n => n.trim()).filter(Boolean);
-  state.guestNamesFileRaw = $("guestNamesFile").value;
-  saveDraft();
-
-  if(!names.length){
-    statusEl.textContent = "សូមបញ្ចូលឈ្មោះភ្ញៀវយ៉ាងហោចណាស់ម្នាក់ម្នាក់ក្នុងមួយបន្ទាត់";
-    return;
-  }
-  if(!checkGuestLimit(names)) return;
-  if(typeof JSZip === "undefined"){
-    statusEl.textContent = "មិនអាចផ្ទុកម៉ូឌុល ZIP បាន សូមព្យាយាមម្តងទៀត ឬពិនិត្យការតភ្ជាប់អ៊ីនធឺណិត";
-    return;
-  }
-  statusEl.textContent = "កំពុងបង្កើតឯកសារ...";
-
-  const zip = new JSZip();
-  const usedNames = {};
-  names.forEach(name => {
-    const guestState = Object.assign({}, state, { __guestName: name });
-    const html = renderInvitation(guestState);
-    let base = safeFileName(name);
-    let finalName = base;
-    let n = 2;
-    while(usedNames[finalName]){ finalName = base + "-" + n; n++; }
-    usedNames[finalName] = true;
-    zip.file(finalName + ".html", html);
-  });
-
-  try{
-    const blob = await zip.generateAsync({ type:"blob" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "guest-invitations.zip";
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-    statusEl.textContent = `បានទាញយក ${names.length} ឯកសារ ក្នុង ZIP មួយ — ស្រាយ (unzip) រួចផ្ញើឯកសារនីមួយៗទៅភ្ញៀវផ្ទាល់`;
-  }catch(e){
-    statusEl.textContent = "មានបញ្ហាកើតឡើងពេលបង្កើត ZIP សូមព្យាយាមម្តងទៀត";
-  }
-}
 // ---------------------------------------------------------------------
 // Publish once (via a Cloudflare Worker that writes to GitHub Pages),
 // then generate unlimited personalized guest links instantly and for
@@ -1175,7 +1135,7 @@ function buildTemplateChips(){
     list.className = "template-preview-list";
     list.style.display = "none";
     list.innerHTML = spec.items.map((text,i) =>
-      `<button type="button" class="template-chip-lg" data-i="${i}" title="${text.replace(/"/g,"&quot;")}">
+      `<button type="button" class="template-chip-lg" data-i="${i}" title="${escapeHtml(text)}">
          <span class="tpl-num">គំរូ ${i+1}</span>
          <span class="tpl-text">${truncate(text, 90).replace(/</g,"&lt;")}</span>
        </button>`
@@ -1224,7 +1184,7 @@ function buildTimelineTemplates(){
   list.style.display = "none";
   list.innerHTML = TIMELINE_PRESETS.map((preset,i) => {
     const previewKm = preset.items.map(it => it.name).join(" → ");
-    return `<button type="button" class="template-chip-lg" data-i="${i}" title="${previewKm.replace(/"/g,"&quot;")}">
+    return `<button type="button" class="template-chip-lg" data-i="${i}" title="${escapeHtml(previewKm)}">
        <span class="tpl-num">${(preset.label+" · "+preset.labelEn).replace(/</g,"&lt;")}</span>
        <span class="tpl-text">${previewKm.replace(/</g,"&lt;")} — (${preset.items.length} ចំណុច)</span>
      </button>`;
@@ -1261,8 +1221,8 @@ function bindSimpleFields(){
     groomName:"groomName", brideName:"brideName", eyebrow:"eyebrow",
     groomNameEn:"groomNameEn", brideNameEn:"brideNameEn", eyebrowEn:"eyebrowEn",
     eventDate:"eventDate", startTime:"startTime",
-    welcomeText:"welcomeText", host1:"host1", host2:"host2",
-    welcomeTextEn:"welcomeTextEn", host1En:"host1En", host2En:"host2En",
+    welcomeText:"welcomeText", host1F:"host1F", host1M:"host1M", host2F:"host2F", host2M:"host2M",
+    welcomeTextEn:"welcomeTextEn", host1FEn:"host1FEn", host1MEn:"host1MEn", host2FEn:"host2FEn", host2MEn:"host2MEn",
     thanksText:"thanksText", thanksTextEn:"thanksTextEn",
     venueName:"venueName", venueAddr:"venueAddr",
     venueNameEn:"venueNameEn", venueAddrEn:"venueAddrEn",
@@ -1420,8 +1380,8 @@ function applyPreset(id){
   fill("groomNameEn", SAMPLE_NAMES.en[0]); fill("brideNameEn", SAMPLE_NAMES.en[1]);
   fill("eyebrow", TEMPLATES.eyebrow.km[p.tpl]); fill("eyebrowEn", TEMPLATES.eyebrow.en[p.tpl]);
   fill("welcomeText", TEMPLATES.welcomeText.km[p.tpl]); fill("welcomeTextEn", TEMPLATES.welcomeText.en[p.tpl]);
-  fill("host1", "ឪពុកម្តាយកូនកម្លោះ"); fill("host2", "ឪពុកម្តាយកូនក្រមុំ");
-  fill("host1En", "Parents of the Groom"); fill("host2En", "Parents of the Bride");
+  fill("host1F", "ឪពុកកូនកម្លោះ"); fill("host1M", "ម្តាយកូនកម្លោះ"); fill("host2F", "ឪពុកកូនក្រមុំ"); fill("host2M", "ម្តាយកូនក្រមុំ");
+  fill("host1FEn", "Father of the Groom"); fill("host1MEn", "Mother of the Groom"); fill("host2FEn", "Father of the Bride"); fill("host2MEn", "Mother of the Bride");
   fill("eventDate", "2026-12-12"); fill("startTime", p.startTime);
   fill("venueName", "សាលមង្គលការ (ឈ្មោះគំរូ)"); fill("venueNameEn", "Sample Wedding Hall");
   fill("venueAddr", "ភ្នំពេញ ព្រះរាជាណាចក្រកម្ពុជា"); fill("venueAddrEn", "Phnom Penh, Cambodia");
@@ -1461,13 +1421,13 @@ function normalizeImported(raw){
   const s = JSON.parse(JSON.stringify(defaultState));
   const r = (raw && typeof raw === "object" && !Array.isArray(raw)) ? raw : {};
   legacyFill_(r);
-  ["groomName","brideName","eyebrow","groomNameEn","brideNameEn","eyebrowEn","welcomeText","host1","host2",
+  ["groomName","brideName","eyebrow","groomNameEn","brideNameEn","eyebrowEn","welcomeText","host1","host2","host1F","host1M","host2F","host2M","host1FEn","host1MEn","host2FEn","host2MEn",
    "welcomeTextEn","thanksText","thanksTextEn","host1En","host2En","venueName","venueAddr","venueNameEn","venueAddrEn","coverPhotoName"
   ].forEach(k => { s[k] = bkStr(r[k], 20000); });
   s.venueMapLink = /^https?:\/\/\S+$/i.test(bkStr(r.venueMapLink, 2000).trim()) ? bkStr(r.venueMapLink, 2000).trim() : "";
   s.guestNamesFileRaw = bkStr(r.guestNamesFileRaw, 500000);
   s.theme = (typeof r.theme === "string" && hasOwn(THEMES, r.theme)) ? r.theme : defaultState.theme;
-  ["kbachFrame","blockFrame","blockFrameSize","lyColor","lyOpen","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadMore","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","layout","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil","sealBtn","textFx","flowerSet"]
+  ["kbachFrame","blockFrame","blockFrameSize","lyColor","lyOpen","kbachBg","frameFit","frameOpacity","frameSpread","frameSpreadMore","frameSnap","frameFx","bgFit","bgOpacity","bgBlur","fontKm","fontEn","galleryStyle","coverArt","textAnim","layout","venueCoords","videoUrl","coverBlur","coverFocusX","coverFocusY","coverSharp","coverVeil","sealBtn","sealSize","textFx","flowerSet"]
     .forEach(k => { if(r[k] !== undefined) s[k] = r[k]; });
   s.galleryArts = Array.isArray(r.galleryArts) ? r.galleryArts : (typeof r.galleryArt === "string" ? [r.galleryArt] : []);   // cleaned by migrateStyle_
   if(!hasOwn(COVER_ART, s.coverArt)) s.coverArt = "none";

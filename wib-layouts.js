@@ -12,7 +12,7 @@
      mode:"key"   = coloured art (gold …) on a WHITE background. White becomes see-through, colours stay as they are.
      mode:"keyG"  = like "key", and the pure GREEN area (photo hole) also becomes see-through.
      mode:"plain" = shown as it is (no changes).
-   seal:{ file:"open/goal_tamp3.png", size:84 } = ត្រាក្រមួន (wax seal) របស់ឈុតនោះ — ជាប៊ូតុងចុចបើកធៀប (px)។ រូបដាក់ក្នុង images/layouts/open/ ហើយជា PNG ថ្លា។
+   (ត្រាមាស seal មិនកំណត់ក្នុងឈុតទៀតទេ — ជ្រើសក្នុង Style tab ជា SEAL_BUTTONS (wib-data.js) រូបដាក់ក្នុង images/seals/ ហើយប្រើបានគ្រប់ឈុត និងគ្មានឈុត)
                      បើគម្របជាបែប ស្រោមសំបុត្រ → ត្រាបិទលើស្រោម · បើជាបែប Tap to Open → ត្រាជំនួសប៊ូតុងមូល។ បើគ្មានរូប → ត្រឡប់ទៅរូបរាងដើម។
    Later, if you turn a picture into a transparent PNG, just change its file name here (e.g. "frame6.png") and set
    mode:"plain". A picture that is missing on GitHub is skipped — nothing breaks.
@@ -358,23 +358,26 @@ try{
 }
 
 // ---------- cover helpers (used by the 2 new openings) ----------
-// the wax seal picture of the current layout (null = none → old look)
+// the wax seal chosen in the Style tab (state.sealBtn -> SEAL_BUTTONS): ONE seal for every opening screen, with or without a layout (null = none -> plain look)
 function lySealSpec_(s){
-  const ly = layoutOf_(s);
-  return (ly && ly.art && ly.art.seal && ly.art.seal.file) ? ly.art.seal : null;
+  s = s || {};
+  if(!hasOwn(SEAL_BUTTONS, s.sealBtn) || s.sealBtn === "none") return null;
+  const e = SEAL_BUTTONS[s.sealBtn]; if(!e.file) return null;
+  const u = Number(s.sealSize) > 0 ? Number(s.sealSize) : 0;   // 0 = automatic size
+  return { file:e.file, legacy:e.legacy || "", size:u || Number(e.size) || 84, under:!!e.under, user:u };
 }
-// Seal picture addresses: the exact path first, then a few other places (a seal put in the wrong folder still shows).
-// NOTE: GitHub Pages is case-sensitive — "goal_tamp4.png" ≠ "Goal_tamp4.PNG".
-function lySealUrls_(file){
-  const base = String(file).split("/").pop(), v = "?v=" + ASSET_VERSION, root = assetBase(), list = [lyUrl_(file)];
+function sealUrl_(file){ return (assetBase() + (ASSET_DIRS.seal || "images/seals/") + file + "?v=" + ASSET_VERSION).replace(/'/g, "%27"); }
+// Seal picture addresses: images/seals/ first, then the old places (a seal not yet moved, or put in the wrong folder, still shows).
+// NOTE: GitHub Pages is case-sensitive: "goal_tamp4.png" != "Goal_tamp4.PNG".
+function lySealUrls_(file, legacy){
+  const base = String(file).split("/").pop(), v = "?v=" + ASSET_VERSION, root = assetBase(), list = [sealUrl_(file)];
   const add = u => { u = (u + v).replace(/'/g, "%27"); if(list.indexOf(u) < 0) list.push(u); };
-  [root + "images/layouts/" + base, root + "images/layouts/open/" + base, root + "images/open/" + base, root + "images/" + base].forEach(add);
-  // last resort: another layout's seal (so a seal still shows; tells you this layout's own file is not found)
-  Object.keys(LAYOUTS).forEach(k => { const a = LAYOUTS[k].art && LAYOUTS[k].art.seal; if(a && a.file) add(lyUrl_(a.file).split("?")[0]); });
+  if(legacy) add(root + legacy);
+  [root + "images/seals/" + base, root + "images/layouts/open/" + base, root + "images/layouts/" + base, root + "images/open/" + base, root + "images/" + base].forEach(add);
   return list;
 }
 function lySealImg_(sp, cls){
-  const u = lySealUrls_(sp.file);
+  const u = lySealUrls_(sp.file, sp.legacy);
   return `<img class="${cls}" src="${u[0]}" data-fb="${u.slice(1).join("|")}" alt="" decoding="async" fetchpriority="high" onerror="var a=(this.getAttribute('data-fb')||'').split('|').filter(Boolean);if(a.length){this.setAttribute('data-fb',a.slice(1).join('|'));this.src=a[0];}else{this.parentNode.classList.add('ly-missing');}">`;
 }
 function lyCoverBits_(s){
@@ -417,7 +420,7 @@ COVER_STYLES.seal = {
     // seal for the PICTURE envelope: sits on the envelope (default = where the teardrop is), grows/shrinks with the envelope width.
     // art.envelope: sealX / sealY = centre in % of the envelope · sealSize = px when the envelope is 350px wide (default: seal.size)
     const envSeal = (EV && sp)
-      ? '<b class="oc-seal oc-seal-img oc-ei-seal" style="--seal-size:calc(var(--env-w,270px) * ' + (((Number(EV.sealSize) || Number(sp.size) || 62) / 350)).toFixed(4) + ');left:' + (EV.sealX == null ? 50.3 : Number(EV.sealX)) + '%;top:' + (EV.sealY == null ? 29.6 : Number(EV.sealY)) + '%">' + lySealImg_(sp, "oc-seal-pic") + '<span></span></b>'
+      ? '<b class="oc-seal oc-seal-img oc-ei-seal" style="--seal-size:calc(var(--env-w,270px) * ' + (((sp.user || Number(EV.sealSize) || Number(sp.size) || 62) / 350)).toFixed(4) + ');left:' + (EV.sealX == null ? 50.3 : Number(EV.sealX)) + '%;top:' + (EV.sealY == null ? 29.6 : Number(EV.sealY)) + '%">' + lySealImg_(sp, "oc-seal-pic") + '<span></span></b>'
       : '';
     const sealHtml = sp
       ? '<b class="oc-seal oc-seal-img" style="--seal-size:' + (Number(sp.size) || 84) + 'px">' + lySealImg_(sp, "oc-seal-pic") + '<span>' + lyInitials_(c.s || {}) + '</span></b>'
@@ -536,7 +539,7 @@ COVER_STYLES.tap = {
         + '@media(prefers-reduced-motion:reduce){.oc-s-tap .oc-btn,.oc-s-tap .oc-btn::before,.oc-s-tap .oc-btn::after{animation:none !important;}}'
         + '.open-cover.opening.oc-s-tap .oc-btn{transform:scale(1.4) rotate(14deg);opacity:0;}'
         + (sp.under ? '.oc-s-tap .oc-inner>*{order:0;}.oc-s-tap .oc-names{order:1;margin-bottom:8px;}.oc-s-tap .oc-btn{order:2;margin-top:4px;}.oc-s-tap .oc-tap-label{order:3;margin:6px 0 18px;}.oc-s-tap .ly-invite{order:4;}.oc-s-tap .oc-hint{order:5;}' : '')
-        + '</style><script>(function(){var u=' + JSON.stringify(lySealUrls_(sp.file)).replace(/</g, "\\u003c") + ',i=0;function t(){if(i>=u.length)return;var m=new Image();m.onload=function(){document.documentElement.style.setProperty("--seal-img","url(\\""+u[i]+"\\")");};m.onerror=function(){i++;t();};m.src=u[i];}t();})();</script>';
+        + '</style><script>(function(){var u=' + JSON.stringify(lySealUrls_(sp.file, sp.legacy)).replace(/</g, "\\u003c") + ',i=0;function t(){if(i>=u.length)return;var m=new Image();m.onload=function(){document.documentElement.style.setProperty("--seal-img","url(\\""+u[i]+"\\")");};m.onerror=function(){i++;t();};m.src=u[i];}t();})();</script>';
     }
     return {
       behind: lb.bg + lb.frame + lb.corners + sealCss,

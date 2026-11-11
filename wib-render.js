@@ -7,7 +7,7 @@
 const SEAL_BTN_CSS = `
 .open-cover .oc-btn.oc-sealbtn{background:none !important;box-shadow:none !important;padding:0;border-radius:0;gap:8px;animation:none;color:var(--ink);}
 .open-cover.oc-s-door .oc-sealbtn,.open-cover.oc-s-curtain .oc-sealbtn,.open-cover.oc-s-lock .oc-sealbtn{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);}
-.oc-sealwrap{position:relative;display:block;width:128px;height:128px;animation:oc-sealpop 3.2s ease-in-out infinite;will-change:transform;transition:transform .55s ease,opacity .45s ease;}
+.oc-sealwrap{position:relative;display:block;width:var(--seal-size,128px);height:var(--seal-size,128px);animation:oc-sealpop 3.2s ease-in-out infinite;will-change:transform;transition:transform .55s ease,opacity .45s ease;}
 .oc-sealwrap::before,.oc-sealwrap::after{content:"";position:absolute;inset:6%;border:2px solid color-mix(in srgb,var(--accent-2) 85%,transparent);border-radius:50%;pointer-events:none;opacity:0;will-change:transform,opacity;animation:oc-sealring 4.2s ease-out infinite;}
 .oc-sealwrap::after{animation-delay:2.1s;}
 .oc-sealbtn-pic{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 5px 7px rgba(0,0,0,.38));}   /* the shadow sits on the (still) picture, so only the cheap transform animates */
@@ -76,13 +76,12 @@ function coverPreloadLinks_(s){
   const urls = [];
   try{
     const ly = layoutOf_(s);
+    { const k0 = hasOwn(COVER_STYLES, s.openStyle) ? s.openStyle : "door", sp0 = lySealSpec_(s);   // the chosen seal: same for every opening, with or without a layout
+      if(sp0 && SEAL_ALL_STYLES.indexOf(k0) >= 0) urls.push(lySealUrls_(sp0.file, sp0.legacy)[0]); }
     if(ly){
-      const sp = ly.art && ly.art.seal;
-      if(sp && sp.file) urls.push(lySealUrls_(sp.file)[0]);
       if(s.blockFrame && s.blockFrame !== "none" && hasOwn(BLOCK_FRAMES, s.blockFrame)) urls.push(blockFrameUrl_(s.blockFrame));
     }else{
       const key = hasOwn(COVER_STYLES, s.openStyle) ? s.openStyle : "door";
-      if(SEAL_BTN_STYLES.indexOf(key) >= 0 && hasOwn(SEAL_BUTTONS, s.sealBtn) && s.sealBtn !== "none") urls.push(lySealUrls_(SEAL_BUTTONS[s.sealBtn].file)[0]);
       const iu = (COVER_IMG_STYLES[key] && !s.__noCoverImg) ? coverImgFor_(key, s) : null;
       if(iu) Object.keys(iu).forEach(k => urls.push(iu[k]));
       const bfk = (s.blockFrame && s.blockFrame !== "none" && hasOwn(BLOCK_FRAMES, s.blockFrame)) ? s.blockFrame : "";
@@ -105,20 +104,20 @@ function buildMusicParts(s){
   const imgU = (s.__noCoverImg || !COVER_IMG_STYLES[key]) ? null : coverImgFor_(key, s);
   const p = imgU ? COVER_IMG_STYLES[key].parts({ names, s }, imgU) : cfg.parts({ names, s });
   const deco = coverDeco_(key, s);
-  // seal button: only for the 6 classic screens, and never when a layout is on (a layout brings its own seal)
-  const sealKey = (!layoutOf_(s) && SEAL_BTN_STYLES.indexOf(key) >= 0 && hasOwn(SEAL_BUTTONS, s.sealBtn) && s.sealBtn !== "none") ? s.sealBtn : "";
+  // seal button for the 6 classic screens: the seal chosen in the Style tab, with or without a layout (the envelope + tap screens draw the same seal in wib-layouts.js)
+  const sealSp = (SEAL_BTN_STYLES.indexOf(key) >= 0) ? lySealSpec_(s) : null;
 
   const namesHtml = (names && p.names !== false) ? `<p class="oc-names display oc-fade">${names}</p>` : "";
   const capHtml = (g && !p.genericBtn)
     ? `<span class="oc-km">ជូនចំពោះ ${g}</span><span class="oc-en">Dear ${g}</span>`
     : `<span class="oc-km">ចុចដើម្បីបើកធៀបអញ្ជើញ</span><span class="oc-en">Tap to open your invitation</span>`;
-  const btnHtml = sealKey
-    ? `<button class="oc-btn oc-sealbtn oc-fade" id="openBtn" type="button"><span class="oc-sealwrap">${lySealImg_({ file: SEAL_BUTTONS[sealKey].file }, "oc-sealbtn-pic")}</span>${capHtml}</button>`
+  const btnHtml = sealSp
+    ? `<button class="oc-btn oc-sealbtn oc-fade" id="openBtn" type="button"><span class="oc-sealwrap"${sealSp.user ? ` style="--seal-size:${sealSp.user}px"` : ""}>${lySealImg_(sealSp, "oc-sealbtn-pic")}</span>${capHtml}</button>`
     : `<button class="oc-btn oc-fade" id="openBtn" type="button">${capHtml}</button>`;
   const hintHtml = ((g && !p.genericBtn) ? `<p class="oc-hint oc-fade">ចុចដើម្បីបើកធៀបអញ្ជើញ<span>Tap to open your invitation</span></p>` : "")
     + (music ? `<p class="oc-hint oc-fade">សូមបើកសំឡេងដើម្បីស្តាប់ចម្រៀង<span>Turn your sound on for the music</span></p>` : "");
 
-  const css = (music ? MUSIC_BTN_CSS : "") + OC_BASE_CSS + (imgU ? COVER_IMG_STYLES[key].css(imgU) : cfg.css) + deco.css + (sealKey ? SEAL_BTN_CSS : "");
+  const css = (music ? MUSIC_BTN_CSS : "") + OC_BASE_CSS + (imgU ? COVER_IMG_STYLES[key].css(imgU) : cfg.css) + deco.css + (sealSp ? SEAL_BTN_CSS : "");
 
   const musicHtml = music ? `
 <audio id="bgm" src="${music.dataUrl}" loop preload="metadata"></audio>
@@ -301,8 +300,10 @@ function buildSection(s, t, lang){
   const eyebrow = isKm ? s.eyebrow : (s.eyebrowEn || s.eyebrow);
   const welcome = isKm ? s.welcomeText : (s.welcomeTextEn || s.welcomeText);
   const thanksNote = isKm ? s.thanksText : (s.thanksTextEn || s.thanksText);
-  const host1 = isKm ? s.host1 : (s.host1En || s.host1);
-  const host2 = isKm ? s.host2 : (s.host2En || s.host2);
+  const hp = (a, b) => String(isKm ? (s[a] || "") : (s[b] || s[a] || "")).trim();   // one parent (English falls back to the Khmer text when empty)
+  const host1F = hp("host1F", "host1FEn"), host1M = hp("host1M", "host1MEn"), host2F = hp("host2F", "host2FEn"), host2M = hp("host2M", "host2MEn");
+  const host1 = [host1F, host1M].filter(Boolean).join(" " + L.and + " ");   // one family on one line (only used when the two blocks are turned off)
+  const host2 = [host2F, host2M].filter(Boolean).join(" " + L.and + " ");
   const venueName = isKm ? s.venueName : (s.venueNameEn || s.venueName);
   const venueAddr = isKm ? s.venueAddr : (s.venueAddrEn || s.venueAddr);
   const displayDate = isKm ? kmDate(s.eventDate) : enDate(s.eventDate);
@@ -361,10 +362,10 @@ function buildSection(s, t, lang){
   const videoInfo = parseVideo(s.videoUrl);
   const mapPrev = buildMapPreview(s, lang, mapsUrl, venueName, venueAddr);
   const hasVenue = !!((venueName || "").trim() || (venueAddr || "").trim() || mapsUrl);
-  // parents: two blocks (groom's side | bride's side) — or the old single block when the staff turned it off
-  const h1t = String(host1 || "").trim(), h2t = String(host2 || "").trim();
-  const hostsHtml = (s.hostsSplit !== false && (h1t || h2t))
-    ? `<div class="hosts hosts-split${(h1t && h2t) ? "" : " one"}">${h1t ? `<div class="host-side host-g"><div class="host-label">${L.hostG}</div><div class="host-names">${escapeHtml(host1)}</div></div>` : ""}${h2t ? `<div class="host-side host-b"><div class="host-label">${L.hostB}</div><div class="host-names">${escapeHtml(host2)}</div></div>` : ""}</div>`
+  // parents: each parent on his / her own line; two blocks (groom's side | bride's side) — or one line per family when the staff turned the blocks off
+  const hostLines = (a, b) => [a, b].filter(Boolean).map(x => `<div class="host-line">${escapeHtml(x)}</div>`).join("");
+  const hostsHtml = (s.hostsSplit !== false && (host1 || host2))
+    ? `<div class="hosts hosts-split${(host1 && host2) ? "" : " one"}">${host1 ? `<div class="host-side host-g"><div class="host-label">${L.hostG}</div><div class="host-names">${hostLines(host1F, host1M)}</div></div>` : ""}${host2 ? `<div class="host-side host-b"><div class="host-label">${L.hostB}</div><div class="host-names">${hostLines(host2F, host2M)}</div></div>` : ""}</div>`
     : `<div class="hosts">${escapeHtml(host1)}<br>${escapeHtml(host2)}</div>`;
   const secWelcome   = (isPrev || hasWelcome)   ? `<section><div class="wrap"><div class="welcome">
 <p>${escapeHtml(welcome)}</p>
@@ -438,7 +439,7 @@ ${mapPrev.openUrl ? `<a class="map-btn" href="${escapeHtml(mapPrev.openUrl)}" ta
 
   // the two names are two elements, so each gets the text effect on its own, and the bride's is drawn with the accent colours swapped (see .names-b)
   const namesHtml = (s.nameSplit !== false && String(groom || "").trim() && String(bride || "").trim())
-    ? `<h1 class="names-wrap"><span class="names display names-g">${escapeHtml(groom)}<span class="amp">${escapeHtml(L.and)}</span></span><span class="names display names-b">${escapeHtml(bride)}</span></h1>`
+    ? `<h1 class="names-wrap"><span class="names display names-g">${escapeHtml(groom)}</span><span class="amp">${escapeHtml(L.and)}</span><span class="names display names-b">${escapeHtml(bride)}</span></h1>`
     : `<h1 class="names display">${escapeHtml(groom)}<span class="amp">${escapeHtml(L.and)}</span>${escapeHtml(bride)}</h1>`;
   const lyp = lyHeroParts_(s, lang, { rawCover, artUrls: galleryArtUrls(s) });
   return `<section id="section${suf}" class="lang-section lang-${lang}" style="display:${isKm ? "block" : "none"}">
@@ -608,14 +609,11 @@ function buildTextFxCss(fx, ta){
   const TC = ".hero.has-cover .names";                                     // names over a photo
   const WS = ".section-title .wa-w,.hero:not(.has-cover) .names .wa-w";    // words created by the scroll animation
   const WC = ".hero.has-cover .names .wa-w";
-  const A = ".hero .names .amp,.hero.has-cover .names .amp";
+  const A = ".hero .names .amp,.hero.has-cover .names .amp,.hero .names-wrap > .amp,.hero.has-cover .names-wrap > .amp";
   const filt = v => (ta === "blur" ? "" : "filter:" + v + " !important;");
   const CLIP = "-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;text-shadow:none;";
   const GRAD  = "background:linear-gradient(180deg,color-mix(in srgb,var(--accent-2) 62%,#fff) 0%,var(--accent-2) 36%,var(--accent-1) 74%,color-mix(in srgb,var(--accent-1) 72%,#000) 100%);" + CLIP;
   const GRADC = "background:linear-gradient(180deg,#fffbe8 0%,color-mix(in srgb,var(--accent-2) 50%,#fff) 42%,color-mix(in srgb,var(--accent-2) 88%,#fff) 100%);" + CLIP;   // lighter, for names over a photo
-  const RIM = "-webkit-text-stroke:.5px color-mix(in srgb,var(--accent-2) 50%,#000);paint-order:stroke fill;";
-  const DOME  = "background:linear-gradient(180deg,color-mix(in srgb,var(--accent-2) 42%,#fff) 0%,var(--accent-2) 46%,color-mix(in srgb,var(--accent-2) 70%,#000) 100%);" + CLIP + RIM;
-  const DOMEC = "background:linear-gradient(180deg,#fffbe8 0%,color-mix(in srgb,var(--accent-2) 48%,#fff) 46%,color-mix(in srgb,var(--accent-2) 82%,#fff) 100%);" + CLIP + "-webkit-text-stroke:.4px color-mix(in srgb,var(--accent-2) 60%,#000);";   // lighter, for names over a photo
   const REFLECT = "-webkit-box-reflect:below -.05em linear-gradient(transparent 78%,rgba(255,255,255,.4));margin-bottom:.2em;";
   const REFLECT_N = "-webkit-box-reflect:below -.05em linear-gradient(transparent 86%,rgba(255,255,255,.4));margin-bottom:.35em;";   // names are taller, so more room below
   const grad = (fS, fC, rf, G = GRAD, GC = GRADC) => `${TS}{${G}${fS}${rf ? REFLECT : ""}}${rf ? ".hero:not(.has-cover) .names{margin-bottom:.35em;}" : ""}${TC}{${GC}${fC}${rf ? REFLECT_N : ""}}.hero.has-cover .names::before{display:none;}${WS}{${G}}${WC}{${GC}}${A}{color:transparent;-webkit-text-fill-color:transparent;text-shadow:none;}`;   // the dark blob behind photo names would paint OVER the gradient (filter makes a stacking context), so it is hidden and a stronger shadow is used instead
@@ -712,7 +710,7 @@ function buildTextAnimJs(mode, isPreview){
 var waMode=${JSON.stringify(mode)};
 var waPrev=${isPreview ? "true" : "false"};
 var waEls=[], waStarted=false;
-var WA_TEXT='.eyebrow,.names,.hero-date,.section-title,.section-sub,.welcome p,.hosts,.tl-time,.tl-name,.venue-name,.venue-addr,.contact-name,.gift-hint,.thanks,footer > div:last-child';
+var WA_TEXT='.eyebrow,.names,.names-wrap > .amp,.hero-date,.section-title,.section-sub,.welcome p,.hosts,.tl-time,.tl-name,.venue-name,.venue-addr,.contact-name,.gift-hint,.thanks,footer > div:last-child';
 var WA_BLOCK='.countdown,.map-btn,.contact-phone,.map-embed,.video-card,.gift-card,.dress-row';
 function waReduced(){ try{ return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } }
 function waSplit(el){
@@ -957,7 +955,7 @@ function renderInvitation(s){
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Battambang:wght@400;700&family=Suwannaphum&family=Angkor&family=Koulen&family=Odor+Mean+Chey&family=Kantumruy+Pro:wght@300;400;500;600;700&family=Great+Vibes&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tangerine:wght@400;700&family=Marck+Script&display=swap" rel="stylesheet">
 <style>
-:root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--ac1:${t.accent1};--ac2:${t.accent2};--card:${t.card};--ctl-bg:color-mix(in srgb, ${t.card} 26%, transparent);--border:${t.border};--radius:${t.radius};--display-font:${fk.display};--body-font:${fk.body};--display-font-en:${fe.display};--body-font-en:${fe.body};}
+:root{--bg:${t.bg};--ink:${t.ink};--accent-1:${t.accent1};--accent-2:${t.accent2};--card:${t.card};--ctl-bg:color-mix(in srgb, ${t.card} 26%, transparent);--border:${t.border};--radius:${t.radius};--display-font:${fk.display};--body-font:${fk.body};--display-font-en:${fe.display};--body-font-en:${fe.body};}
 *{box-sizing:border-box}
 html{background:var(--bg);}
 body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-webkit-font-smoothing:antialiased;}
@@ -987,8 +985,8 @@ body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-web
 .guest-line{position:sticky;top:0;z-index:70;display:block;width:100%;margin:0;padding:13px 20px;font-size:15px;font-weight:700;letter-spacing:.03em;text-align:center;color:#fff;background:linear-gradient(90deg, var(--accent-1), var(--accent-2));box-shadow:0 4px 16px rgba(0,0,0,.2);font-style:normal;}
 .lang-en .guest-line{font-style:normal;}
 .names{font-size:clamp(36px,10vw,64px);line-height:1.4;margin:0;}
-.names .amp{display:block;font-family:var(--body-font);font-size:0.4em;color:var(--accent-2);margin:6px 0;}
-.lang-en .names .amp{font-family:var(--body-font-en);font-style:italic;}
+.names .amp,.names-wrap > .amp{display:block;font-family:var(--body-font);font-size:0.4em;color:var(--accent-2);margin:6px 0;}
+.lang-en .names .amp,.lang-en .names-wrap > .amp{font-family:var(--body-font-en);font-style:italic;}
 .hero-date{margin-top:14px;font-size:19px;color:var(--accent-1);}
 .hero.has-cover{position:relative;overflow:hidden;isolation:isolate;padding-top:150px;padding-bottom:100px;min-height:clamp(440px,85vh,720px);display:flex;flex-direction:column;justify-content:center;}
 .hb{position:absolute;pointer-events:none;background:var(--cover) var(--fx,50%) var(--fy,35%)/cover no-repeat;}
@@ -1001,7 +999,7 @@ body{margin:0;color:var(--ink);font-family:var(--body-font);line-height:1.8;-web
 .hero.has-cover .eyebrow{color:#fff;opacity:1;text-shadow:0 0 3px rgba(0,0,0,.8), 0 2px 10px rgba(0,0,0,.75), 0 4px 20px rgba(0,0,0,.55);}
 .hero.has-cover .names{position:relative;z-index:1;color:#fff;-webkit-text-stroke:0;font-weight:700;text-shadow:0 1px 0 rgba(0,0,0,.75),0 2px 0 rgba(0,0,0,.6),0 3px 0 rgba(0,0,0,.45),0 4px 0 rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.65);}
 .hero.has-cover .names::before{content:"";position:absolute;left:50%;top:50%;width:125%;height:135%;transform:translate(-50%,-50%);background:radial-gradient(ellipse at center, rgba(0,0,0,.50) 0%, rgba(0,0,0,.30) 45%, transparent 72%);filter:blur(10px);z-index:-1;pointer-events:none;}
-.hero.has-cover .names .amp{color:color-mix(in srgb,var(--accent-2) 40%,#fff);-webkit-text-stroke:0;text-shadow:0 1px 0 rgba(0,0,0,.7),0 2px 0 rgba(0,0,0,.5),0 5px 12px rgba(0,0,0,.6);}
+.hero.has-cover .names .amp,.hero.has-cover .names-wrap > .amp{color:color-mix(in srgb,var(--accent-2) 40%,#fff);-webkit-text-stroke:0;text-shadow:0 1px 0 rgba(0,0,0,.7),0 2px 0 rgba(0,0,0,.5),0 5px 12px rgba(0,0,0,.6);}
 .hero.has-cover .hero-date{color:#fff;opacity:1;text-shadow:0 0 3px rgba(0,0,0,.8), 0 2px 10px rgba(0,0,0,.75), 0 4px 20px rgba(0,0,0,.55);}
 section{padding:30px 0;}
 .lang-section{padding:0;}
@@ -1012,20 +1010,17 @@ section{padding:30px 0;}
 .welcome{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:26px 32px;text-align:center;}
 .welcome p{font-size:18px;margin:0;}
 .hosts{margin-top:14px;font-size:18px;color:var(--accent-1);font-weight:600;}
-/* ---- groom / bride names in two colours: the bride's name is drawn with the accent colours swapped (every text effect follows) ---- */
-.names-wrap{margin:0;font:inherit;line-height:inherit;color:inherit;font-weight:inherit;}
+/* ---- groom / bride names: each name is its own line, so the text effect (colour, shadow, reflection) is drawn on EACH name, exactly the same ---- */
+.names-wrap{margin:0;font-size:clamp(36px,10vw,64px);line-height:1.4;font-weight:inherit;color:inherit;}
 .names-wrap .names{display:block;}
-.names-wrap .names-b{--accent-1:var(--ac2);--accent-2:var(--ac1);}
-.names-wrap .names-g{-webkit-box-reflect:none !important;margin-bottom:0 !important;}   /* the reflection of the effects that have one is only drawn under the last name */
 /* ---- parents: two blocks, groom's side | bride's side ---- */
 .hosts-split{display:grid;grid-template-columns:1fr 1fr;margin-top:18px;text-align:center;}
 .hosts-split.one{grid-template-columns:1fr;}
 .hosts-split .host-side{padding:2px 12px;min-width:0;overflow-wrap:anywhere;}
 .hosts-split .host-side + .host-side{border-left:1px solid color-mix(in srgb,var(--accent-2) 55%,transparent);}
 .host-label{font-size:.7em;font-weight:500;letter-spacing:.03em;color:var(--ink);opacity:.72;margin-bottom:6px;}
-.host-g .host-names{color:var(--accent-1);}
-.host-b .host-names{color:color-mix(in srgb,var(--accent-2) 62%,var(--ink));}
-.hosts-split .host-names{font-weight:600;line-height:1.55;}
+.hosts-split .host-names{font-weight:600;line-height:1.55;color:var(--accent-1);}
+.host-line{display:block;}
 @media(max-width:330px){.hosts-split{grid-template-columns:1fr;}.hosts-split .host-side + .host-side{border-left:0;border-top:1px solid color-mix(in srgb,var(--accent-2) 55%,transparent);margin-top:12px;padding-top:12px;}}
 
 .countdown{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}

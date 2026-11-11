@@ -273,16 +273,22 @@ const THEME_GALLERY_DEFAULTS = { gold:"grid", rose:"polaroid", minimal:"square",
 // បើរូបនៅកន្លែងផ្សេង ដាក់ URL ពេញ ឧ. "https://USERNAME.github.io/REPO/"  (ត្រូវបញ្ចប់ដោយ /)
 const ASSET_BASE_OVERRIDE = "";
 // folder រូបទាំងអស់ (ទាក់ទងនឹង ASSET_BASE) — ចង់ប្តូរឈ្មោះ folder សូមកែត្រង់នេះតែមួយកន្លែង
-const ASSET_DIRS = { frame:"images/frames/", bg:"images/backgrounds/", cover:"images/covers/", gallery:"images/gallery/", layout:"images/layouts/" };
-// ប៊ូតុងត្រា (Seal) សម្រាប់អេក្រង់បើកដំបូងទាំង ៦ បែបដើម — រូបដាក់ក្នុង images/layouts/open/ (PNG ថ្លា)
+const ASSET_DIRS = { frame:"images/frames/", bg:"images/backgrounds/", cover:"images/covers/", gallery:"images/gallery/", layout:"images/layouts/", seal:"images/seals/" };
+// ត្រាមាស (Seal) — ប្រើបានទូទៅ៖ ជ្រើសម្តង ប្រើបានគ្រប់អេក្រង់បើកទាំង ៨ ទាំងមាន និងគ្មានឈុត (Layout) ហើយដូរបានគ្រប់ពេល។
+// ទីតាំងរូប៖ images/seals/  (WebP/PNG ថ្លា)។ ដើម្បីបន្ថែមត្រាថ្មី ដាក់ឯកសារក្នុង folder នោះ ហើយបន្ថែមមួយបន្ទាត់ខាងក្រោម។
+//   file  = ឈ្មោះឯកសារក្នុង images/seals/ (ប្រយ័ត្នអក្សរធំ/តូច — GitHub Pages ញែកអក្សរធំតូច)
+//   size  = ទំហំលំនាំដើម (px) សម្រាប់ស្រោមសំបុត្រ/ចុចបើក (អ្នកប្រើអាចកែទំហំបាន)    under:true = ដាក់ក្រោមឈ្មោះ (ចុចបើក)
 const SEAL_BUTTONS = {
   none:{ label:"ប៊ូតុងធម្មតា" },
-  s1:{ label:"ត្រាទី១", file:"open/goal_tamp.png" },
-  s2:{ label:"ត្រាទី២", file:"open/goal_tamp2.png" },
-  s3:{ label:"ត្រាទី៣", file:"open/goal_tamp3.png" },
-  s4:{ label:"ត្រាទី៤", file:"open/goal_tamp4.png" }
+  seal1:{ label:"ត្រា ១ (ឈូក)",      file:"seal1.webp", size:86 },
+  seal2:{ label:"ត្រា ២ (LT Media)", file:"seal2.webp", size:108 },
+  seal3:{ label:"ត្រា ៣ (ចិញ្ចៀន)",  file:"seal3.webp", size:86 },
+  seal4:{ label:"ត្រា ៤ (បេះដូង)",   file:"seal4.webp", size:150, under:true },
+  seal5:{ label:"ត្រា ៥ (ក្បាច់)",    file:"seal5.webp", size:96 },
+  seal6:{ label:"ត្រា ៦ (ស្លឹកឈើ)",  file:"seal6.webp", size:96 }
 };
-const SEAL_BTN_STYLES = ["door","curtain","lock","rings","lotus","heart"];   // អេក្រង់បើកដែលអាចប្រើប៊ូតុងត្រាបាន
+const SEAL_BTN_STYLES = ["door","curtain","lock","rings","lotus","heart"];   // អេក្រង់បើកបែបដើម ៦ (ត្រាជំនួសប៊ូតុង)
+const SEAL_ALL_STYLES = SEAL_BTN_STYLES.concat(["seal","tap"]);              // ត្រាប្រើបានគ្រប់ ៨ (ស្រោមសំបុត្រ + ចុចបើក ក៏ប្រើដែរ)
 const ASSET_VERSION = "5";   // ប្តូរលេខនេះ (2, 3 …) ពេលជំនួសរូបថ្មី ដើម្បីបំបាត់ cache
 function assetBase(){
   if(ASSET_BASE_OVERRIDE) return ASSET_BASE_OVERRIDE;
@@ -714,7 +720,6 @@ const MUSIC_BTN_CSS = `
 .music-btn.on{background:var(--accent-1);color:#fff;}
 `;
 
-const TPL_LABELS = { km:["ប្រពៃណី","កក់ក្តៅ","សាមញ្ញ"], en:["Formal","Heartfelt","Simple"] };
 
 const TEMPLATES = {
   eyebrow:{
@@ -824,7 +829,7 @@ const PRESET_DESIGN_BASE = {
   kbachFrame:"none", frameFit:"stretch", frameOpacity:100, frameFx:"fade", frameSpread:0, frameSpreadMore:6, frameSnap:true,
   kbachBg:"none", bgFit:"cover", bgOpacity:100, bgBlur:0,
   blockFrame:"none", blockFrameSize:100, lyColor:"layout", lyOpen:"layout",
-  textAnim:"fadeup", openStyle:"door", layout:"none",
+  textAnim:"fadeup", openStyle:"door", layout:"none", sealBtn:"none", sealSize:0,
   coverBlur:22, coverFocusX:50, coverFocusY:35, coverSharp:60, coverVeil:35
 };
 const INVITATION_PRESETS = {};   // filled by the layout files: wib-layout-l1.js, wib-layout-l2.js … (each adds INVITATION_PRESETS.lN)
@@ -844,7 +849,7 @@ const defaultState = {
   textFx:"none",
   openStyle:"door",
   coverAlways:false,
-  sealBtn:"none",
+  sealBtn:"none", sealSize:0,
   flowerSet:"set1",   // ប្រភេទផ្កា របស់ layout ដែលមាន sets (l5): set1 | set2 | set3
   groomName:"", brideName:"",
   eyebrow:"",
@@ -854,10 +859,12 @@ const defaultState = {
   welcomeText:"",
   host1:"",
   host2:"",
+  host1F:"", host1M:"", host2F:"", host2M:"",   // father / mother of each side (Khmer)
   welcomeTextEn:"",
   thanksText:"", thanksTextEn:"",
   host1En:"",
   host2En:"",
+  host1FEn:"", host1MEn:"", host2FEn:"", host2MEn:"",   // father / mother of each side (English)
   timeline:[
     {time:"", name:"", timeEn:"", nameEn:""},
     {time:"", name:"", timeEn:"", nameEn:""},
@@ -953,8 +960,24 @@ function legacyFill_(r){
   }
   return r;
 }
+// Parents: one input per parent (father / mother) so a long line can never wrap and break a name.
+// The old single "parents" line ("លោក … និងលោកស្រី …" / "Mr. … & Mrs. …") is split ONCE when an old project is opened; if it cannot be split the whole text goes to the father line.
+function splitParents_(txt, km){
+  const t = String(txt || "").trim(); if(!t) return ["", ""];
+  const re = km ? /^(.*?\S)\s*(?:និង|&)\s*((?:លោកស្រី|អ្នកស្រី|អ្នកនាង|កញ្ញា|លោក).*)$/s
+                : /^(.*?\S)\s*(?:&|and)\s*((?:Mrs|Ms|Mr|Madam|Miss|Dr|Lady|Lord)\b.*)$/is;
+  const m = re.exec(t);
+  return m ? [m[1].trim(), m[2].trim()] : [t, ""];
+}
 function migrateStyle_(s){
   if(!s || typeof s !== "object") return s;
+  // parents: father / mother in their own inputs (see splitParents_)
+  [["host1","host1F","host1M",true],["host2","host2F","host2M",true],["host1En","host1FEn","host1MEn",false],["host2En","host2FEn","host2MEn",false]].forEach(([old, f, m, km]) => {
+    s[f] = String(s[f] || ""); s[m] = String(s[m] || "");
+    const o = String(s[old] || "").trim();
+    if(o && !s[f].trim() && !s[m].trim()){ const p = splitParents_(o, km); s[f] = p[0]; s[m] = p[1]; }
+    s[old] = "";
+  });
   delete s.effect;   // the falling effect is now chosen by each guest, not by staff
   if(typeof s.frameStyle === "string" && s.kbachFrame === undefined) s.kbachFrame = s.frameStyle;
   if(s.fontKm === "battambang") s.fontKm = "koulen";          // removed (too thin) -> bold display font
@@ -981,6 +1004,7 @@ function migrateStyle_(s){
   if(s.bgFit !== "cover" && s.bgFit !== "stretch") s.bgFit = "cover";
   if(!COVER_STYLE_KEYS.includes(s.openStyle)) s.openStyle = "door";
   if(!_ho(SEAL_BUTTONS, s.sealBtn)) s.sealBtn = "none";
+  s.sealSize = (Number(s.sealSize) >= 40) ? Math.min(220, Math.round(Number(s.sealSize))) : 0;   // 0 = automatic size
   if(typeof s.flowerSet !== "string") s.flowerSet = "set1";   // checked against the layout's sets when drawing (wib-layouts.js layoutOf_)
   if(typeof s.layout !== "string") s.layout = "none";   // checked against LAYOUTS (wib-layouts.js) when drawing; unknown id = no layout
   if(s.frameFit !== "stretch" && s.frameFit !== "cover") s.frameFit = "stretch";
@@ -1025,7 +1049,20 @@ state = migrateStyle_(state);
 state.photos = (state.photos || []).filter(Boolean);
 state.photoNames = state.photoNames || [];
 
-function saveDraft(){ try{ localStorage.setItem("wib-draft-v2", JSON.stringify(state)); }catch(e){} }
+// Saving is not silent: when the browser storage is full the user is told (instead of showing "saved" with nothing written).
+const STORAGE_FULL_MSG = "⚠ ទំហំ browser ពេញ — រក្សាទុកមិនបាន! សូមនាំចេញ (Export) .json ទុកជាមុន រួចកាត់បន្ថយចំនួនរូបភាព ឬទំហំចម្រៀង";
+let lastStorageWarn = 0;
+function saveDraft(){
+  try{ localStorage.setItem("wib-draft-v2", JSON.stringify(state)); return true; }
+  catch(e){
+    if(Date.now() - lastStorageWarn > 20000){
+      lastStorageWarn = Date.now();
+      const el = document.getElementById("backupStatus");
+      if(el) el.textContent = STORAGE_FULL_MSG;
+    }
+    return false;
+  }
+}
 
 function kmDate(dateStr){
   if(!dateStr) return "";

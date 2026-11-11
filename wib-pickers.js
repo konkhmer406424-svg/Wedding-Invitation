@@ -241,19 +241,35 @@ function buildCoverStyleSelect(){
   $("coverAlways").checked = !!state.coverAlways;
   refreshMusicUI();
 }
-// ប៊ូតុងត្រា — បង្ហាញតែពេលប្រើអេក្រង់បើកបែបដើម ហើយមិនមាន Layout (Layout មានត្រារបស់ខ្លួនរួចហើយ)
+// ត្រាមាស — ជម្រើសតែមួយ ប្រើបានគ្រប់អេក្រង់បើក ទាំងមាន និងគ្មានឈុត (Layout មិនកំណត់ត្រាទៀតទេ)
+function sealThumb_(k){
+  const e = SEAL_BUTTONS[k], u = lySealUrls_(e.file, e.legacy);
+  return `<img class="seal-thumb" src="${u[0]}" data-fb="${u.slice(1).join("|")}" alt="" onerror="var a=(this.getAttribute('data-fb')||'').split('|').filter(Boolean);if(a.length){this.setAttribute('data-fb',a.slice(1).join('|'));this.src=a[0];}else{this.style.display='none';}">`;
+}
+function sealDefaultSize_(s){
+  const k = hasOwn(COVER_STYLES, s.openStyle) ? s.openStyle : "door";
+  if(SEAL_BTN_STYLES.indexOf(k) >= 0) return 128;
+  const sp = lySealSpec_(Object.assign({}, s, { sealSize:0 }));
+  return sp ? sp.size : 84;
+}
 function buildSealSelect(){
   const g = $("sealBtnGroup"); if(!g) return;
   if(!hasOwn(SEAL_BUTTONS, state.sealBtn)) state.sealBtn = "none";
-  const hasLy = (typeof layoutOf_ === "function") && !!layoutOf_(state);
-  g.style.display = ((!hasLy || state.lyOpen === "classic") && SEAL_BTN_STYLES.indexOf(state.openStyle) >= 0) ? "" : "none";
+  g.style.display = "";
   renderPicker("pickSeal", Object.keys(SEAL_BUTTONS).map(k => ({ key:k, title:SEAL_BUTTONS[k].label,
-    inner: k === "none" ? NONE_ICON : '<img class="seal-thumb" src="' + lyUrl_(SEAL_BUTTONS[k].file) + '" alt="" onerror="this.style.display=\'none\'">' })),
+    inner: k === "none" ? NONE_ICON : sealThumb_(k) })),
     state.sealBtn, k => {
       state.sealBtn = k; buildSealSelect();
       try{ sessionStorage.removeItem("wib-cover-seen"); }catch(e){}   // show it in the preview straight away
       update();
     });
+  const box = $("sealSizeBox"), r = $("sealSize");
+  if(box && r){
+    box.style.display = state.sealBtn !== "none" ? "" : "none";
+    const auto = !(Number(state.sealSize) > 0), v = auto ? sealDefaultSize_(state) : Number(state.sealSize);
+    r.value = String(v);
+    $("sealSizeVal").textContent = auto ? "ស្វ័យប្រវត្តិ (" + v + " px)" : v + " px";
+  }
 }
 // ប្រភេទផ្កា — បង្ហាញតែពេល layout ដែលបានជ្រើសមាន sets (l5: កុលាបស · ផ្ការំដួល · លីលីឈូក)
 function buildFlowerSetSelect(){
@@ -286,12 +302,12 @@ function buildTimeline(){
       <div class="tl-head"><button class="icon-btn tl-remove" type="button" title="លុប">×</button></div>
       <div class="row2">
         <div class="tl-col">
-          <input type="text" class="tl-time-in" value="${(item.time||"").replace(/"/g,"&quot;")}" placeholder="ម៉ោង (ខ្មែរ)">
-          <input type="text" class="tl-name-in" value="${(item.name||"").replace(/"/g,"&quot;")}" placeholder="ឈ្មោះកម្មវិធី (ខ្មែរ)">
+          <input type="text" class="tl-time-in" value="${escapeHtml(item.time)}" placeholder="ម៉ោង (ខ្មែរ)">
+          <input type="text" class="tl-name-in" value="${escapeHtml(item.name)}" placeholder="ឈ្មោះកម្មវិធី (ខ្មែរ)">
         </div>
         <div class="tl-col">
-          <input type="text" class="tl-time-en-in" value="${(item.timeEn||"").replace(/"/g,"&quot;")}" placeholder="Time (English)">
-          <input type="text" class="tl-name-en-in" value="${(item.nameEn||"").replace(/"/g,"&quot;")}" placeholder="Program Name (English)">
+          <input type="text" class="tl-time-en-in" value="${escapeHtml(item.timeEn)}" placeholder="Time (English)">
+          <input type="text" class="tl-name-en-in" value="${escapeHtml(item.nameEn)}" placeholder="Program Name (English)">
         </div>
       </div>
     </div>`).join("");
@@ -458,13 +474,13 @@ function buildContacts(){
   list.innerHTML = state.contacts.map((c,i) => `
     <div class="item-card" data-i="${i}">
       <div class="tl-row" style="grid-template-columns:1fr 110px 30px;">
-        <input type="text" class="ct-name-in" value="${(c.name||"").replace(/"/g,"&quot;")}" placeholder="ឈ្មោះ (ខ្មែរ)">
-        <input type="text" class="ct-phone-in" value="${(c.phone||"").replace(/"/g,"&quot;")}" placeholder="លេខទូរស័ព្ទ">
+        <input type="text" class="ct-name-in" value="${escapeHtml(c.name)}" placeholder="ឈ្មោះ (ខ្មែរ)">
+        <input type="text" class="ct-phone-in" value="${escapeHtml(c.phone)}" placeholder="លេខទូរស័ព្ទ">
         <button class="icon-btn ct-remove" type="button" title="លុប">×</button>
       </div>
       <div class="lang-tag">English name</div>
       <div class="tl-row en-row">
-        <input type="text" class="ct-name-en-in" style="grid-column:1/-1;" value="${(c.nameEn||"").replace(/"/g,"&quot;")}" placeholder="Name (English)">
+        <input type="text" class="ct-name-en-in" style="grid-column:1/-1;" value="${escapeHtml(c.nameEn)}" placeholder="Name (English)">
       </div>
     </div>`).join("");
   list.querySelectorAll(".item-card").forEach(row => {

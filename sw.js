@@ -7,7 +7,7 @@
    To force everyone to drop old caches, change CACHE_VERSION. */
 const CACHE_VERSION = "wib-v6";
 const MAX_CACHED_IMAGE = 1.5 * 1024 * 1024;   // bytes
-const CORE = ["./", "index.html", "style.css", "wib-data.js", "layouts/l1/wib-layout-l1.js", "layouts/l2/wib-layout-l2.js", "layouts/l3/wib-layout-l3.js", "layouts/l4/wib-layout-l4.js", "layouts/l5/wib-layout-l5.js", "wib-layouts.js", "wib-render.js", "wib-pickers.js", "wib-ui.js", "logo.png", "manifest.json"];
+const CORE = ["./", "index.html", "style.css", "wib-data.js", "layouts/l1/wib-layout-l1.js", "layouts/l2/wib-layout-l2.js", "layouts/l3/wib-layout-l3.js", "layouts/l4/wib-layout-l4.js", "layouts/l5/wib-layout-l5.js", "layouts/l5/wib-layout-l5.js", "wib-layouts.js", "wib-render.js", "wib-pickers.js", "wib-ui.js", "logo.png", "manifest.json"];
 
 self.addEventListener("install", e => {
   e.waitUntil(
