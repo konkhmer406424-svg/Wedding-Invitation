@@ -25,7 +25,7 @@ window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
       corners:{ file:IMG+"frames/corner.webp", mode:"plain", width:"min(34vw,170px)", offset:"6px" },   // ក្បាច់ជ្រុងមាសទាំង៤ លើទំព័រគម្រប (មុនចុចបើក) · ត្រូវមានរូប frames/corner.webp ក្នុង folder នេះ
       orn:  { file:IMG+"cover/orn.webp",           mode:"tint", color:"accent1", width:"min(72%,320px)" },
       name: { file:IMG+"nameframes/name.webp",     mode:"plain", width:"min(80%,320px)", inset:"20% 15%" },
-      seal: { file:IMG+"open/seal.webp", size:86 },   // ត្រា seal.png — បង្ហាញលើស្រោមសំបុត្រ (envelope.sealX/sealY/sealSize កំណត់ទីតាំង និងទំហំ)
+      // ត្រាមាស (seal) មិនកំណត់ក្នុងឈុតទេ — ជ្រើសក្នុង Style tab (images/seals/ · SEAL_BUTTONS ក្នុង wib-data.js)។ envelope.sealX/sealY/sealSize ខាងក្រោម គ្រាន់តែជាទីតាំងលើរូបស្រោមសំបុត្រ។
       envelope:{ file:IMG+"open/envelope.webp", width:"min(100vw,600px)", ratio:1298/646, sealX:50.3, sealY:29.6, sealSize:62 }   // ស្រោមសំបុត្រជារូបតែមួយ — គម្របបើកដោយខ្លួនឯង · ratio = ទទឹង ÷ កម្ពស់ នៃរូប (១២៩៨ ÷ ៦៤៦)
     }
   };
@@ -37,6 +37,6 @@ window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
     design:Object.assign({}, PRESET_DESIGN_BASE, {
       layout:"l1", theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"polaroid",
       galleryArts:["gallery3","gallery4","gallery5","gallery6"], coverArt:"none",
-      textAnim:"blur", openStyle:"seal", coverAlways:true })
+      textAnim:"blur", openStyle:"seal", coverAlways:true, sealBtn:"seal1" })
   };
 })();

@@ -33,7 +33,7 @@ window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
       orn:  { file:IMG+"cover/orn.webp",           mode:"plain", width:"min(62%,260px)" },
       name: { file:IMG+"nameframes/name.webp", mode:"plain", width:"min(90%,400px)", inset:"32% 20% 30% 20%" },   // ស៊ុមឈ្មោះមាសរាងវែង · width = ទំហំស៊ុម · inset = ផ្ទៃអក្សរក្នុងរន្ធ [លើ ស្តាំ ក្រោម ឆ្វេង] (បង្កើន = អក្សរតូចចូលជ្រៅ)
       photo:{ file:IMG+"frames/photo.png",        mode:"keyG", clip:"l2-hole", width:"min(68vw,330px)", big:true, photoPos:"center 30%" },
-      seal: { file:IMG+"open/seal.webp", size:108 }   // LT Media
+      // ត្រាមាស (seal) មិនកំណត់ក្នុងឈុតទេ — ជ្រើសក្នុង Style tab (images/seals/ · SEAL_BUTTONS ក្នុង wib-data.js)។
     }
   };
 
@@ -44,6 +44,6 @@ window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
     design:Object.assign({}, PRESET_DESIGN_BASE, {
       layout:"l2", theme:"emerald", fontKm:"moul", fontEn:"playfair", galleryStyle:"grid",
       galleryArts:["gallery1","gallery2","gallery3","gallery4"], coverArt:"cover1",
-      textAnim:"fadeup", openStyle:"tap", coverAlways:true })
+      textAnim:"fadeup", openStyle:"tap", coverAlways:true, sealBtn:"seal2" })
   };
 })();

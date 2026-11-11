@@ -17,7 +17,7 @@
 window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
 (function(){
   const IMG  = "layouts/l5/images/frames/";   // all flower pictures of this layout
-  const OPEN = "layouts/l5/images/open/";     // wax seal
+  const OPEN = "layouts/l5/images/open/";     // envelope picture (open/envelope.webp)
   const AUTO = window.WIB_L5_AUTO || {};      // measured photo openings (l5-clips.js)
 
   // ---- standard shapes (used only while l5-clips.js is not yet there, or a frame has no measured opening) ----
@@ -91,7 +91,7 @@ ${SEL.split(",").map(x => x + "::after").join(",")}{background-image:${url("bloc
         name:   { file:IMG + k + "_oval-landscape.webp", mode:"plain", width:"min(92%,400px)", inset:a.nameInset || "28% 18% 28% 18%" },   // ស៊ុមឈ្មោះភ្ញៀវ
         photo:  { file:IMG + k + "_portrait.webp",   mode:"plain", clip:id("portrait"),   width:"100%", photoPos:"center 20%" },            // កូនកម្លោះ
         photo2: { file:IMG + k + "_portrait-2.webp", mode:"plain", clip:id("portrait-2"), width:"100%", photoPos:"center 20%" },            // កូនក្រមុំ
-        seal:   { file:OPEN + "seal.webp", size:86 }                                                                                         // ចិញ្ចៀនរៀបការ
+        // ត្រាមាស (seal) មិនកំណត់ក្នុងឈុតទេ — ជ្រើសក្នុង Style tab (images/seals/ · SEAL_BUTTONS ក្នុង wib-data.js)។
       }
     };
   }
@@ -120,6 +120,6 @@ ${SEL.split(",").map(x => x + "::after").join(",")}{background-image:${url("bloc
     design:Object.assign({}, PRESET_DESIGN_BASE, {
       layout:"l5", theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"square",
       galleryArts:["gallery1","gallery2","gallery3","gallery4"], coverArt:"none",
-      textAnim:"blur", openStyle:"seal", coverAlways:true })
+      textAnim:"blur", openStyle:"seal", coverAlways:true, sealBtn:"seal3" })
   };
 })();

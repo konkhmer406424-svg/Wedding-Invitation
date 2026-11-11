@@ -19,7 +19,9 @@ window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
     // CSS of this layout only — ស៊ុមមាសធំដាក់ពីក្រោយអត្ថបទ (z-index:-1) ដើម្បីកុំឱ្យក្បាច់គ្របលើអក្សរ រូប និងប៊ូតុង
     css:`
 .ly-frame{z-index:-1 !important;}
-.open-cover .ly-frame{z-index:0 !important;}   /* ស៊ុមលើទំព័រគម្រប៖ ពីលើផ្ទៃ ប៉ុន្តែនៅក្រោមអក្សរ */
+.ly-slice{z-index:-1 !important;}   /* ស៊ុមមុំ ៤ (slice) ក៏នៅពីក្រោយអក្សរដែរ */
+.open-cover .ly-frame{z-index:0 !important;}
+.open-cover .ly-slice{z-index:0 !important;}   /* ស៊ុមលើទំព័រគម្រប៖ ពីលើផ្ទៃ ប៉ុន្តែនៅក្រោមអក្សរ */
 `,
     // teardrop openings of the two gold frames (measured from the pictures, drawn 2% larger so the gold edge covers the seam)
     clips:{
@@ -37,15 +39,15 @@ window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
       bg:    { file:IMG+"background/bg.webp",      mode:"tint", color:"accent1", opacity:0.20 },
       orn:   { file:IMG+"cover/orn.webp",          mode:"plain", width:"min(54%,230px)" },
       name:  { file:IMG+"nameframes/name.webp",    mode:"plain", width:"min(92%,400px)", inset:"34% 24% 36% 24%" },   // already painted gold (pre-coloured PNG, transparent background) — shown as it is
-      // ស៊ុមមាសតែមួយ frames/frame-gold.webp (ក្បាច់មាស ៤ ជ្រុង + បន្ទាត់ទ្វេរជុំវិញ) — ប្រើទាំងទំព័រធៀប (frame) និងទំព័រគម្រប (coverFrame) ជំនួសក្បាច់ជ្រុងស ៤ និងស៊ុមស្តើងចាស់
-      //   layout:"border" = កាត់ជា ៩ ផ្នែក៖ ជ្រុងទាំង ៤ (ក្បាច់ធំ) មិនខូចទ្រង់ទ្រាយ ហើយបន្ទាត់ត្រង់ជាប់គែមលាតតាមកម្ពស់អេក្រង់
-      //   slice  = [លើ, ស្តាំ, ក្រោម, ឆ្វេង] ទំហំជ្រុងក្នុងរូប 1080×1920 (px) · width = ទទឹងស៊ុម ពេញអេក្រង់ តែមិនលើស ៩០% នៃកម្ពស់
-      //   border = ទទឹងក្បាច់ម្ខាង · borderY = កម្ពស់ក្បាច់ខាងលើ (វាស់តាមអេក្រង់ ដូច្នេះក្បាច់ខាងលើទាំងពីរជួបគ្នាចំកណ្តាល)
-      frame:     { file:IMG+"frames/frame-gold.webp", mode:"plain", layout:"border", slice:[570, 540, 590, 540], border:"calc(min(100vw, 90vh) / 2)", borderY:"calc(min(max(min(min(100vw, 90vh) / 1080, 100vh / 1900), min(100vw, 90vh) / 1350), 100vh / 1160) * 570)", width:"min(100%, 90vh)" },
-      coverFrame:{ file:IMG+"frames/frame-gold.webp", mode:"plain", layout:"border", slice:[570, 540, 590, 540], border:"calc(min(100vw, 90vh) / 2)", borderY:"calc(min(max(min(min(100vw, 90vh) / 1080, 100vh / 1900), min(100vw, 90vh) / 1350), 100vh / 1160) * 570)", width:"min(100%, 90vh)" },
+      // ស៊ុមទំព័រ + ទំព័រគម្រប — រូបមុំតែមួយ frames/frame-corner.png (ក្បាច់ឈូក + បន្ទាត់ទ្វេរ នៅមុំខាងលើឆ្វេង) ដូច l1 (layout:"slice")
+      //   ក្បាច់មុំទាំង ៤ = រូបតែមួយក្រឡាប់ (មិនលាត) · បន្ទាត់ត្រង់ = ផ្នែកស្តើងនៃរូប លាតតាមប្រវែងតែមួយទិស → ជាប់ជ្រុងអេក្រង់គ្រប់ទំហំ គ្មានស្នាមព្រិល
+      //   slice = ទំហំក្បាច់មុំក្នុងរូប (% នៃទទឹង/កម្ពស់ · វាស់ពីរូប 1024×1024៖ ក្បាច់ដល់ ~349px) · margin = គែមថ្លានៃរូប (ប្រភាគនៃទទឹង) · aspect = កម្ពស់ ÷ ទទឹង
+      //   scale = ទំហំក្បាច់មុំ (ធំ = ក្បាច់ធំ) · pad = គម្លាតពីគែមអេក្រង់ (px) · color:"accent2" = ពណ៌មាស (ប្តូរជា "accent1" = ពណ៌ក្រហមស្វាយ)
+      frame:     { file:IMG+"frames/frame-corner.png", mode:"tint", color:"accent2", layout:"slice", slice:{x:34.2,y:34.2}, margin:{x:0.0645,y:0.0664}, aspect:1, scale:0.56, pad:6 },
+      coverFrame:{ file:IMG+"frames/frame-corner.png", mode:"tint", color:"accent2", layout:"slice", slice:{x:34.2,y:34.2}, margin:{x:0.0645,y:0.0664}, aspect:1, scale:0.56, pad:6 },
       photo: { file:IMG+"frames/photo.webp",       mode:"plain", clip:"l4-tearL", width:"100%", photoPos:"center 20%" },   // the photo fills the whole teardrop opening
       photo2:{ file:IMG+"frames/photo2.webp",      mode:"plain", clip:"l4-tearR", width:"100%", photoPos:"center 20%" },
-      seal:  { file:IMG+"open/seal.webp", size:86 }   // ចិញ្ចៀនរៀបការ
+      // ត្រាមាស (seal) មិនកំណត់ក្នុងឈុតទេ — ជ្រើសក្នុង Style tab (images/seals/ · SEAL_BUTTONS ក្នុង wib-data.js)។
     }
   };
 
@@ -56,6 +58,6 @@ window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
     design:Object.assign({}, PRESET_DESIGN_BASE, {
       layout:"l4", theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"square",
       galleryArts:["gallery1","gallery2","gallery3","gallery4"], coverArt:"none",
-      textAnim:"blur", openStyle:"seal", coverAlways:true })
+      textAnim:"blur", openStyle:"seal", coverAlways:true, sealBtn:"seal3" })
   };
 })();

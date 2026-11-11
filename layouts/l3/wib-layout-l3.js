@@ -22,7 +22,7 @@ window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
       corners:{ file:IMG+"frames/corner.webp",  mode:"plain", width:"min(34vw,170px)", offset:"6px" },   // ក្បាច់ជ្រុងមាសទាំង៤ លើទំព័រគម្រប (ចុចបើក) · width = ទំហំ · offset = ចន្លោះពីគែម
       orn:  { file:IMG+"cover/orn.webp",           mode:"plain", width:"min(60%,250px)" },
       name: { file:IMG+"nameframes/name.webp",     mode:"plain", width:"min(86%,340px)", inset:"24% 20%", fill:"rgba(255,255,255,.92)" },
-      seal: { file:IMG+"open/seal.webp", size:150, under:true }   // បេះដូង (under:true = នៅក្រោមឈ្មោះកូនកម្លោះ-ក្រមុំ)
+      // ត្រាមាស (seal) មិនកំណត់ក្នុងឈុតទេ — ជ្រើសក្នុង Style tab (images/seals/ · SEAL_BUTTONS ក្នុង wib-data.js)។
     }
   };
 
@@ -33,7 +33,7 @@ window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
     design:Object.assign({}, PRESET_DESIGN_BASE, {
       layout:"l3", theme:"gold", fontKm:"moul", fontEn:"greatVibes", galleryStyle:"classic",
       galleryArts:["gallery1","gallery2","gallery5","gallery6"], coverArt:"cover2",
-      textAnim:"fadeup", openStyle:"tap", coverAlways:true,
+      textAnim:"fadeup", openStyle:"tap", coverAlways:true, sealBtn:"seal4",
       coverBlur:0, coverFocusX:50, coverFocusY:40 })
   };
 })();
