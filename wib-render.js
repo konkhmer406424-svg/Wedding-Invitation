@@ -307,6 +307,8 @@ function buildSection(s, t, lang){
   const venueName = isKm ? s.venueName : (s.venueNameEn || s.venueName);
   const venueAddr = isKm ? s.venueAddr : (s.venueAddrEn || s.venueAddr);
   const displayDate = isKm ? kmDate(s.eventDate) : enDate(s.eventDate);
+  const heroDateHtml = (typeof khHeroDateHtml === "function" && khHeroDateHtml(s.eventDate, lang)) || displayDate;   // Khmer: lunar + solar line; English: "December 12, 2026"
+  const calHtml = (typeof khMonthCalendarHtml === "function") ? khMonthCalendarHtml(s.eventDate, lang) : "";   // month calendar above the countdown
 
   const ornamentSvg = t.ornate
     ? `<svg width="18" height="18" viewBox="0 0 20 20"><path d="M10 2 C10 8 4 8 4 12 C4 16 10 16 10 18 C10 16 16 16 16 12 C16 8 10 8 10 2 Z" fill="none" stroke="var(--accent-2)" stroke-width="1.2"/></svg>`
@@ -374,12 +376,14 @@ ${hostsHtml}
   const secCountdown = (isPrev || hasCountdown) ? `<section><div class="wrap">
 <h2 class="section-title display">${L.countdownTitle}</h2>
 <p class="section-sub">${L.countdownSub}</p>
+${calHtml}
 <div class="countdown" id="countdown${suf}">
 <div class="cd-unit"><div class="cd-num" id="cd-d${suf}">00</div><div class="cd-label">${L.days}</div></div>
 <div class="cd-unit"><div class="cd-num" id="cd-h${suf}">00</div><div class="cd-label">${L.hours}</div></div>
 <div class="cd-unit"><div class="cd-num" id="cd-m${suf}">00</div><div class="cd-label">${L.minutes}</div></div>
 <div class="cd-unit"><div class="cd-num" id="cd-s${suf}">00</div><div class="cd-label">${L.seconds}</div></div>
 </div>${hasCountdown ? `<div class="cal-wrap"><button class="cal-btn" type="button" data-lang="${lang}">${L.calBtn}</button></div>` : ""}</div></section>` : "";
+  const secCalOnly   = (!isPrev && !hasCountdown && calHtml) ? `<section><div class="wrap">${calHtml}</div></section>` : "";
   const secProgram   = (isPrev || hasProgram)   ? `<section><div class="wrap">
 <h2 class="section-title display">${L.programTitle}</h2>
 <p class="section-sub">${displayDate}</p>
@@ -435,7 +439,7 @@ ${mapPrev.openUrl ? `<a class="map-btn" href="${escapeHtml(mapPrev.openUrl)}" ta
 <h2 class="section-title display">${L.thanksTitle}</h2>
 <div class="welcome thanks-note"><p>${escapeHtml(thanksNote)}</p></div>
 </div></section>` : "";
-  const bodySections = [secWelcome, secCountdown, secProgram, secDress, secGallery, secVideo, secVenue, secContacts, secGift, secThanks].filter(Boolean).join(divider);
+  const bodySections = [secWelcome, secCountdown, secCalOnly, secProgram, secDress, secGallery, secVideo, secVenue, secContacts, secGift, secThanks].filter(Boolean).join(divider);
 
   // the two names are two elements, so each gets the text effect on its own, and the bride's is drawn with the accent colours swapped (see .names-b)
   const namesHtml = (s.nameSplit !== false && String(groom || "").trim() && String(bride || "").trim())
@@ -447,7 +451,7 @@ ${mapPrev.openUrl ? `<a class="map-btn" href="${escapeHtml(mapPrev.openUrl)}" ta
 <section class="${heroClass}${lyOn ? " ly-hero ly-" + lyOn.id : ""}"${heroStyle}>${heroLayers}${lyp.pre}
 <p class="eyebrow">${escapeHtml(eyebrow)}</p>${lyp.mid}
 ${namesHtml}
-<p class="hero-date">${displayDate}</p>${lyp.post}
+<p class="hero-date">${heroDateHtml}</p>${lyp.post}
 </section>
 ${bodySections}
 <footer><div class="thanks display">${L.thanks}</div><div>${escapeHtml(groom)} ${L.and} ${escapeHtml(bride)}</div></footer>
@@ -1111,6 +1115,7 @@ section{padding:30px 0;}
 .cal-wrap{text-align:center;margin-top:22px;}
 .cal-btn{display:inline-block;padding:11px 26px;border-radius:999px;border:1.5px solid var(--accent-1);background:transparent;color:var(--accent-1);font-family:inherit;font-size:14px;font-style:normal;cursor:pointer;transition:background .2s,color .2s;}
 .cal-btn:hover,.cal-btn:focus-visible{background:var(--accent-1);color:#fff;outline:none;}
+${typeof KHCAL_CSS === "string" ? KHCAL_CSS : ""}
 .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
 .contact-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;text-align:center;}
 .contact-name{font-size:17px;margin:0 0 6px;}

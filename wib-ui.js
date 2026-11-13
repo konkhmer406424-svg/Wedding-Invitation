@@ -1330,7 +1330,9 @@ function bindSimpleFields(){
 function updateEventDateReadback_(){
   const el = $("eventDateReadback");
   if(!el) return;
-  el.textContent = state.eventDate ? kmDate(state.eventDate) : "";
+  const lunar = (typeof khDateReadback === "function" && state.eventDate) ? khDateReadback(state.eventDate) : "";
+  el.textContent = state.eventDate ? kmDate(state.eventDate) + (lunar ? "\n" + lunar : "") : "";
+  el.style.whiteSpace = "pre-line";
 }
 
 function update(){
