@@ -61,7 +61,7 @@ function buildBlockFrameCss_(s){
   const f = BLOCK_FRAMES[k], u = blockFrameUrl_(k);
   const n = Number(s.blockFrameSize), size = (Number.isFinite(n) ? Math.max(50, Math.min(200, n)) : 100) / 100;
   const [t, r, b, l] = f.slice, q = v => (v / l).toFixed(4);
-  const SEL = ".welcome,.dress-card,.venue-card,.contact-card,.gift-card,.countdown,.timeline,.gallery,.vid-block";   // every information block: welcome · countdown (one frame for the whole row) · programme · pictures · video · dress colours · location · contact · gift
+  const SEL = ".welcome,.dress-card,.venue-card,.contact-card,.gift-card,.countdown,.khcal,.timeline,.gallery,.vid-block";   // every information block: welcome · countdown (one frame for the whole row) · programme · pictures · video · dress colours · location · contact · gift
   const after = SEL.split(",").map(x => x + "::after").join(",");
   const pad = "max(22px,calc(" + f.pad + "px * " + size + ")) !important";
   const bw = "calc(var(--bf-px) * " + q(t) + ") calc(var(--bf-px) * " + q(r) + ") calc(var(--bf-px) * " + q(b) + ") var(--bf-px)";
@@ -1121,7 +1121,7 @@ ${typeof KHCAL_CSS === "string" ? KHCAL_CSS : ""}
 .contact-name{font-size:17px;margin:0 0 6px;}
 .contact-phone{display:inline-block;color:var(--accent-1);font-weight:600;text-decoration:none;font-size:16.5px;font-style:normal;}
 /* ---- Glass + 3D cards (countdown, short invitation, venue, contacts): see-through so the animated background shows behind. Tune --glass-a1 / --glass-a2 (higher = more solid) ---- */
-.welcome,.cd-unit,.venue-card,.contact-card,.dress-card,.gift-card{--glass-a1:58%;--glass-a2:30%;position:relative;background:linear-gradient(160deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,0) 44%),linear-gradient(145deg,color-mix(in srgb,var(--card) var(--glass-a1),transparent),color-mix(in srgb,var(--card) var(--glass-a2),transparent));-webkit-backdrop-filter:blur(3px) saturate(1.25);backdrop-filter:blur(3px) saturate(1.25);border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 1px 0 0 rgba(255,255,255,.3),inset 0 -2px 5px rgba(0,0,0,.06),0 14px 28px -8px rgba(0,0,0,.30),0 4px 10px rgba(0,0,0,.10);}
+.welcome,.cd-unit,.khcal,.venue-card,.contact-card,.dress-card,.gift-card{--glass-a1:58%;--glass-a2:30%;position:relative;background:linear-gradient(160deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,0) 44%),linear-gradient(145deg,color-mix(in srgb,var(--card) var(--glass-a1),transparent),color-mix(in srgb,var(--card) var(--glass-a2),transparent));-webkit-backdrop-filter:blur(3px) saturate(1.25);backdrop-filter:blur(3px) saturate(1.25);border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 1px 0 0 rgba(255,255,255,.3),inset 0 -2px 5px rgba(0,0,0,.06),0 14px 28px -8px rgba(0,0,0,.30),0 4px 10px rgba(0,0,0,.10);}
 /* Dress colours: 3D glossy swatches (inset highlight + soft drop shadow) to match the glass cards */
 .dress-dot span{box-shadow:0 0 0 3px color-mix(in srgb,var(--card) 80%,transparent),0 0 0 4px var(--border),inset 0 3px 5px rgba(255,255,255,.55),inset 0 -5px 8px rgba(0,0,0,.18),0 8px 14px -3px rgba(0,0,0,.35);}
 .dress-row + .dress-row{border-top-color:color-mix(in srgb,var(--border) 70%,rgba(255,255,255,.6));}
