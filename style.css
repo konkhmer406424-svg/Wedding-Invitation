@@ -333,5 +333,5 @@ textarea.one-line{min-height:40px;height:40px;resize:vertical;overflow:auto;line
 .song-tile:focus-visible{outline:2px solid var(--b-accent);outline-offset:2px;}
 .song-marq{display:block;width:100%;overflow:hidden;white-space:nowrap;line-height:1.5;}
 .song-txt{display:inline-block;min-width:100%;font-size:10px;font-weight:600;text-align:center;animation:song-run 10s linear infinite;}
-@keyframes song-run{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
+@keyframes song-run{from{transform:translateX(100%);}to{transform:translateX(-100%);}}
 @media (prefers-reduced-motion:reduce){.song-txt{animation:none;overflow:hidden;text-overflow:ellipsis;display:block;}}
