@@ -265,21 +265,20 @@
       <p class="photo-hint">ភ្ញៀវនឹងឃើញអេក្រង់ «ចុចដើម្បីបើកធៀបអញ្ជើញ» ជាមុន ហើយចម្រៀងចាប់ផ្តើមលេងពេលចុច (browser មិនអនុញ្ញាតឱ្យលេងសំឡេងដោយខ្លួនឯងទេ)។ ភ្ញៀវអាចបិទ/បើកបានពីប៊ូតុងខាងក្រោមស្តាំ។</p>
       <p class="photo-hint">ជ្រើសរើស MP3 ប៉ុន្មានធំក៏បាន — ប្រព័ន្ធ<b>កាត់ចម្រៀងឱ្យខ្លីស្វ័យប្រវត្តិ</b> (ចាប់ពីដើម) ហើយលុបរូបភាព/ព័ត៌មានក្នុងឯកសារ MP3 ចេញ ដើម្បីកុំឱ្យឯកសារភ្ញៀវធំ។ ចម្រៀងត្រូវបានដាក់ចូលក្នុងឯកសារភ្ញៀវនីមួយៗ។</p>
       <div class="field">
-        <label for="musicMaxSel">រយៈពេលអតិបរមានៃចម្រៀង</label>
+        <label for="musicMaxSel">រយៈពេលអតិបរមា (សម្រាប់ចម្រៀងពីម៉ាស៊ីនប៉ុណ្ណោះ)</label>
         <select id="musicMaxSel">
           <option value="30">30 វិនាទី</option>
           <option value="45">45 វិនាទី</option>
           <option value="60" selected>60 វិនាទី</option>
         </select>
       </div>
-      <div class="field" id="musicPresetField">
-        <label for="musicPresetSel">ចម្រៀងដែលមានស្រាប់ (90 វិនាទី)</label>
-        <select id="musicPresetSel"><option value="">— ជ្រើសរើសចម្រៀង —</option></select>
-        <p class="photo-hint" style="margin-top:6px;">ចម្រៀងទាំងនេះមិនធ្វើឲ្យឯកសារអញ្ជើញធំទេ (ទាញយកតែពេលភ្ញៀវលេង)។ ឬចុចប៊ូតុងខាងក្រោម ដើម្បីប្រើចម្រៀងពីម៉ាស៊ីនរបស់អ្នក។</p>
-      </div>
+      <div class="pick-label">ជ្រើសរើសចម្រៀង (90 វិនាទី)</div>
+      <div class="song-grid" id="musicGrid"></div>
+      <p class="photo-hint" style="margin-top:8px;">ចម្រៀងទាំង ៥ ខាងលើមិនធ្វើឲ្យឯកសារអញ្ជើញធំទេ។ ប៊ូតុងទី ៦ សម្រាប់ទាញចូលចម្រៀងពីម៉ាស៊ីនរបស់អ្នក។</p>
+
       <input type="file" id="musicFile" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" style="display:none;">
       <div class="profile-btn-row">
-        <button class="add-btn" id="musicPickBtn" type="button">ជ្រើសរើសចម្រៀង (MP3)</button>
+        <button class="add-btn" id="musicPickBtn" type="button" style="display:none;">ជ្រើសរើសចម្រៀង (MP3)</button>
         <button class="access-btn" id="musicRemoveBtn" type="button" style="display:none;">លុបចម្រៀង</button>
       </div>
       <audio id="musicPreview" controls preload="none" style="width:100%;margin-top:10px;display:none;"></audio>

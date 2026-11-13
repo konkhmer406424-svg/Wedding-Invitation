@@ -439,13 +439,35 @@ function presetAsset_(p){
   return { name: p.name, preset: p.id, url, size: 0, origSize: 0, seconds: p.seconds || null, origSeconds: null, startSeconds: 0, dataUrl: "" };
 }
 function fillPresetSelect_(){
-  const sel = $("musicPresetSel");
-  if(!sel || sel.options.length > 1) return;
-  PRESET_SONGS.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.name; sel.appendChild(o); });
+  const g = $("musicGrid");
+  if(!g || g.children.length) return;
+  const note = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+  const plus = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+  PRESET_SONGS.forEach(p => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "song-tile"; b.dataset.song = p.id;
+    b.innerHTML = note + '<span class="song-name"></span>';
+    b.querySelector(".song-name").textContent = p.name;
+    b.addEventListener("click", () => usePresetSong(p.id));
+    g.appendChild(b);
+  });
+  const own = document.createElement("button");
+  own.type = "button"; own.className = "song-tile song-own"; own.dataset.song = "__own";
+  own.innerHTML = plus + '<span class="song-name">ទាញចូលពីម៉ាស៊ីន</span>';
+  own.addEventListener("click", () => $("musicFile").click());
+  g.appendChild(own);
 }
 function syncPresetSelect_(){
-  const sel = $("musicPresetSel");
-  if(sel) sel.value = (musicAsset && musicAsset.preset) ? musicAsset.preset : "";
+  const g = $("musicGrid");
+  if(!g) return;
+  const cur = !musicAsset ? "" : (musicAsset.preset ? musicAsset.preset : "__own");
+  Array.prototype.forEach.call(g.children, t => {
+    const on = t.dataset.song === cur;
+    t.classList.toggle("on", on);
+    t.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  const own = g.querySelector(".song-own .song-name");
+  if(own) own.textContent = (musicAsset && !musicAsset.preset) ? musicAsset.name : "ទាញចូលពីម៉ាស៊ីន";
 }
 function usePresetSong(id){
   const p = presetSong_(id);
@@ -592,7 +614,7 @@ $("musicStartEndBtn").addEventListener("click", () => {
   setMusicStart(Math.ceil(musicAsset.origSeconds - longest));
 });
 fillPresetSelect_();
-$("musicPresetSel").addEventListener("change", e => usePresetSong(e.target.value));
+syncPresetSelect_();
 $("musicPickBtn").addEventListener("click", () => $("musicFile").click());
 $("musicFile").addEventListener("change", e => {
   const file = e.target.files && e.target.files[0];
