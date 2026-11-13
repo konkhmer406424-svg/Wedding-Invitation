@@ -438,50 +438,49 @@ function presetAsset_(p){
   try{ url = new URL(p.file, location.href).href; }catch(e){}
   return { name: p.name, preset: p.id, url, size: 0, origSize: 0, seconds: p.seconds || null, origSeconds: null, startSeconds: 0, dataUrl: "" };
 }
+function setSongTitle_(tile, text){
+  const t = tile.querySelector(".song-txt");
+  if(!t) return;
+  t.textContent = text;
+  t.style.animationDuration = Math.max(6, Math.round(text.length * 0.38)) + "s";
+}
 function fillPresetSelect_(){
-  const g = $("musicGrid"), lg = $("musicLegend");
+  const g = $("musicGrid");
   if(!g || g.children.length) return;
   const ico = d => '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
   const note = ico('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>');
   const plus = ico('<path d="M12 5v14M5 12h14"/>');
-  PRESET_SONGS.forEach((p, i) => {
+  const body = '<span class="song-marq"><span class="song-txt"></span></span>';
+  PRESET_SONGS.forEach(p => {
     const b = document.createElement("button");
     b.type = "button"; b.className = "song-tile"; b.dataset.song = p.id;
     b.title = p.name; b.setAttribute("aria-label", p.name);
-    b.innerHTML = note + '<span class="song-num">' + (i + 1) + '</span>';
+    b.innerHTML = note + body;
+    setSongTitle_(b, p.name);
     b.addEventListener("click", () => usePresetSong(p.id));
     g.appendChild(b);
-    if(lg){
-      const r = document.createElement("div");
-      r.className = "song-row"; r.dataset.song = p.id;
-      r.textContent = (i + 1) + ". " + p.name;
-      lg.appendChild(r);
-    }
   });
   const own = document.createElement("button");
   own.type = "button"; own.className = "song-tile song-own"; own.dataset.song = "__own";
   own.title = "ទាញចូលពីម៉ាស៊ីន"; own.setAttribute("aria-label", "ទាញចូលពីម៉ាស៊ីន");
-  own.innerHTML = plus + '<span class="song-num">' + (PRESET_SONGS.length + 1) + '</span>';
+  own.innerHTML = plus + body;
+  setSongTitle_(own, "ទាញចូលពីម៉ាស៊ីន");
   own.addEventListener("click", () => $("musicFile").click());
   g.appendChild(own);
-  if(lg){
-    const r = document.createElement("div");
-    r.className = "song-row"; r.dataset.song = "__own";
-    lg.appendChild(r);
-  }
 }
 function syncPresetSelect_(){
-  const g = $("musicGrid"), lg = $("musicLegend");
+  const g = $("musicGrid");
   if(!g) return;
   const cur = !musicAsset ? "" : (musicAsset.preset ? musicAsset.preset : "__own");
   Array.prototype.forEach.call(g.children, t => {
     const on = t.dataset.song === cur;
     t.classList.toggle("on", on);
     t.setAttribute("aria-pressed", on ? "true" : "false");
-  });
-  if(lg) Array.prototype.forEach.call(lg.children, r => {
-    r.classList.toggle("on", r.dataset.song === cur);
-    if(r.dataset.song === "__own") r.textContent = (PRESET_SONGS.length + 1) + ". " + ((musicAsset && !musicAsset.preset) ? musicAsset.name : "ទាញចូលពីម៉ាស៊ីន");
+    if(t.dataset.song === "__own"){
+      const label = (musicAsset && !musicAsset.preset) ? musicAsset.name : "ទាញចូលពីម៉ាស៊ីន";
+      t.title = label;
+      setSongTitle_(t, label);
+    }
   });
   const mf = $("musicMaxField");
   if(mf) mf.style.display = (musicAsset && !musicAsset.preset) ? "" : "none";
