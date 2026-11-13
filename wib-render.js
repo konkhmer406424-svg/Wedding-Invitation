@@ -1126,7 +1126,7 @@ ${typeof KHCAL_CSS === "string" ? KHCAL_CSS : ""}
 .dress-dot span{box-shadow:0 0 0 3px color-mix(in srgb,var(--card) 80%,transparent),0 0 0 4px var(--border),inset 0 3px 5px rgba(255,255,255,.55),inset 0 -5px 8px rgba(0,0,0,.18),0 8px 14px -3px rgba(0,0,0,.35);}
 .dress-row + .dress-row{border-top-color:color-mix(in srgb,var(--border) 70%,rgba(255,255,255,.6));}
 /* Countdown: dark-tinted glass tile (theme colour) so the 3D digits stay clear on any background */
-.cd-unit{width:80px;padding:6px 0 4px;background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;}
+.cd-unit{width:80px;padding:12px 0 10px;background:none;border:1.5px solid var(--accent-1);border-radius:18px;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;}
 .cd-label{color:#fff;opacity:1;font-weight:700;margin-top:6px;text-shadow:0 1px 0 rgba(0,0,0,.65),0 2px 7px rgba(0,0,0,.7);}
 .cd-num{font-size:40px;font-weight:900;line-height:1.1;letter-spacing:.5px;font-variant-numeric:tabular-nums;background:none;-webkit-background-clip:border-box;background-clip:border-box;filter:none;color:#fff;-webkit-text-fill-color:#fff;text-shadow:0 1px 0 color-mix(in srgb,var(--accent-1) 60%,#000),0 2px 0 color-mix(in srgb,var(--accent-1) 52%,#000),0 3px 0 color-mix(in srgb,var(--accent-1) 44%,#000),0 4px 0 color-mix(in srgb,var(--accent-1) 36%,#000),0 5px 0 color-mix(in srgb,var(--accent-1) 28%,#000),0 11px 14px rgba(0,0,0,.5);}
 @media(max-width:420px){.countdown{gap:8px;flex-wrap:nowrap;}.cd-unit{width:auto;flex:1 1 0;min-width:0;}.cd-num{font-size:34px;}}
