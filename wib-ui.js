@@ -431,6 +431,33 @@ async function loadFrameOnStartup(){
   if(state.kbachFrame === "custom" || state.kbachBg === "custom") update();
 }
 
+// ---- Ready-made songs (PRESET_SONGS in wib-data.js): guest file stores only the song's web address ----
+function presetSong_(id){ return PRESET_SONGS.filter(p => p.id === id)[0] || null; }
+function presetAsset_(p){
+  let url = p.file;
+  try{ url = new URL(p.file, location.href).href; }catch(e){}
+  return { name: p.name, preset: p.id, url, size: 0, origSize: 0, seconds: p.seconds || null, origSeconds: null, startSeconds: 0, dataUrl: "" };
+}
+function fillPresetSelect_(){
+  const sel = $("musicPresetSel");
+  if(!sel || sel.options.length > 1) return;
+  PRESET_SONGS.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.name; sel.appendChild(o); });
+}
+function syncPresetSelect_(){
+  const sel = $("musicPresetSel");
+  if(sel) sel.value = (musicAsset && musicAsset.preset) ? musicAsset.preset : "";
+}
+function usePresetSong(id){
+  const p = presetSong_(id);
+  if(!p){ musicAsset = null; musicSource = null; refreshMusicUI(); persistMusic(); update(); return; }
+  musicAsset = presetAsset_(p);
+  musicSource = null;
+  try{ sessionStorage.removeItem("wib-cover-seen"); }catch(e){}
+  refreshMusicUI(true);
+  persistMusic();
+  update();
+}
+
 async function loadMusicOnStartup(){
   try{
     const rec = await musicStoreOp("readonly", st => st.get(MUSIC_KEY));
@@ -438,6 +465,8 @@ async function loadMusicOnStartup(){
     musicAsset = (rec && typeof rec.dataUrl === "string" && /^data:audio\/[a-z0-9.+-]+;base64,[A-Za-z0-9+\/=]+$/i.test(rec.dataUrl))
       ? { name: String(rec.name || "song"), size: num(rec.size) || 0, origSize: num(rec.origSize) || 0, seconds: num(rec.seconds), origSeconds: num(rec.origSeconds), startSeconds: num(rec.startSeconds) || 0, dataUrl: rec.dataUrl }
       : null;
+    const pr = rec && rec.preset ? presetSong_(rec.preset) : null;
+    if(pr) musicAsset = presetAsset_(pr);
   }catch(e){ musicAsset = null; }
   refreshMusicUI();
   update();
@@ -447,9 +476,10 @@ function refreshMusicUI(autoplay){
   const prev = $("musicPreview"), st = $("musicStatus");
   if(!prev) return;
   const rm = $("musicRemoveBtn"), startField = $("musicStartField");
+  syncPresetSelect_();
   try{ prev.pause(); }catch(e){}
   if(musicAsset){
-    prev.src = musicAsset.dataUrl;
+    prev.src = musicAsset.url || musicAsset.dataUrl;
     prev.style.display = "block";
     rm.style.display = "";
     let line = musicAsset.name;
@@ -469,7 +499,12 @@ function refreshMusicUI(autoplay){
       startField.style.display = "none";
     }
     if(autoplay){ try{ const pr = prev.play(); if(pr && pr.catch) pr.catch(() => {}); }catch(e){} }
-    st.textContent = line + `\nឯកសារភ្ញៀវនីមួយៗនឹងធំបន្ថែមប្រហែល ${fmtSize(musicAsset.dataUrl.length)}`;
+    if(musicAsset.preset){
+      line = musicAsset.name + (musicAsset.seconds ? ` — រយៈពេល ${fmtTime(musicAsset.seconds)}` : "");
+      st.textContent = line + "\nចម្រៀងដែលមានស្រាប់ — មិនបន្ថែមទំហំឯកសារភ្ញៀវទេ" + (/^https?:/i.test(musicAsset.url) ? "" : "\n(ត្រូវបើកតាមគេហទំព័រ GitHub Pages ទើបចម្រៀងដំណើរការក្នុងឯកសារដែលបានផ្សាយ)");
+    }else{
+      st.textContent = line + `\nឯកសារភ្ញៀវនីមួយៗនឹងធំបន្ថែមប្រហែល ${fmtSize(musicAsset.dataUrl.length)}`;
+    }
     st.style.whiteSpace = "pre-line";
   }else{
     prev.removeAttribute("src");
@@ -556,6 +591,8 @@ $("musicStartEndBtn").addEventListener("click", () => {
   const longest = Math.min(musicMaxSeconds(), MAX_MUSIC_OUT_BYTES / bytesPerSec * 0.98, musicAsset.origSeconds);
   setMusicStart(Math.ceil(musicAsset.origSeconds - longest));
 });
+fillPresetSelect_();
+$("musicPresetSel").addEventListener("change", e => usePresetSong(e.target.value));
 $("musicPickBtn").addEventListener("click", () => $("musicFile").click());
 $("musicFile").addEventListener("change", e => {
   const file = e.target.files && e.target.files[0];
@@ -1461,7 +1498,7 @@ function exportProject(){
   const statusEl = $("backupStatus");
   const name = [state.groomNameEn || state.groomName, state.brideNameEn || state.brideName].filter(Boolean).join(" & ") || "invitation";
   let includeMusic = false;
-  if(musicAsset && typeof musicAsset.dataUrl === "string"){
+  if(musicAsset && !musicAsset.preset && typeof musicAsset.dataUrl === "string"){
     includeMusic = window.confirm(`រួមបញ្ចូលចម្រៀង "${musicAsset.name}" ក្នុងឯកសារ .json ផងដែរឬទេ?\nOK = រួមបញ្ចូល (ឯកសារធំបន្ថែមប្រហែល ${fmtSize(musicAsset.dataUrl.length)})\nCancel = មិនរួមបញ្ចូល`);
   }
   const copy = JSON.parse(JSON.stringify(state));
@@ -1469,6 +1506,7 @@ function exportProject(){
   delete copy.publishTokenKey;
   const payload = { app: BACKUP_APP_ID, version: 1, name, exportedAt: Date.now(), state: copy };
   if(includeMusic) payload.music = JSON.parse(JSON.stringify(musicAsset));
+  else if(musicAsset && musicAsset.preset) payload.music = { preset: musicAsset.preset, name: musicAsset.name };
   if(frameAsset && state.kbachFrame === "custom") payload.frame = JSON.parse(JSON.stringify(frameAsset));
   if(bgAsset && state.kbachBg === "custom") payload.bg = JSON.parse(JSON.stringify(bgAsset));
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -1478,7 +1516,8 @@ function exportProject(){
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
   let note = "";
-  if(musicAsset && !includeMusic) note = " (ចម្រៀងមិនរួមជាមួយឯកសារនេះទេ ត្រូវជ្រើសរើសម្តងទៀតលើ device ថ្មី)";
+  if(musicAsset && musicAsset.preset) note = " (រួមទាំងចម្រៀងដែលបានជ្រើស)";
+  else if(musicAsset && !includeMusic) note = " (ចម្រៀងមិនរួមជាមួយឯកសារនេះទេ ត្រូវជ្រើសរើសម្តងទៀតលើ device ថ្មី)";
   else if(includeMusic) note = " (រួមទាំងចម្រៀង)";
   statusEl.textContent = `បាននាំចេញ "${name}" ជាឯកសារ .json — រក្សាទុកក្នុងទីកន្លែងសុវត្ថិភាព${note}`;
 }
@@ -1501,7 +1540,10 @@ function importProject(file){
       let musicNote = " · ឯកសារនេះគ្មានចម្រៀងទេ (ចម្រៀងដែលមានស្រាប់ក្នុង browser នេះនៅដដែល)";
       const m = payload.music;
       if(m && typeof m === "object"){
-        if(typeof m.dataUrl === "string" && BK_AUDIO_RE.test(m.dataUrl)){
+        if(m.preset && presetSong_(m.preset)){
+          try{ await musicStoreOp("readwrite", st => st.put({ preset: m.preset, name: presetSong_(m.preset).name }, MUSIC_KEY)); musicNote = " · រួមទាំងចម្រៀង"; }
+          catch(e){ musicNote = " · មិនអាចរក្សាទុកចម្រៀងក្នុង browser នេះបានទេ"; }
+        }else if(typeof m.dataUrl === "string" && BK_AUDIO_RE.test(m.dataUrl)){
           const num = v => (typeof v === "number" && isFinite(v) && v >= 0) ? v : null;
           const asset = { name: bkStr(m.name, 200) || "song", size: num(m.size) || 0, origSize: num(m.origSize) || 0, seconds: num(m.seconds), origSeconds: num(m.origSeconds), startSeconds: num(m.startSeconds) || 0, dataUrl: m.dataUrl };
           try{ await musicStoreOp("readwrite", st => st.put(asset, MUSIC_KEY)); musicNote = " · រួមទាំងចម្រៀង"; }

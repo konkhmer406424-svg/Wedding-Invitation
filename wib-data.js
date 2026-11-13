@@ -934,6 +934,14 @@ const COVER_STYLE_KEYS = ["door","curtain","lock","rings","lotus","heart","seal"
 
 // Background song (one per project, this device). Kept out of `state` — far too big for
 // localStorage — and stored in IndexedDB instead (see the Music block below).
+// Ready-made songs (files in the songs/ folder, 90s, ~1MB each). Guest files point at them by address, not embedded.
+const PRESET_SONGS = [
+  { id: "thngai-del-pouk-yeung-rong-cham", name: "ថ្ងៃដែលពួកយើងរង់ចាំ — ថុល សុភិទិ", file: "songs/thngai-del-pouk-yeung-rong-cham.mp3", seconds: 90 },
+  { id: "thngai-mongkul-yeung", name: "ថ្ងៃមង្គលយើង", file: "songs/thngai-mongkul-yeung.mp3", seconds: 90 },
+  { id: "soriya-all3rgy", name: "សូរិយា — ALL3RGY ft. Jenna Norodom", file: "songs/soriya-all3rgy.mp3", seconds: 90 },
+  { id: "beautiful-in-white", name: "Beautiful in White — Westlife", file: "songs/beautiful-in-white.mp3", seconds: 90 },
+  { id: "when-two-forever-begin", name: "When Two Forever Begin", file: "songs/when-two-forever-begin.mp3", seconds: 90 }
+];
 let musicAsset = null;   // { name, size, dataUrl, seconds, origSeconds, startSeconds } or null
 // Custom decorative frame image (JPG / PNG / GIF), one per project on this device. Stored in IndexedDB (same
 // database as the song, key "frame") because it is too big for localStorage. See the Frame image block below.

@@ -30,6 +30,7 @@ self.addEventListener("fetch", e => {
   if(req.method !== "GET") return;
   const url = new URL(req.url);
   if(url.origin !== self.location.origin) return;
+  if(/\/songs\//.test(url.pathname)) return;   // songs: let the browser stream/cache them itself (range requests)
 
   // Art images: cache first (exact address, so ?v= changes are respected)
   if(isArtImage(url)){

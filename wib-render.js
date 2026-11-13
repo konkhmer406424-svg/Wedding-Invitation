@@ -92,7 +92,7 @@ function coverPreloadLinks_(s){
   return urls.filter((u, i) => u && urls.indexOf(u) === i).map(u => `<link rel="preload" as="image" fetchpriority="high" href="${escapeHtml(u)}">`).join("");
 }
 function buildMusicParts(s){
-  const music = (musicAsset && musicAsset.dataUrl) ? musicAsset : null;
+  const music = (musicAsset && (musicAsset.dataUrl || musicAsset.url)) ? musicAsset : null;
   if(!music && !s.coverAlways) return { css:"", html:"", js:"" };
 
   const key = hasOwn(COVER_STYLES, s.openStyle) ? s.openStyle : "door";
@@ -120,7 +120,7 @@ function buildMusicParts(s){
   const css = (music ? MUSIC_BTN_CSS : "") + OC_BASE_CSS + (imgU ? COVER_IMG_STYLES[key].css(imgU) : cfg.css) + deco.css + (sealSp ? SEAL_BTN_CSS : "");
 
   const musicHtml = music ? `
-<audio id="bgm" src="${music.dataUrl}" loop preload="metadata"></audio>
+<audio id="bgm" src="${music.url ? escapeHtml(music.url) : music.dataUrl}" loop preload="metadata"></audio>
 <button class="music-btn" id="musicBtn" type="button" aria-pressed="false" aria-label="Music" title="ចម្រៀង / Music">
   <svg class="ico-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
   <svg class="ico-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
