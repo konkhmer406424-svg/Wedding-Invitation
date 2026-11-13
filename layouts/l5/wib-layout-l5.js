@@ -17,7 +17,7 @@
 window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
 (function(){
   const IMG  = "layouts/l5/images/frames/";   // all flower pictures of this layout
-  const OPEN = "layouts/l5/images/open/";     // envelope picture (open/envelope.webp)
+  const OPEN = "layouts/l5/images/open/";     // wax seal
   const AUTO = window.WIB_L5_AUTO || {};      // measured photo openings (l5-clips.js)
 
   // ---- standard shapes (used only while l5-clips.js is not yet there, or a frame has no measured opening) ----
@@ -50,7 +50,7 @@ window.WIB_LAYOUTS = window.WIB_LAYOUTS || {};
     const pd = v => "calc(var(--cdw) * " + v.toFixed(4) + ")";
     const padCd = pd(ty0 / oar) + " " + pd(1 - tx1) + " " + pd((1 - ty1) / oar) + " " + pd(tx0);
     const url = f => "url('" + lyUrl_(IMG + k + "_" + f + ".webp") + "')";
-    const SEL = ".welcome,.dress-card,.venue-card,.contact-card,.gift-card";
+    const SEL = ".welcome,.dress-card,.venue-card,.contact-card,.gift-card,.khcal";
     return `
 /* ---- l5: flower corners around each information block (pieces cut from the landscape frame, anchored on the frame-line corner) ---- */
 ${SEL}{position:relative;overflow:visible;--bpw:min(24vw,118px);padding-top:44px !important;padding-bottom:44px !important;border:1.5px solid var(--accent-2) !important;border-radius:3px !important;box-shadow:none !important;background:color-mix(in srgb,var(--card) 84%,transparent) !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important;}
@@ -91,7 +91,7 @@ ${SEL.split(",").map(x => x + "::after").join(",")}{background-image:${url("bloc
         name:   { file:IMG + k + "_oval-landscape.webp", mode:"plain", width:"min(92%,400px)", inset:a.nameInset || "28% 18% 28% 18%" },   // ស៊ុមឈ្មោះភ្ញៀវ
         photo:  { file:IMG + k + "_portrait.webp",   mode:"plain", clip:id("portrait"),   width:"100%", photoPos:"center 20%" },            // កូនកម្លោះ
         photo2: { file:IMG + k + "_portrait-2.webp", mode:"plain", clip:id("portrait-2"), width:"100%", photoPos:"center 20%" },            // កូនក្រមុំ
-        // ត្រាមាស (seal) មិនកំណត់ក្នុងឈុតទេ — ជ្រើសក្នុង Style tab (images/seals/ · SEAL_BUTTONS ក្នុង wib-data.js)។
+        seal:   { file:OPEN + "seal.webp", size:86 }                                                                                         // ចិញ្ចៀនរៀបការ
       }
     };
   }
@@ -120,6 +120,6 @@ ${SEL.split(",").map(x => x + "::after").join(",")}{background-image:${url("bloc
     design:Object.assign({}, PRESET_DESIGN_BASE, {
       layout:"l5", theme:"blush", fontKm:"suwannaphum", fontEn:"parisienne", galleryStyle:"square",
       galleryArts:["gallery1","gallery2","gallery3","gallery4"], coverArt:"none",
-      textAnim:"blur", openStyle:"seal", coverAlways:true, sealBtn:"seal3" })
+      textAnim:"blur", openStyle:"seal", coverAlways:true })
   };
 })();
