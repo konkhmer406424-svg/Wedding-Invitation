@@ -47,10 +47,10 @@ function khDateReadback(dateStr){
   return `ថ្ងៃ${k.weekday} ${khDigits(k.day)}${k.phase} ខែ${k.month} ឆ្នាំ${k.animal} ${k.sak} ព.ស. ${khDigits(k.be)}`;
 }
 
-const KH_DOW_KM = ["អា","ច","អ","ពុ","ព្រ","សុ","ស"];
-const KH_DOW_EN = ["Su","Mo","Tu","We","Th","Fr","Sa"];
-
-// Whole month calendar (Sunday first) around the event day, with the Khmer lunar day under every solar day.
+// Whole month calendar (Sunday first) around the event day.
+//  Khmer:   header = full solar date of the event, full weekday names, Khmer lunar day under every solar day,
+//           footer = the event day's real lunar date (weekday, កើត/រោច, month, animal year, sak, BE).
+//  English: plain English calendar (month + year, full weekday names, no lunar text at all).
 function khMonthCalendarHtml(dateStr, lang){
   const p = khParseDate_(dateStr);
   if(!p) return "";
@@ -58,38 +58,39 @@ function khMonthCalendarHtml(dateStr, lang){
   const first = new Date(p.y, p.m - 1, 1).getDay();
   const days = new Date(p.y, p.m, 0).getDate();
   const num = n => isKm ? khDigits(n) : String(n);
-  const dows = (isKm ? KH_DOW_KM : KH_DOW_EN).map((w, i) => `<div class="khcal-dow${i === 0 ? " khcal-sun" : ""}">${w}</div>`).join("");
+  const names = isKm ? KM_WEEKDAYS : EN_WEEKDAYS;
+  const dows = names.map((w, i) => `<div class="khcal-dow${i === 0 ? " khcal-sun" : ""}">${escapeHtml(w)}</div>`).join("");
   let cells = "";
   for(let i = 0; i < first; i++) cells += `<div class="khcal-c khcal-empty"></div>`;
-  const months = [];
+  let evLunar = null;
   for(let d = 1; d <= days; d++){
-    const k = khLunarOf(p.y, p.m, d);
-    if(k && months.indexOf(k.month) < 0) months.push(k.month);
+    const k = isKm ? khLunarOf(p.y, p.m, d) : null;
+    if(isKm && d === p.d) evLunar = k;
     const col = (first + d - 1) % 7;
     const ev = d === p.d;
     const lunar = k ? `<i>${khDigits(k.day)}${k.phase}</i>` : "";
     cells += `<div class="khcal-c${ev ? " khcal-ev" : ""}${col === 0 ? " khcal-sun" : ""}"${ev ? ` aria-current="date"` : ""}><b>${num(d)}</b>${lunar}</div>`;
   }
-  const title = isKm ? `ខែ${KM_MONTHS[p.m - 1]} ឆ្នាំ${khDigits(p.y)}` : `${EN_MONTHS[p.m - 1]} ${p.y}`;
-  const hasLunar = months.length > 0;
-  const foot = !hasLunar ? "" : (isKm
-    ? `<p class="khcal-foot">ចន្ទគតិ៖ ${months.map(x => "ខែ" + escapeHtml(x)).join(" · ")}</p>`
-    : `<p class="khcal-foot">Khmer lunar day under each date (កើត = waxing · រោច = waning) · ${months.map(escapeHtml).join(" · ")}</p>`);
+  const title = isKm ? `ថ្ងៃទី${khDigits(p.d)} ខែ${KM_MONTHS[p.m - 1]} ឆ្នាំ${khDigits(p.y)}` : `${EN_MONTHS[p.m - 1]} ${p.y}`;
+  const foot = (isKm && evLunar)
+    ? `<p class="khcal-foot">${escapeHtml(`ថ្ងៃ${evLunar.weekday} ${khDigits(evLunar.day)}${evLunar.phase} ខែ${evLunar.month} ឆ្នាំ${evLunar.animal} ${evLunar.sak} ពុទ្ធសករាជ ${khDigits(evLunar.be)}`)}</p>`
+    : "";
   return `<div class="khcal" role="group" aria-label="${escapeHtml(title)}"><div class="khcal-head display">${escapeHtml(title)}</div><div class="khcal-grid">${dows}${cells}</div>${foot}</div>`;
 }
 
 const KHCAL_CSS = `
-.khcal{max-width:430px;margin:0 auto 26px;padding:16px 12px 12px;border:1px solid color-mix(in srgb,var(--accent-1) 38%,transparent);border-radius:18px;background:color-mix(in srgb,var(--accent-1) 6%,transparent);font-style:normal;}
-.khcal-head{text-align:center;font-size:21px;line-height:1.5;margin:0 0 8px;}
-.khcal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;}
-.khcal-dow{text-align:center;font-size:12px;font-weight:700;color:var(--accent-2);padding:4px 0;}
-.khcal-c{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;padding:3px 0;border-radius:10px;color:var(--ink);}
-.khcal-c b{font-size:clamp(14px,4.2vw,18px);font-weight:700;line-height:1.2;}
-.khcal-c i{font-style:normal;font-size:clamp(8px,2.3vw,10px);line-height:1.2;opacity:.62;white-space:nowrap;}
+.khcal{max-width:620px;margin:0 auto 30px;padding:20px 14px 16px;border:1px solid color-mix(in srgb,var(--accent-1) 38%,transparent);border-radius:20px;background:color-mix(in srgb,var(--accent-1) 6%,transparent);font-style:normal;box-sizing:border-box;}
+.khcal-head{text-align:center;font-size:clamp(19px,5.4vw,26px);line-height:1.6;margin:0 0 12px;}
+.khcal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;}
+.khcal-dow{text-align:center;font-size:clamp(8.5px,2.45vw,13px);font-weight:700;color:var(--accent-2);padding:6px 0 8px;white-space:nowrap;overflow:hidden;letter-spacing:-.01em;}
+.khcal-c{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:clamp(50px,13.5vw,70px);padding:4px 0;border-radius:12px;color:var(--ink);}
+.khcal-c b{font-size:clamp(16px,4.9vw,24px);font-weight:700;line-height:1.2;}
+.khcal-c i{font-style:normal;font-size:clamp(8.5px,2.5vw,12px);line-height:1.25;opacity:.64;white-space:nowrap;}
 .khcal-sun b,.khcal-dow.khcal-sun{color:var(--accent-2);}
-.khcal-c.khcal-ev{background:var(--accent-1);box-shadow:0 3px 12px color-mix(in srgb,var(--accent-1) 45%,transparent);}
+.khcal-c.khcal-ev{background:var(--accent-1);box-shadow:0 4px 14px color-mix(in srgb,var(--accent-1) 45%,transparent);}
 .khcal-c.khcal-ev b,.khcal-c.khcal-ev i{color:#fff;opacity:1;-webkit-text-fill-color:#fff;}
-.khcal-foot{text-align:center;font-size:11px;line-height:1.5;margin:10px 4px 0;color:var(--ink);opacity:.62;}
+.khcal-foot{text-align:center;font-size:clamp(13px,3.6vw,16px);font-weight:600;line-height:1.7;margin:14px 6px 2px;color:var(--accent-1);}
+@media(max-width:520px){.khcal{margin-left:-12px;margin-right:-12px;padding-left:8px;padding-right:8px;}.khcal-grid{gap:2px;}}
 .hero-date .hd-lunar,.hero-date .hd-solar{display:block;}
 .hero-date .hd-lunar{font-size:.92em;line-height:1.55;}
 .hero-date .hd-solar{margin-top:2px;}
