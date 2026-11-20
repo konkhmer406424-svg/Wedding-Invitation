@@ -958,7 +958,7 @@ function continueAfterUnlock_(){
 // Here we also remove the owner's KHQR, an uploaded song and guest names, and shrink the photos.
 // ---------------------------------------------------------------------
 // ==== REPLACE with your deployed TRIAL Worker URL (ends with /) ====
-const TRIAL_ENDPOINT = "https://YOUR-TRIAL-WORKER.YOUR-SUBDOMAIN.workers.dev/";
+const TRIAL_ENDPOINT = "https://trial.konkhmer406424.workers.dev/";
 const TRIAL_LAST_KEY = "wib-trial-last";
 const TRIAL_MAX_BYTES = 8 * 1024 * 1024;   // same limit as the Worker
 const TRIAL_COOLDOWN_MS = 15000;
