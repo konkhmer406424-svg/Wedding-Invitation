@@ -950,6 +950,136 @@ function continueAfterUnlock_(){
   if(!state.publishedUrl) publishWebsite();
   else generateGuestLinks();
 }
+// ---------------------------------------------------------------------
+// FREE 48-hour TRIAL link (no payment).
+// The invitation is rendered here, sent ONCE to a separate Cloudflare Worker (trial-worker.js) that keeps it
+// in KV for 48 hours and then deletes it by itself. Nothing is written to GitHub.
+// The Worker adds the watermark and ignores ?to=GuestName when it serves the page.
+// Here we also remove the owner's KHQR, an uploaded song and guest names, and shrink the photos.
+// ---------------------------------------------------------------------
+// ==== REPLACE with your deployed TRIAL Worker URL (ends with /) ====
+const TRIAL_ENDPOINT = "https://YOUR-TRIAL-WORKER.YOUR-SUBDOMAIN.workers.dev/";
+const TRIAL_LAST_KEY = "wib-trial-last";
+const TRIAL_MAX_BYTES = 8 * 1024 * 1024;   // same limit as the Worker
+const TRIAL_COOLDOWN_MS = 15000;
+let trialBusy_ = false;
+
+function trialConfigured(){ return TRIAL_ENDPOINT && TRIAL_ENDPOINT.indexOf("YOUR-") === -1; }
+
+// Smaller copy of a photo (data URL) for the trial link only. Returns the original on any problem.
+function shrinkDataUrl_(dataUrl, maxDim, quality){
+  return new Promise(resolve => {
+    if(typeof dataUrl !== "string" || dataUrl.indexOf("data:image/") !== 0){ resolve(dataUrl); return; }
+    const img = new Image();
+    img.onload = () => {
+      try{
+        const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+        const w = Math.max(1, Math.round(img.naturalWidth * scale));
+        const h = Math.max(1, Math.round(img.naturalHeight * scale));
+        const c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        const ctx = c.getContext("2d");
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        const out = c.toDataURL("image/jpeg", quality);
+        resolve(out.length < dataUrl.length ? out : dataUrl);
+      }catch(e){ resolve(dataUrl); }
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+function trialErrorText_(code){
+  const m = {
+    rate_limited: "⚠️ បង្កើតច្រើនពេកហើយ សូមរង់ចាំប្រហែលមួយម៉ោង រួចសាកល្បងម្តងទៀត",
+    too_big: "⚠️ ឯកសារធំពេក — សូមកាត់បន្ថយចំនួនរូប ឬលុបស៊ុម/ផ្ទៃខាងក្រោមដែលបាន upload ផ្ទាល់ខ្លួន",
+    origin_not_allowed: "⚠️ Worker មិនអនុញ្ញាតគេហទំព័រនេះ (សូមពិនិត្យ ALLOWED_ORIGINS ក្នុង Worker)",
+    kv_not_bound: "⚠️ Worker មិនទាន់ភ្ជាប់ KV (Variable name ត្រូវជា TRIALS)",
+    not_an_invitation: "⚠️ ទិន្នន័យមិនត្រឹមត្រូវ សូមសាកល្បងម្តងទៀត"
+  };
+  return m[code] || ("❌ បង្កើត Link សាកល្បងមិនបាន៖ " + code);
+}
+
+async function createTrialLink(){
+  const statusEl = $("trialStatus");
+  const btn = $("trialLinkBtn");
+  if(trialBusy_) return;
+  if(!trialConfigured()){
+    statusEl.textContent = "⚠️ មិនទាន់បានកំណត់ TRIAL_ENDPOINT ទេ — សូមដាក់ URL របស់ Trial Worker ក្នុង code (ស្វែងរក \"TRIAL_ENDPOINT\")";
+    return;
+  }
+  if(!(state.groomName || state.brideName || state.groomNameEn || state.brideNameEn)){
+    statusEl.textContent = "សូមបំពេញឈ្មោះកូនកម្លោះ/កូនក្រមុំជាមុន";
+    return;
+  }
+  trialBusy_ = true; btn.disabled = true;
+  try{
+    statusEl.textContent = "កំពុងរៀបចំ Link សាកល្បង...";
+    // Trial copy of the project: no KHQR, no guest names, no secrets, smaller photos.
+    const t = Object.assign({}, state, {
+      khqrGroom: null, khqrBride: null, guestNamesFileRaw: "",
+      publishToken: "", publishTokenKey: "", publishedUrl: ""
+    });
+    t.coverPhoto = await shrinkDataUrl_(state.coverPhoto, 1100, 0.72);
+    t.photos = await Promise.all((state.photos || []).map(p => shrinkDataUrl_(p, 800, 0.68)));
+
+    // An uploaded song is big (up to 2 MB): leave it out. Ready-made songs are only an address, so they stay.
+    const savedMusic = musicAsset;
+    if(musicAsset && musicAsset.dataUrl) musicAsset = null;
+    let html;
+    try{ html = renderInvitation(t); } finally { musicAsset = savedMusic; }
+
+    const bytes = new Blob([html]).size;
+    if(bytes > TRIAL_MAX_BYTES){ statusEl.textContent = trialErrorText_("too_big"); return; }
+
+    statusEl.textContent = "កំពុងបញ្ជូន (" + (bytes / 1048576).toFixed(1) + " MB)...";
+    const resp = await fetch(TRIAL_ENDPOINT + "create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ html })
+    });
+    const data = await resp.json().catch(() => ({}));
+    if(!resp.ok || !data.url){ statusEl.textContent = trialErrorText_(data.error || ("HTTP " + resp.status)); return; }
+
+    try{ localStorage.setItem(TRIAL_LAST_KEY, JSON.stringify({ url: data.url, expiresAt: data.expiresAt })); }catch(e){}
+    statusEl.textContent = "✅ បង្កើត Link សាកល្បងរួចរាល់ — ផុតកំណត់ក្នុង " + (data.hours || 48) + " ម៉ោង";
+    renderTrialBox_();
+  }catch(e){
+    console.error("Trial link failed:", e);
+    statusEl.textContent = "❌ បង្កើត Link សាកល្បងមិនបាន៖ " + (e && e.message ? e.message : e);
+  }finally{
+    trialBusy_ = false;
+    setTimeout(() => { btn.disabled = false; }, TRIAL_COOLDOWN_MS);
+  }
+}
+
+function renderTrialBox_(){
+  const box = $("trialLinkBox");
+  if(!box) return;
+  let rec = null;
+  try{ rec = JSON.parse(localStorage.getItem(TRIAL_LAST_KEY) || "null"); }catch(e){}
+  if(!rec || typeof rec.url !== "string" || !/^https:\/\//i.test(rec.url) || !rec.expiresAt || rec.expiresAt <= Date.now()){
+    box.innerHTML = "";
+    return;
+  }
+  const hrs = Math.max(1, Math.ceil((rec.expiresAt - Date.now()) / 3600000));
+  box.innerHTML = `<div style="margin-top:8px;font-size:13px;line-height:1.8;word-break:break-all;">Link សាកល្បង: <a href="${escapeHtml(rec.url)}" target="_blank" rel="noopener">${escapeHtml(rec.url)}</a> &nbsp;•&nbsp; នៅសល់ ~${hrs} ម៉ោង &nbsp;•&nbsp; <button type="button" id="trialCopyBtn" class="pay-link">ចម្លង</button></div>`;
+  const cb = $("trialCopyBtn");
+  if(cb) cb.addEventListener("click", async () => {
+    try{ await navigator.clipboard.writeText(rec.url); }
+    catch(e){
+      const ta = document.createElement("textarea");
+      ta.value = rec.url; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand("copy"); }catch(err){}
+      ta.remove();
+    }
+    cb.textContent = "✓ បានចម្លង";
+  });
+}
+$("trialLinkBtn").addEventListener("click", createTrialLink);
+renderTrialBox_();
+
 $("uploadFilesBtn").addEventListener("click", () => {
   if(isUnlocked()) continueAfterUnlock_();
   else openPaymentChoice_();
