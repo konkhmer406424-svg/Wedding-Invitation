@@ -5,13 +5,23 @@
    Images larger than MAX_CACHED_IMAGE are shown but NOT stored (keeps the cache small).
    Only same-origin GET requests are handled: Google Apps Script, Cloudflare Worker, fonts and CDN are never touched.
    To force everyone to drop old caches, change CACHE_VERSION. */
-const CACHE_VERSION = "wib-v7";
+const CACHE_VERSION = "wib-v8";
 const MAX_CACHED_IMAGE = 1.5 * 1024 * 1024;   // bytes
-const CORE = ["./", "index.html", "style.css", "wib-data.js", "layouts/l1/wib-layout-l1.js", "layouts/l2/wib-layout-l2.js", "layouts/l3/wib-layout-l3.js", "layouts/l4/wib-layout-l4.js", "layouts/l5/wib-layout-l5.js", "layouts/l5/wib-layout-l5.js", "wib-layouts.js", "momentkh.js", "wib-khmercal.js", "wib-render.js", "wib-pickers.js", "wib-ui.js", "logo.png", "manifest.json"];
+const CORE = [
+  "./", "index.html", "style.css", "manifest.json", "logo.png",
+  "wib-data.js", "wib-layouts.js", "wib-render.js", "wib-pickers.js", "wib-ui.js",
+  "momentkh.js", "wib-khmercal.js",
+  "layouts/l1/wib-layout-l1.js", "layouts/l2/wib-layout-l2.js", "layouts/l3/wib-layout-l3.js",
+  "layouts/l4/wib-layout-l4.js", "layouts/l5/l5-clips.js", "layouts/l5/wib-layout-l5.js"
+];
 
 self.addEventListener("install", e => {
   e.waitUntil(
-    caches.open(CACHE_VERSION).then(c => c.addAll(CORE)).catch(() => {}).then(() => self.skipWaiting())
+    // Cache each file on its own: one missing file no longer stops all the others from being stored (addAll is all-or-nothing)
+    caches.open(CACHE_VERSION)
+      .then(c => Promise.allSettled(CORE.map(u => c.add(u))))
+      .catch(() => {})
+      .then(() => self.skipWaiting())
   );
 });
 
