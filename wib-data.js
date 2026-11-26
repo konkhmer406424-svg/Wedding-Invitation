@@ -713,7 +713,8 @@ body.oc-noscroll{overflow:hidden;}
 `;
 
 const MUSIC_BTN_CSS = `
-.music-dock{position:fixed;right:16px;bottom:18px;z-index:100;display:flex;align-items:center;pointer-events:none;}
+.music-dock{position:fixed;right:16px;bottom:calc(var(--lt-bar-h,0px) + 18px);z-index:100;display:flex;align-items:center;pointer-events:none;}
+.music-dock .music-btn{bottom:auto !important;}   /* the trial page's own CSS moves .music-btn with bottom:...; keep the button inside the dock so it stays next to its title */
 .music-btn{pointer-events:auto;position:relative;z-index:2;flex:0 0 56px;box-sizing:border-box;width:56px;height:56px;padding:0;border-radius:50%;border:2.5px solid var(--accent-1);color:var(--accent-1);cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;
   background:radial-gradient(circle at center,transparent 0 17%,color-mix(in srgb, var(--accent-1) 30%, transparent) 17.5% 18.5%,transparent 19% 32%,color-mix(in srgb, var(--accent-1) 15%, transparent) 32.5% 33.5%,transparent 34% 45%,color-mix(in srgb, var(--accent-1) 15%, transparent) 45.5% 46.5%,transparent 47%),conic-gradient(from 20deg,color-mix(in srgb, var(--accent-1) 12%, var(--ctl-bg, var(--card))) 0 22%,var(--ctl-bg, var(--card)) 22% 50%,color-mix(in srgb, var(--accent-1) 12%, var(--ctl-bg, var(--card))) 50% 72%,var(--ctl-bg, var(--card)) 72% 100%),var(--card);
   box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-1) 24%, transparent),0 3px 12px rgba(0,0,0,.22);}
