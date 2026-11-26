@@ -722,9 +722,9 @@ const MUSIC_BTN_CSS = `
 .music-btn:not(.on) .ico-on{display:none;}
 .music-btn.on{animation:mb-spin 3.6s linear infinite;}
 @keyframes mb-spin{to{transform:rotate(360deg);}}
-.mb-title{pointer-events:none;box-sizing:border-box;display:flex;align-items:center;height:30px;margin:0 -28px 0 0;padding:0 34px 2px 2px;border:0;border-bottom:2px solid var(--accent-1);border-radius:0;background:transparent;color:var(--accent-1);opacity:0;visibility:hidden;clip-path:inset(-8px -8px -8px 100%);-webkit-clip-path:inset(-8px -8px -8px 100%);transform:translateX(24px);transition:clip-path .5s ease,-webkit-clip-path .5s ease,transform .5s ease,opacity .25s ease,visibility .5s;}
-.music-dock.on .mb-title{opacity:1;visibility:visible;clip-path:inset(-8px -8px -8px -8px);-webkit-clip-path:inset(-8px -8px -8px -8px);transform:none;}
-.mb-marq{display:block;max-width:150px;overflow:hidden;white-space:nowrap;text-align:left;text-overflow:ellipsis;font-size:13px;font-weight:700;line-height:1.7;text-shadow:0 0 3px var(--card),0 0 6px var(--card);}
+.mb-title{pointer-events:none;box-sizing:border-box;display:flex;align-items:center;justify-content:flex-end;height:30px;width:0;margin:0 -28px 0 0;padding:0 34px 2px 6px;border:0;border-left:2px solid var(--accent-1);border-bottom:2px solid var(--accent-1);border-radius:0;overflow:hidden;background:transparent;color:var(--accent-1);opacity:0;visibility:hidden;transition:width .5s ease,opacity .25s ease,visibility .5s;}
+.music-dock.on .mb-title{opacity:1;visibility:visible;width:var(--mbw,190px);}
+.mb-marq{flex:none;display:block;max-width:150px;overflow:hidden;white-space:nowrap;text-align:left;text-overflow:ellipsis;font-size:13px;font-weight:700;line-height:1.7;text-shadow:0 0 3px var(--card),0 0 6px var(--card);}
 .mb-txt{display:inline-block;min-width:100%;}
 .mb-marq.run{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 86%,transparent 100%);mask-image:linear-gradient(90deg,#000 0,#000 86%,transparent 100%);}
 .mb-marq.run .mb-txt{animation:mb-run 10s linear infinite;}

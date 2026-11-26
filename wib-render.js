@@ -168,7 +168,7 @@ if(bgm){
     mMarq.style.width='0px';
     var w=mTxt.offsetWidth;
     var cap=Math.max(60,Math.min(150,window.innerWidth-130));
-    mMarq.style.width=Math.min(w+1,cap)+'px';
+    mMarq.style.width=Math.min(w+1,cap)+'px'; if(mMarq.parentNode){ mMarq.parentNode.style.setProperty('--mbw',(Math.min(w+1,cap)+42)+'px'); }
     if(w>cap){
       mTxt.style.animationDuration=Math.max(7,Math.round(w/22))+'s';
       mMarq.classList.add('run');
