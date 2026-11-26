@@ -122,10 +122,10 @@ function buildMusicParts(s){
   const musicTitle = music ? String(music.name || "").replace(/\.(mp3|m4a|wav|ogg|aac|flac)$/i, "").trim() : "";
   const musicHtml = music ? `
 <audio id="bgm" src="${music.url ? escapeHtml(music.url) : music.dataUrl}" loop preload="metadata"></audio>
-<button class="music-btn${musicTitle ? " has-title" : ""}" id="musicBtn" type="button" aria-pressed="false" aria-label="Music" title="${escapeHtml(musicTitle || "ចម្រៀង / Music")}">
-  <span class="mb-ico"><svg class="ico-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-  <svg class="ico-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg></span>${musicTitle ? `<span class="mb-marq" id="musicMarq"><span class="mb-txt" id="musicTxt">${escapeHtml(musicTitle)}</span></span>` : ""}
-</button>` : "";
+<div class="music-dock" id="musicDock">${musicTitle ? `<span class="mb-title"><span class="mb-marq" id="musicMarq"><span class="mb-txt" id="musicTxt">${escapeHtml(musicTitle)}</span></span></span>` : ""}<button class="music-btn" id="musicBtn" type="button" aria-pressed="false" aria-label="Music" title="${escapeHtml(musicTitle || "ចម្រៀង / Music")}">
+  <svg class="ico-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+  <svg class="ico-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+</button></div>` : "";
   const html = musicHtml + `
 <div class="open-cover oc-s-${key}" id="openCover" role="dialog" aria-modal="true" aria-label="Open invitation"${previewAttr}>${deco.bg}${p.behind || ""}<div class="oc-inner">${p.top || ""}${namesHtml}${p.mid || ""}${btnHtml}${p.after || ""}${hintHtml}</div>${deco.frame}</div>`;
 
@@ -135,6 +135,7 @@ var bgm=document.getElementById('bgm');
 var playMusic=function(){};
 if(bgm){
   var mBtn=document.getElementById('musicBtn');
+  var mDock=document.getElementById('musicDock');
   var baseVol=0.7;
   var fadeVol=function(){
     var d=bgm.duration, ct=bgm.currentTime, v=baseVol;
@@ -152,6 +153,7 @@ if(bgm){
     if(!mBtn) return;
     var on=!bgm.paused;
     mBtn.classList.toggle('on',on);
+    if(mDock) mDock.classList.toggle('on',on);
     mBtn.setAttribute('aria-pressed',on?'true':'false');
   };
   playMusic=function(){
@@ -162,13 +164,13 @@ if(bgm){
   var mTxt=document.getElementById('musicTxt'), mMarq=document.getElementById('musicMarq');
   var fitTitle=function(){
     if(!mTxt||!mMarq) return;
-    var avail=Math.min(240,window.innerWidth-32)-58;
     mMarq.classList.remove('run'); mTxt.style.animationDuration='';
+    mMarq.style.width='0px';
     var w=mTxt.offsetWidth;
-    if(avail>0 && w>avail){
-      mTxt.style.setProperty('--mb-a',avail+'px');
-      mTxt.style.setProperty('--mb-w',w+'px');
-      mTxt.style.animationDuration=Math.max(9,Math.round((avail+w)/34))+'s';
+    var cap=Math.max(60,Math.min(150,window.innerWidth-130));
+    mMarq.style.width=Math.min(w+1,cap)+'px';
+    if(w>cap){
+      mTxt.style.animationDuration=Math.max(7,Math.round(w/22))+'s';
       mMarq.classList.add('run');
     }
   };

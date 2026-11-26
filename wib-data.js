@@ -713,21 +713,23 @@ body.oc-noscroll{overflow:hidden;}
 `;
 
 const MUSIC_BTN_CSS = `
-.music-btn{position:fixed;right:16px;bottom:18px;z-index:100;box-sizing:border-box;width:46px;height:46px;padding:0;border-radius:999px;border:2.5px solid var(--accent-1);background:var(--ctl-bg, var(--card));color:var(--accent-1);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-1) 24%, transparent),0 3px 12px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:flex-start;cursor:pointer;overflow:hidden;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:width .3s ease,background .2s ease,color .2s ease;}
-.music-btn .mb-ico{flex:0 0 41px;height:100%;display:flex;align-items:center;justify-content:center;}
-.music-btn svg{width:21px;height:21px;filter:drop-shadow(0 0 3px var(--card));}
+.music-dock{position:fixed;right:16px;bottom:18px;z-index:100;display:flex;align-items:flex-end;pointer-events:none;}
+.music-btn{pointer-events:auto;position:relative;z-index:2;flex:0 0 56px;box-sizing:border-box;width:56px;height:56px;padding:0;border-radius:50%;border:2.5px solid var(--accent-1);color:var(--accent-1);cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;
+  background:radial-gradient(circle at center,transparent 0 17%,color-mix(in srgb, var(--accent-1) 30%, transparent) 17.5% 18.5%,transparent 19% 32%,color-mix(in srgb, var(--accent-1) 15%, transparent) 32.5% 33.5%,transparent 34% 45%,color-mix(in srgb, var(--accent-1) 15%, transparent) 45.5% 46.5%,transparent 47%),conic-gradient(from 20deg,color-mix(in srgb, var(--accent-1) 12%, var(--ctl-bg, var(--card))) 0 22%,var(--ctl-bg, var(--card)) 22% 50%,color-mix(in srgb, var(--accent-1) 12%, var(--ctl-bg, var(--card))) 50% 72%,var(--ctl-bg, var(--card)) 72% 100%);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-1) 24%, transparent),0 3px 12px rgba(0,0,0,.22);}
+.music-btn svg{width:22px;height:22px;filter:drop-shadow(0 0 3px var(--card));}
 .music-btn.on .ico-off{display:none;}
 .music-btn:not(.on) .ico-on{display:none;}
-.music-btn.on{background:var(--accent-1);color:#fff;box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-2, var(--accent-1)) 50%, transparent),0 3px 12px rgba(0,0,0,.25);}
-.music-btn.on svg{filter:none;}
-.music-btn .mb-marq{flex:0 0 0;width:0;margin:0;overflow:hidden;white-space:nowrap;text-align:left;text-overflow:ellipsis;font-size:13px;font-weight:700;line-height:1.7;}
-.music-btn.has-title.on{width:min(240px,calc(100vw - 32px));}
-.music-btn.has-title.on .mb-marq{flex:1 1 auto;width:auto;min-width:0;margin-right:12px;}
-.music-btn .mb-txt{display:inline-block;min-width:100%;}
-.music-btn .mb-marq.run{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%);}
-.music-btn .mb-marq.run .mb-txt{animation:mb-run linear infinite;}
-@keyframes mb-run{from{transform:translateX(var(--mb-a,100%));}to{transform:translateX(calc(var(--mb-w,100%) * -1));}}
-@media (prefers-reduced-motion:reduce){.music-btn .mb-marq.run .mb-txt{animation:none;}.music-btn .mb-marq.run{-webkit-mask-image:none;mask-image:none;}}
+.music-btn.on{animation:mb-spin 3.6s linear infinite;}
+@keyframes mb-spin{to{transform:rotate(360deg);}}
+.mb-title{pointer-events:none;box-sizing:border-box;display:flex;align-items:center;height:28px;margin:0 -26px 3px 0;padding:0 31px 0 12px;border:2px solid var(--accent-1);border-radius:999px;background:transparent;color:var(--accent-1);opacity:0;visibility:hidden;transform:translateX(22px);transition:opacity .25s ease,transform .3s ease,visibility .3s;}
+.music-dock.on .mb-title{opacity:1;visibility:visible;transform:none;}
+.mb-marq{display:block;max-width:150px;overflow:hidden;white-space:nowrap;text-align:left;text-overflow:ellipsis;font-size:13px;font-weight:700;line-height:1.7;text-shadow:0 0 3px var(--card),0 0 6px var(--card);}
+.mb-txt{display:inline-block;min-width:100%;}
+.mb-marq.run{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 86%,transparent 100%);mask-image:linear-gradient(90deg,#000 0,#000 86%,transparent 100%);}
+.mb-marq.run .mb-txt{animation:mb-run 10s linear infinite;}
+@keyframes mb-run{0%{transform:none;opacity:0;}6%{opacity:1;}30%{transform:none;opacity:1;}100%{transform:translateX(-100%);opacity:1;}}
+@media (prefers-reduced-motion:reduce){.music-btn.on{animation:none;}.mb-marq.run .mb-txt{animation:none;}.mb-marq.run{-webkit-mask-image:none;mask-image:none;}}
 `;
 
 

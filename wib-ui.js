@@ -440,9 +440,23 @@ function presetAsset_(p){
 }
 function setSongTitle_(tile, text){
   const t = tile.querySelector(".song-txt");
-  if(!t) return;
+  if(!t || t.textContent === text) return;
   t.textContent = text;
-  t.style.animationDuration = Math.max(10, Math.round(text.length * 0.55)) + "s";
+  fitSongTitles_();
+}
+// A title that fits in its button stays still; a longer one waits fully visible, slides left until gone, then shows again.
+function fitSongTitles_(){
+  const g = $("musicGrid");
+  if(!g) return;
+  Array.prototype.forEach.call(g.querySelectorAll(".song-tile"), tile => {
+    const m = tile.querySelector(".song-marq"), t = tile.querySelector(".song-txt");
+    if(!m || !t) return;
+    t.classList.remove("run"); t.style.animationDuration = "";
+    const cw = m.clientWidth;
+    if(!cw) return;   // tab hidden: measured again when the grid becomes visible
+    const w = t.offsetWidth;
+    if(w > cw + 1){ t.style.animationDuration = Math.max(7, Math.round(w / 22)) + "s"; t.classList.add("run"); }
+  });
 }
 function fillPresetSelect_(){
   const g = $("musicGrid");
@@ -467,6 +481,9 @@ function fillPresetSelect_(){
   setSongTitle_(own, "ទាញចូលពីម៉ាស៊ីន");
   own.addEventListener("click", () => $("musicFile").click());
   g.appendChild(own);
+  fitSongTitles_();
+  if(typeof ResizeObserver !== "undefined") new ResizeObserver(() => fitSongTitles_()).observe(g);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitSongTitles_);
 }
 function syncPresetSelect_(){
   const g = $("musicGrid");
