@@ -5,7 +5,7 @@
    Images larger than MAX_CACHED_IMAGE are shown but NOT stored (keeps the cache small).
    Only same-origin GET requests are handled: Google Apps Script, Cloudflare Worker, fonts and CDN are never touched.
    To force everyone to drop old caches, change CACHE_VERSION. */
-const CACHE_VERSION = "wib-v8";
+const CACHE_VERSION = "wib-v14";
 const MAX_CACHED_IMAGE = 1.5 * 1024 * 1024;   // bytes
 const CORE = [
   "./", "index.html", "style.css", "manifest.json", "logo.png",

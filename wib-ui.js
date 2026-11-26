@@ -1007,12 +1007,24 @@ function shrinkDataUrl_(dataUrl, maxDim, quality){
   });
 }
 
+// Random 32-hex ownership key for ONE trial link. Kept only in this browser (localStorage); the Worker stores its hash.
+// Sent again with the link's id, it lets the same owner replace the content of the SAME link. It is not a password.
+function trialSecret_(){
+  const b = new Uint8Array(16);
+  crypto.getRandomValues(b);
+  return Array.from(b, x => x.toString(16).padStart(2, "0")).join("");
+}
+
 function trialErrorText_(code){
   const m = {
     rate_limited: "⚠️ បង្កើតច្រើនពេកហើយ សូមរង់ចាំប្រហែលមួយម៉ោង រួចសាកល្បងម្តងទៀត",
     too_big: "⚠️ ឯកសារធំពេក — សូមកាត់បន្ថយចំនួនរូប ឬលុបស៊ុម/ផ្ទៃខាងក្រោមដែលបាន upload ផ្ទាល់ខ្លួន",
     origin_not_allowed: "⚠️ Worker មិនអនុញ្ញាតគេហទំព័រនេះ (សូមពិនិត្យ ALLOWED_ORIGINS ក្នុង Worker)",
     kv_not_bound: "⚠️ Worker មិនទាន់ភ្ជាប់ KV (Variable name ត្រូវជា TRIALS)",
+    bad_secret: "⚠️ កូដសម្គាល់ Link មិនត្រឹមត្រូវ សូមសាកល្បងម្តងទៀត",
+    forbidden: "⚠️ Link នេះមានម្ចាស់ផ្សេង សូមសាកល្បងម្តងទៀតដើម្បីបង្កើត Link ថ្មី",
+    bad_json: "⚠️ ទិន្នន័យមិនត្រឹមត្រូវ សូមសាកល្បងម្តងទៀត",
+    empty: "⚠️ ទិន្នន័យទទេ សូមសាកល្បងម្តងទៀត",
     not_an_invitation: "⚠️ ទិន្នន័យមិនត្រឹមត្រូវ សូមសាកល្បងម្តងទៀត"
   };
   return m[code] || ("❌ បង្កើត Link សាកល្បងមិនបាន៖ " + code);
@@ -1051,16 +1063,31 @@ async function createTrialLink(){
     if(bytes > TRIAL_MAX_BYTES){ statusEl.textContent = trialErrorText_("too_big"); return; }
 
     statusEl.textContent = "កំពុងបញ្ជូន (" + (bytes / 1048576).toFixed(1) + " MB)...";
-    const resp = await fetch(TRIAL_ENDPOINT + "create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ html })
-    });
-    const data = await resp.json().catch(() => ({}));
+    // The Worker wants { html, slug, secret, id? }. With the id + secret of a link that has not expired yet it REPLACES that
+    // link's content (same address, 48 h restart); otherwise it makes a new link.
+    let prev = null;
+    try{ prev = JSON.parse(localStorage.getItem(TRIAL_LAST_KEY) || "null"); }catch(e){}
+    const reuse = !!(prev && typeof prev.id === "string" && /^[a-f0-9]{32}$/.test(prev.secret || "") && prev.expiresAt > Date.now());
+    const slug = [state.groomNameEn, state.brideNameEn].filter(Boolean).join(" ");
+    const send = async (id, secret) => {
+      const payload = { html, slug, secret };
+      if(id) payload.id = id;
+      const resp = await fetch(TRIAL_ENDPOINT + "create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await resp.json().catch(() => ({}));
+      return { resp, data };
+    };
+    let secret = reuse ? prev.secret : trialSecret_();
+    let res = await send(reuse ? prev.id : null, secret);
+    if(res.data && res.data.error === "forbidden"){ secret = trialSecret_(); res = await send(null, secret); }   // not our link any more -> make a new one
+    const resp = res.resp, data = res.data;
     if(!resp.ok || !data.url){ statusEl.textContent = trialErrorText_(data.error || ("HTTP " + resp.status)); return; }
 
-    try{ localStorage.setItem(TRIAL_LAST_KEY, JSON.stringify({ url: data.url, expiresAt: data.expiresAt })); }catch(e){}
-    statusEl.textContent = "✅ បង្កើត Link សាកល្បងរួចរាល់ — ផុតកំណត់ក្នុង " + (data.hours || 48) + " ម៉ោង";
+    try{ localStorage.setItem(TRIAL_LAST_KEY, JSON.stringify({ url: data.url, id: data.id, secret, expiresAt: data.expiresAt })); }catch(e){}
+    statusEl.textContent = (data.updated ? "✅ បានកែ Link សាកល្បងដដែល — ផុតកំណត់ក្នុង " : "✅ បង្កើត Link សាកល្បងរួចរាល់ — ផុតកំណត់ក្នុង ") + (data.hours || 48) + " ម៉ោង";
     renderTrialBox_();
   }catch(e){
     console.error("Trial link failed:", e);
