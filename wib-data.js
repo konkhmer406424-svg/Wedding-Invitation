@@ -713,11 +713,21 @@ body.oc-noscroll{overflow:hidden;}
 `;
 
 const MUSIC_BTN_CSS = `
-.music-btn{position:fixed;right:16px;bottom:18px;z-index:100;width:44px;height:44px;padding:0;border-radius:50%;border:1px solid color-mix(in srgb, var(--border) 55%, transparent);background:var(--ctl-bg, var(--card));color:var(--accent-1);box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.music-btn svg{width:20px;height:20px;filter:drop-shadow(0 0 3px var(--card));}
-.music-btn .ico-off{display:none;}
+.music-btn{position:fixed;right:16px;bottom:18px;z-index:100;box-sizing:border-box;width:46px;height:46px;padding:0;border-radius:999px;border:2.5px solid var(--accent-1);background:var(--ctl-bg, var(--card));color:var(--accent-1);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-1) 24%, transparent),0 3px 12px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:flex-start;cursor:pointer;overflow:hidden;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:width .3s ease,background .2s ease,color .2s ease;}
+.music-btn .mb-ico{flex:0 0 41px;height:100%;display:flex;align-items:center;justify-content:center;}
+.music-btn svg{width:21px;height:21px;filter:drop-shadow(0 0 3px var(--card));}
+.music-btn.on .ico-off{display:none;}
 .music-btn:not(.on) .ico-on{display:none;}
-.music-btn.on{background:var(--accent-1);color:#fff;}
+.music-btn.on{background:var(--accent-1);color:#fff;box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-2, var(--accent-1)) 50%, transparent),0 3px 12px rgba(0,0,0,.25);}
+.music-btn.on svg{filter:none;}
+.music-btn .mb-marq{flex:0 0 0;width:0;margin:0;overflow:hidden;white-space:nowrap;text-align:left;text-overflow:ellipsis;font-size:13px;font-weight:700;line-height:1.7;}
+.music-btn.has-title.on{width:min(240px,calc(100vw - 32px));}
+.music-btn.has-title.on .mb-marq{flex:1 1 auto;width:auto;min-width:0;margin-right:12px;}
+.music-btn .mb-txt{display:inline-block;min-width:100%;}
+.music-btn .mb-marq.run{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%);}
+.music-btn .mb-marq.run .mb-txt{animation:mb-run linear infinite;}
+@keyframes mb-run{from{transform:translateX(var(--mb-a,100%));}to{transform:translateX(calc(var(--mb-w,100%) * -1));}}
+@media (prefers-reduced-motion:reduce){.music-btn .mb-marq.run .mb-txt{animation:none;}.music-btn .mb-marq.run{-webkit-mask-image:none;mask-image:none;}}
 `;
 
 

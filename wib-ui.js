@@ -442,7 +442,7 @@ function setSongTitle_(tile, text){
   const t = tile.querySelector(".song-txt");
   if(!t) return;
   t.textContent = text;
-  t.style.animationDuration = Math.max(6, Math.round(text.length * 0.38)) + "s";
+  t.style.animationDuration = Math.max(10, Math.round(text.length * 0.55)) + "s";
 }
 function fillPresetSelect_(){
   const g = $("musicGrid");
@@ -952,43 +952,19 @@ function continueAfterUnlock_(){
 }
 // ---------------------------------------------------------------------
 // FREE 48-hour TRIAL link (no payment).
-// The invitation is rendered here and sent to a separate Cloudflare Worker (trial-worker.js) that keeps it
-// in KV and deletes it by itself 48 hours after the LAST edit. Nothing is written to GitHub.
-// First click = a new link  .../t/<english-names>-<random>.  Next clicks = the SAME link is updated
-// (this browser keeps a secret that proves it is the owner). "Link ថ្មី" makes a different link.
+// The invitation is rendered here, sent ONCE to a separate Cloudflare Worker (trial-worker.js) that keeps it
+// in KV for 48 hours and then deletes it by itself. Nothing is written to GitHub.
 // The Worker adds the watermark and ignores ?to=GuestName when it serves the page.
 // Here we also remove the owner's KHQR, an uploaded song and guest names, and shrink the photos.
 // ---------------------------------------------------------------------
 // ==== REPLACE with your deployed TRIAL Worker URL (ends with /) ====
-const TRIAL_ENDPOINT = "https://trial.konkhmer406424.workers.dev/";
-const TRIAL_LAST_KEY = "wib-trial-last";   // this browser's last trial link: { url, id, secret, slug, expiresAt }
+const TRIAL_ENDPOINT = "https://YOUR-TRIAL-WORKER.YOUR-SUBDOMAIN.workers.dev/";
+const TRIAL_LAST_KEY = "wib-trial-last";
 const TRIAL_MAX_BYTES = 8 * 1024 * 1024;   // same limit as the Worker
 const TRIAL_COOLDOWN_MS = 15000;
-const TRIAL_BTN_TEXT = "🔗 បង្កើត Link សាកល្បង (ឥតគិតថ្លៃ · ៤៨ម៉ោង)";
-const TRIAL_BTN_UPDATE_TEXT = "🔄 ធ្វើបច្ចុប្បន្នភាព Link សាកល្បង (Link ដដែល)";
 let trialBusy_ = false;
 
 function trialConfigured(){ return TRIAL_ENDPOINT && TRIAL_ENDPOINT.indexOf("YOUR-") === -1; }
-
-// English names for the end of the link: "sokha-srey-pov". Empty names -> "wedding".
-function trialSlug_(){
-  const g = asciiSafe(state.groomNameEn).replace(/_+/g, "-");
-  const b = asciiSafe(state.brideNameEn).replace(/_+/g, "-");
-  const slug = [g, b].filter(Boolean).join("-").toLowerCase().replace(/^-+|-+$/g, "").slice(0, 40);
-  return slug || "wedding";
-}
-function trialSecret_(){
-  const a = new Uint8Array(16);
-  crypto.getRandomValues(a);
-  return Array.from(a, x => x.toString(16).padStart(2, "0")).join("");   // 32 hex characters
-}
-function trialLoad_(){
-  try{
-    const r = JSON.parse(localStorage.getItem(TRIAL_LAST_KEY) || "null");
-    if(r && typeof r.url === "string" && /^https:\/\//i.test(r.url) && r.expiresAt > Date.now()) return r;
-  }catch(e){}
-  return null;
-}
 
 // Smaller copy of a photo (data URL) for the trial link only. Returns the original on any problem.
 function shrinkDataUrl_(dataUrl, maxDim, quality){
@@ -1020,8 +996,7 @@ function trialErrorText_(code){
     too_big: "⚠️ ឯកសារធំពេក — សូមកាត់បន្ថយចំនួនរូប ឬលុបស៊ុម/ផ្ទៃខាងក្រោមដែលបាន upload ផ្ទាល់ខ្លួន",
     origin_not_allowed: "⚠️ Worker មិនអនុញ្ញាតគេហទំព័រនេះ (សូមពិនិត្យ ALLOWED_ORIGINS ក្នុង Worker)",
     kv_not_bound: "⚠️ Worker មិនទាន់ភ្ជាប់ KV (Variable name ត្រូវជា TRIALS)",
-    not_an_invitation: "⚠️ ទិន្នន័យមិនត្រឹមត្រូវ សូមសាកល្បងម្តងទៀត",
-    forbidden: "⚠️ មិនអាចកែ Link នេះបានទេ (សោមិនត្រូវ) — សូមចុច \"បង្កើត Link ថ្មី\""
+    not_an_invitation: "⚠️ ទិន្នន័យមិនត្រឹមត្រូវ សូមសាកល្បងម្តងទៀត"
   };
   return m[code] || ("❌ បង្កើត Link សាកល្បងមិនបាន៖ " + code);
 }
@@ -1058,25 +1033,17 @@ async function createTrialLink(){
     const bytes = new Blob([html]).size;
     if(bytes > TRIAL_MAX_BYTES){ statusEl.textContent = trialErrorText_("too_big"); return; }
 
-    // Same link (update) when this browser already has a live link for the SAME english names; otherwise a new one.
-    const slug = trialSlug_();
-    const prev = trialLoad_();
-    const reuse = !!(prev && prev.id && prev.secret && prev.slug === slug);
-    const secret = reuse ? prev.secret : trialSecret_();
-
     statusEl.textContent = "កំពុងបញ្ជូន (" + (bytes / 1048576).toFixed(1) + " MB)...";
     const resp = await fetch(TRIAL_ENDPOINT + "create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ html, slug, secret, id: reuse ? prev.id : undefined })
+      body: JSON.stringify({ html })
     });
     const data = await resp.json().catch(() => ({}));
     if(!resp.ok || !data.url){ statusEl.textContent = trialErrorText_(data.error || ("HTTP " + resp.status)); return; }
 
-    try{ localStorage.setItem(TRIAL_LAST_KEY, JSON.stringify({ url: data.url, id: data.id, secret, slug, expiresAt: data.expiresAt })); }catch(e){}
-    statusEl.textContent = data.updated
-      ? "✅ បានធ្វើបច្ចុប្បន្នភាព Link ដដែល — ផុតកំណត់ក្នុង " + (data.hours || 48) + " ម៉ោងពីពេលនេះ (ប្រហែល ១ នាទី ទើបអ្នកផ្សេងឃើញកំណែថ្មី)"
-      : "✅ បង្កើត Link សាកល្បងរួចរាល់ — ផុតកំណត់ក្នុង " + (data.hours || 48) + " ម៉ោង";
+    try{ localStorage.setItem(TRIAL_LAST_KEY, JSON.stringify({ url: data.url, expiresAt: data.expiresAt })); }catch(e){}
+    statusEl.textContent = "✅ បង្កើត Link សាកល្បងរួចរាល់ — ផុតកំណត់ក្នុង " + (data.hours || 48) + " ម៉ោង";
     renderTrialBox_();
   }catch(e){
     console.error("Trial link failed:", e);
@@ -1089,13 +1056,15 @@ async function createTrialLink(){
 
 function renderTrialBox_(){
   const box = $("trialLinkBox");
-  const btn = $("trialLinkBtn");
   if(!box) return;
-  const rec = trialLoad_();
-  if(btn) btn.textContent = (rec && rec.id && rec.secret) ? TRIAL_BTN_UPDATE_TEXT : TRIAL_BTN_TEXT;
-  if(!rec){ box.innerHTML = ""; return; }
+  let rec = null;
+  try{ rec = JSON.parse(localStorage.getItem(TRIAL_LAST_KEY) || "null"); }catch(e){}
+  if(!rec || typeof rec.url !== "string" || !/^https:\/\//i.test(rec.url) || !rec.expiresAt || rec.expiresAt <= Date.now()){
+    box.innerHTML = "";
+    return;
+  }
   const hrs = Math.max(1, Math.ceil((rec.expiresAt - Date.now()) / 3600000));
-  box.innerHTML = `<div style="margin-top:8px;font-size:13px;line-height:1.8;word-break:break-all;">Link សាកល្បង: <a href="${escapeHtml(rec.url)}" target="_blank" rel="noopener">${escapeHtml(rec.url)}</a> &nbsp;•&nbsp; នៅសល់ ~${hrs} ម៉ោង &nbsp;•&nbsp; <button type="button" id="trialCopyBtn" class="pay-link">ចម្លង</button> &nbsp;•&nbsp; <button type="button" id="trialNewBtn" class="pay-link">បង្កើត Link ថ្មី</button></div>`;
+  box.innerHTML = `<div style="margin-top:8px;font-size:13px;line-height:1.8;word-break:break-all;">Link សាកល្បង: <a href="${escapeHtml(rec.url)}" target="_blank" rel="noopener">${escapeHtml(rec.url)}</a> &nbsp;•&nbsp; នៅសល់ ~${hrs} ម៉ោង &nbsp;•&nbsp; <button type="button" id="trialCopyBtn" class="pay-link">ចម្លង</button></div>`;
   const cb = $("trialCopyBtn");
   if(cb) cb.addEventListener("click", async () => {
     try{ await navigator.clipboard.writeText(rec.url); }
@@ -1106,11 +1075,6 @@ function renderTrialBox_(){
       ta.remove();
     }
     cb.textContent = "✓ បានចម្លង";
-  });
-  const nb = $("trialNewBtn");
-  if(nb) nb.addEventListener("click", () => {
-    try{ localStorage.removeItem(TRIAL_LAST_KEY); }catch(e){}   // forget the old link here (it still works until it expires)
-    createTrialLink();
   });
 }
 $("trialLinkBtn").addEventListener("click", createTrialLink);

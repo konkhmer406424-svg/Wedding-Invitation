@@ -119,11 +119,12 @@ function buildMusicParts(s){
 
   const css = (music ? MUSIC_BTN_CSS : "") + OC_BASE_CSS + (imgU ? COVER_IMG_STYLES[key].css(imgU) : cfg.css) + deco.css + (sealSp ? SEAL_BTN_CSS : "");
 
+  const musicTitle = music ? String(music.name || "").replace(/\.(mp3|m4a|wav|ogg|aac|flac)$/i, "").trim() : "";
   const musicHtml = music ? `
 <audio id="bgm" src="${music.url ? escapeHtml(music.url) : music.dataUrl}" loop preload="metadata"></audio>
-<button class="music-btn" id="musicBtn" type="button" aria-pressed="false" aria-label="Music" title="ចម្រៀង / Music">
-  <svg class="ico-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-  <svg class="ico-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+<button class="music-btn${musicTitle ? " has-title" : ""}" id="musicBtn" type="button" aria-pressed="false" aria-label="Music" title="${escapeHtml(musicTitle || "ចម្រៀង / Music")}">
+  <span class="mb-ico"><svg class="ico-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+  <svg class="ico-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg></span>${musicTitle ? `<span class="mb-marq" id="musicMarq"><span class="mb-txt" id="musicTxt">${escapeHtml(musicTitle)}</span></span>` : ""}
 </button>` : "";
   const html = musicHtml + `
 <div class="open-cover oc-s-${key}" id="openCover" role="dialog" aria-modal="true" aria-label="Open invitation"${previewAttr}>${deco.bg}${p.behind || ""}<div class="oc-inner">${p.top || ""}${namesHtml}${p.mid || ""}${btnHtml}${p.after || ""}${hintHtml}</div>${deco.frame}</div>`;
@@ -158,6 +159,22 @@ if(bgm){
   };
   bgm.addEventListener('play',syncMusic);
   bgm.addEventListener('pause',syncMusic);
+  var mTxt=document.getElementById('musicTxt'), mMarq=document.getElementById('musicMarq');
+  var fitTitle=function(){
+    if(!mTxt||!mMarq) return;
+    var avail=Math.min(240,window.innerWidth-32)-58;
+    mMarq.classList.remove('run'); mTxt.style.animationDuration='';
+    var w=mTxt.offsetWidth;
+    if(avail>0 && w>avail){
+      mTxt.style.setProperty('--mb-a',avail+'px');
+      mTxt.style.setProperty('--mb-w',w+'px');
+      mTxt.style.animationDuration=Math.max(9,Math.round((avail+w)/34))+'s';
+      mMarq.classList.add('run');
+    }
+  };
+  fitTitle();
+  window.addEventListener('resize',fitTitle);
+  if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(fitTitle); }
   syncMusic();
   if(mBtn){ mBtn.addEventListener('click',function(){ if(bgm.paused){ playMusic(); } else { bgm.pause(); } }); }
   document.addEventListener('visibilitychange',function(){
